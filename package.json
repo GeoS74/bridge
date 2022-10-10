@@ -1,0 +1,25 @@
+{
+  "name": "bridge",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "db:init": "node ./libs/db.init.js",
+    "db:drop": "node ./libs/db.init.js --drop",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "GeoS",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "log4js": "^6.7.0",
+    "pg": "^8.8.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.2"
+  }
+}
