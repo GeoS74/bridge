@@ -35,8 +35,8 @@ const data = {
   await pool.query(`
     CREATE TABLE brands (
       id SERIAL PRIMARY KEY,
-      createdat TIMESTAMP DEFAULT NOW(),
-      updatedat TIMESTAMP DEFAULT NOW(),
+      createdat TIMESTAMP NOT NULL DEFAULT NOW(),
+      updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
       title TEXT
     );
   `)
@@ -46,34 +46,38 @@ const data = {
   await pool.query(`
     CREATE TABLE suppliers (
       id SERIAL PRIMARY KEY,
-      createdat TIMESTAMP DEFAULT NOW(),
-      updatedat TIMESTAMP DEFAULT NOW(),
+      createdat TIMESTAMP NOT NULL DEFAULT NOW(),
+      updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
       title TEXT
     );
   `)
     .then(() => logger.info('create table "suppliers"'))
     .catch((error) => logger.warn(error.message));
 
-  // await pool.query(`
-  //   CREATE TABLE bovid (
-  //     id SERIAL PRIMARY KEY,
-  //     createdat TIMESTAMP DEFAULT NOW(),
-  //     updatedat TIMESTAMP DEFAULT NOW(),
-  //     title TEXT
-  //   );
-  // `)
-  //   .then(() => logger.info('create table "suppliers"'))
-  //   .catch((error) => logger.warn(error.message));
+  await pool.query(`
+    CREATE TABLE bovid (
+      id SERIAL PRIMARY KEY,
+      createdat TIMESTAMP NOT NULL DEFAULT NOW(),
+      updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
+      code TEXT UNIQUE NOT NULL,
+      article TEXT,
+      title TEXT,
+      amount INTEGER
+    );
+  `)
+    .then(() => logger.info('create table "bovid"'))
+    .catch((error) => logger.warn(error.message));
 
   await pool.query(`
     CREATE TABLE positions (
       id SERIAL PRIMARY KEY,
-      createdat TIMESTAMP DEFAULT NOW(),
-      updatedat TIMESTAMP DEFAULT NOW(),
-      brand_id INTEGER REFERENCES brands,
-      supplier_id INTEGER REFERENCES suppliers,
+      createdat TIMESTAMP NOT NULL DEFAULT NOW(),
+      updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
+      brand_id INTEGER NOT NULL REFERENCES brands,
+      supplier_id INTEGER NOT NULL REFERENCES suppliers,
+      bovid_id INTEGER REFERENCES bovid,
       article TEXT,
-      title TEXT,
+      title TEXT
     );
   `)
     .then(() => logger.info('create table "positions"'))
@@ -82,9 +86,9 @@ const data = {
   await pool.query(`
     CREATE TABLE prices (
       id BIGSERIAL PRIMARY KEY,
-      createdat TIMESTAMP DEFAULT NOW(),
-      position_id INTEGER REFERENCES positions,
-      price REAL
+      createdat TIMESTAMP NOT NULL DEFAULT NOW(),
+      position_id INTEGER NOT NULL REFERENCES positions,
+      price REAL NOT NULL
     );
   `)
     .then(() => logger.info('create table "prices"'))
