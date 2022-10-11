@@ -4,7 +4,6 @@ module.exports = {
   server: {
     host: process.env.SERVER_HOST || 'localhost',
     port: process.env.SERVER_PORT || 3100,
-    domain: process.env.SERVER_DOMAIN || 'localhost:3100',
   },
   postgres: {
     user: process.env.DB_USER || 'postgres',
