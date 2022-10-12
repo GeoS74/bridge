@@ -44,14 +44,14 @@ const data = {
     .catch((error) => logger.warn(error.message));
 
   await pool.query(`
-    CREATE TABLE suppliers (
+    CREATE TABLE providers (
       id SERIAL PRIMARY KEY,
       createdat TIMESTAMP NOT NULL DEFAULT NOW(),
       updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
       title TEXT
     );
   `)
-    .then(() => logger.info('create table "suppliers"'))
+    .then(() => logger.info('create table "providers"'))
     .catch((error) => logger.warn(error.message));
 
   await pool.query(`
@@ -74,7 +74,7 @@ const data = {
       createdat TIMESTAMP NOT NULL DEFAULT NOW(),
       updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
       brand_id INTEGER NOT NULL REFERENCES brands,
-      supplier_id INTEGER NOT NULL REFERENCES suppliers,
+      provider_id INTEGER NOT NULL REFERENCES providers,
       bovid_id INTEGER REFERENCES bovid,
       article TEXT,
       title TEXT
