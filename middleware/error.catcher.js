@@ -12,7 +12,20 @@ module.exports = async (ctx, next) => {
       return;
     }
 
-    logger.error(error.message);
+    if(error.code) { //ошибки PostgreSQL
+      if(error.code === '23503'){
+        ctx.status = 400;
+        ctx.body = {
+          error: 'проверьте правильность идентификатора бренда или поставщика'
+        }
+        return;
+      }
+      logger.error(error.detail)
+    }
+    else {
+      logger.error(error.message);
+    }
+
     ctx.status = 500;
     ctx.body = {
       error: 'internal server error',

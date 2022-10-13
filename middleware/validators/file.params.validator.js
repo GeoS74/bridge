@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const logger = require('../../libs/logger');
 
-module.exports.file = async (ctx, next) => {
+module.exports.params = async (ctx, next) => {
   if (!ctx.request.files) {
     ctx.throw(400, 'file not uploaded');
   }
@@ -29,24 +29,6 @@ module.exports.file = async (ctx, next) => {
       _deleteFile(ctx.request.files);
       ctx.throw(400, 'file must be in excel format');
   }
-
-  await next();
-};
-
-module.exports.params = async (ctx, next) => {
-  const brandId = parseInt(ctx.request?.body?.brand_id, 10);
-  if (!brandId) {
-    _deleteFile(ctx.request.files);
-    ctx.throw(404, 'brand not found');
-  }
-  ctx.request.body.brandId = brandId;
-
-  const providerId = parseInt(ctx.request?.body?.provider_id, 10);
-  if (!providerId) {
-    _deleteFile(ctx.request.files);
-    ctx.throw(404, 'provider not found');
-  }
-  ctx.request.body.providerId = providerId;
 
   await next();
 };

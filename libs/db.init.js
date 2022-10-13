@@ -61,6 +61,7 @@ const data = {
       updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
       code TEXT UNIQUE NOT NULL,
       article TEXT,
+      article_parse TEXT,
       title TEXT,
       amount INTEGER
     );
@@ -77,6 +78,7 @@ const data = {
       provider_id INTEGER NOT NULL REFERENCES providers,
       bovid_id INTEGER REFERENCES bovid,
       article TEXT,
+      article_parse TEXT,
       title TEXT
     );
   `)
