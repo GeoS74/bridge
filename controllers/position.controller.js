@@ -3,16 +3,25 @@ const db = require('../libs/db');
 
 module.exports.add = async (ctx) => {
   const { brandId, providerId } = ctx.request.body;
+  const start = Date.now();
 
   for (const position of ctx.positions) {
     const data = await _makeData(Object.values(position), brandId, providerId);
-    const newPosition = await _insertPosition(Object.values(data).slice(0, 6));
-    await _insertPrice(newPosition.id, data.price);
+
+    if (data.articleParse) {
+      let pos = await _updatePosition(data);
+
+      if (!pos) {
+        pos = await _insertPosition(data);
+      }
+      await _insertPrice(pos.id, data.price);
+    }
   }
 
   ctx.status = 200;
   ctx.body = {
     message: 'file upload',
+    time: (Date.now() - start) / 1000,
   };
 };
 
@@ -36,12 +45,23 @@ function _getBovidId(articleParse) {
     .then((res) => res.rows[0]);
 }
 
+function _updatePosition(data) {
+  return db.query(`UPDATE positions
+  SET
+    updatedat=DEFAULT,
+    title=$1
+  WHERE article_parse=$2 AND brand_id=$3 AND provider_id=$4
+  RETURNING *
+  `, [data.title, data.articleParse, data.brandId, data.providerId])
+    .then((res) => res.rows[0]);
+}
+
 function _insertPosition(data) {
   return db.query(`INSERT INTO positions
     (bovid_id, brand_id, provider_id, article, title, article_parse)
     VALUES ($1, $2, $3, $4, $5, $6)
     RETURNING *
-  `, data)
+  `, [data.bovidId, data.brandId, data.providerId, data.article, data.title, data.articleParse])
     .then((res) => res.rows[0]);
 }
 

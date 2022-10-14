@@ -13,7 +13,7 @@ function _readExceltoArray(filePath) {
   const workbook = XLSX.readFile(filePath);
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
-  return XLSX.utils.sheet_to_json(worksheet);
+  return XLSX.utils.sheet_to_json(worksheet, { defval: '' });
 }
 
 function _delFile(filepath) {

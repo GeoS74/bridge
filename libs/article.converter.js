@@ -2,7 +2,7 @@ const dictionary = require('../dictionary/russian.symbol.json');
 
 module.exports = (word) => {
   word = _translit(word.toLowerCase().trim());
-  return _parseToArray(word).sort().join('-');
+  return _parseToArray(word).sort().join('');
 };
 
 function _parseToArray(word) {

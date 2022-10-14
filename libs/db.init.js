@@ -81,6 +81,7 @@ const data = {
       article_parse TEXT,
       title TEXT
     );
+    CREATE INDEX positions_idx ON positions (article_parse, brand_id, provider_id);
   `)
     .then(() => logger.info('create table "positions"'))
     .catch((error) => logger.warn(error.message));
