@@ -1,14 +1,3 @@
- select article, price 
-  from positions 
-  join prices p1 
-  on positions.id = p1.position_id 
-  where p1.createdat = (select max(createdat) 
-    from prices p2 
-    where p1.position_id = p2.position_id);  
-
-
-select max(createdat) from prices group by position_id;  
-
 -- this is work
 select article, title, price
 from positions p1
@@ -18,3 +7,5 @@ where p2.createdat = (
   select max(createdat) from prices p3
   where p2.position_id=p3.position_id
 );
+
+select max(createdat) from prices group by position_id;  
