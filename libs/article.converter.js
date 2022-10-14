@@ -5,13 +5,13 @@ module.exports = (word) => {
   return _parseToArray(word).sort().join('-');
 };
 
-function _parseToArray(word){
+function _parseToArray(word) {
   return word.match(/[a-z\d]+/g) || [];
 }
 
 function _translit(word) {
   let result = '';
-  for( let i = 0; i < word.length; i++){
+  for (let i = 0; i < word.length; i += 1) {
     result += dictionary[word[i]] || word[i];
   }
   return result;

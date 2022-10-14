@@ -1,6 +1,8 @@
 const XLSX = require('xlsx');
 const fs = require('fs');
 
+const logger = require('../libs/logger');
+
 module.exports.upload = async (ctx, next) => {
   ctx.positions = _readExceltoArray(ctx.request.files.file.filepath);
   _delFile(ctx.request.files.file.filepath);

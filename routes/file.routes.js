@@ -21,12 +21,12 @@ const optional = {
 const router = new Router({ prefix: '/api/file' });
 
 router.post(
-  '/upload', 
-  koaBody(optional), 
-  fileValidator.params, 
+  '/upload',
+  koaBody(optional),
+  fileValidator.params,
   fileController.upload,
-  positionValidator.params, 
-  positionController.add
+  positionValidator.params,
+  positionController.add,
 );
 
 module.exports = router.routes();

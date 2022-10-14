@@ -12,17 +12,16 @@ module.exports = async (ctx, next) => {
       return;
     }
 
-    if(error.code) { //ошибки PostgreSQL
-      if(error.code === '23503'){
+    if (error.code) { // ошибки PostgreSQL
+      if (error.code === '23503') {
         ctx.status = 400;
         ctx.body = {
-          error: 'проверьте правильность идентификатора бренда или поставщика'
-        }
+          error: 'проверьте правильность идентификатора бренда или поставщика',
+        };
         return;
       }
-      logger.error(error.detail)
-    }
-    else {
+      logger.error(error.detail);
+    } else {
       logger.error(error.message);
     }
 
