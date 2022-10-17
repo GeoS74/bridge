@@ -23,7 +23,6 @@ where M.createdat = (
   select max(createdat) from prices p3
   where M.position_id=p3.position_id
 )
-and p1.bovid_id is null
 offset 150 limit 10;
 
 -- query count compare positions
