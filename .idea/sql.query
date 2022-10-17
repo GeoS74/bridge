@@ -11,14 +11,19 @@ where p2.createdat = (
 select max(createdat) from prices group by position_id;  
 
 -- query positions
-select B.code, p1.article, p1.title, p2.price, B.amount, p2.createdat
+select R.title as brand, B.code, p1.article, p1.title, M.price, B.amount, M.createdat
 from positions p1
-join prices p2
-on p1.id=p2.position_id
+join prices M
+on p1.id=M.position_id
 join bovid B
 on B.id=p1.bovid_id
-where p2.createdat = (
+join brands R
+on p1.brand_id=R.id
+where M.createdat = (
   select max(createdat) from prices p3
-  where p2.position_id=p3.position_id
+  where M.position_id=p3.position_id
 )
-limit 10;
+offset 150 limit 10;
+
+-- query count compare positions
+select count(*) from positions where bovid_id is not null;

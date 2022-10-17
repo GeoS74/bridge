@@ -7,7 +7,7 @@ module.exports.addBovid = async (ctx) => {
   let i = 0;
   for (const position of ctx.positions) {
     i++;
-    if(!(i%100)) {
+    if (!(i % 100)) {
       console.log(`writed: ${i}`);
       console.log(process.memoryUsage().heapUsed);
     }
@@ -15,7 +15,7 @@ module.exports.addBovid = async (ctx) => {
     const data = await _makeDataBovid(Object.values(position));
 
     if (data.articleParse) {
-      let pos = await _updatePositionBovid(data);
+      const pos = await _updatePositionBovid(data);
 
       if (!pos) {
         await _insertPositionBovid(data);
@@ -29,7 +29,6 @@ module.exports.addBovid = async (ctx) => {
     time: (Date.now() - start) / 1000,
   };
 };
-
 
 async function _makeDataBovid(row) {
   const articleParse = articleConv(row[1]);
@@ -59,14 +58,11 @@ function _insertPositionBovid(data) {
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *
   `, [data.code, data.article, data.title, data.amount, data.articleParse])
-    .then((res) => res.rows[0]).catch(error => {
+    .then((res) => res.rows[0]).catch((error) => {
       console.log(error);
-      throw error
+      throw error;
     });
 }
-
-
-
 
 module.exports.add = async (ctx) => {
   const { brandId, providerId } = ctx.request.body;
@@ -75,11 +71,11 @@ module.exports.add = async (ctx) => {
   let i = 0;
   for (const position of ctx.positions) {
     i++;
-    if(!(i%100)) {
+    if (!(i % 100)) {
       console.log(`writed: ${i}`);
       console.log(process.memoryUsage().heapUsed);
     }
-    
+
     const data = await _makeData(Object.values(position), brandId, providerId);
 
     if (data.articleParse) {
