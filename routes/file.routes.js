@@ -29,4 +29,12 @@ router.post(
   positionController.add,
 );
 
+router.post(
+  '/upload/bovid',
+  koaBody(optional),
+  fileValidator.params,
+  fileController.upload,
+  positionController.addBovid,
+);
+
 module.exports = router.routes();

@@ -1,7 +1,7 @@
 const dictionary = require('../dictionary/russian.symbol.json');
 
 module.exports = (word) => {
-  word = _translit(word.toLowerCase().trim());
+  word = _translit(word.toString().toLowerCase().trim());
   return _parseToArray(word).sort().join('');
 };
 

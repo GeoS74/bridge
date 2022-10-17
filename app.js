@@ -19,8 +19,8 @@ const app = new Koa();
 
 app.use(errorCatcher);
 app.use(clientRoutes);
-app.use(fileRoutes);
 app.use(brandRoutes);
 app.use(providerRoutes);
+app.use(fileRoutes);
 
 module.exports = app;

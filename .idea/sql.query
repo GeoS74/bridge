@@ -1,4 +1,4 @@
--- this is work
+-- query simple positions
 select article, title, price
 from positions p1
 join prices p2
@@ -9,3 +9,16 @@ where p2.createdat = (
 );
 
 select max(createdat) from prices group by position_id;  
+
+-- query positions
+select B.code, p1.article, p1.title, p2.price, B.amount, p2.createdat
+from positions p1
+join prices p2
+on p1.id=p2.position_id
+join bovid B
+on B.id=p1.bovid_id
+where p2.createdat = (
+  select max(createdat) from prices p3
+  where p2.position_id=p3.position_id
+)
+limit 10;

@@ -93,6 +93,7 @@ const data = {
       position_id INTEGER NOT NULL REFERENCES positions,
       price REAL NOT NULL
     );
+    CREATE INDEX prices_idx ON prices (position_id);
   `)
     .then(() => logger.info('create table "prices"'))
     .catch((error) => logger.warn(error.message));
