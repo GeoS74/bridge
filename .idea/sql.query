@@ -15,7 +15,7 @@ select R.title as brand, B.code, p1.article, p1.title, M.price, B.amount, M.crea
 from positions p1
 join prices M
 on p1.id=M.position_id
-join bovid B
+left join bovid B
 on B.id=p1.bovid_id
 join brands R
 on p1.brand_id=R.id
@@ -23,6 +23,7 @@ where M.createdat = (
   select max(createdat) from prices p3
   where M.position_id=p3.position_id
 )
+and p1.bovid_id is null
 offset 150 limit 10;
 
 -- query count compare positions
