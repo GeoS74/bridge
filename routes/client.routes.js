@@ -24,4 +24,9 @@ router.get('/brands', async (ctx) => {
   ctx.body = fs.createReadStream(path.join(__dirname, '../client/brands.html'));
 });
 
+router.get('/test', async (ctx) => {
+  ctx.set('content-type', 'text/html; charset=utf-8');
+  ctx.body = fs.createReadStream(path.join(__dirname, '../client/test.html'));
+});
+
 module.exports = router.routes();
