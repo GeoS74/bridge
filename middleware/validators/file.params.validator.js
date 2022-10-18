@@ -17,6 +17,11 @@ module.exports.params = async (ctx, next) => {
     ctx.throw(400, 'field name "file" is empty');
   }
 
+  if (Array.isArray(ctx.request.files.file)) {
+    _deleteFile(ctx.request.files);
+    ctx.throw(400, 'more than 1 file received by field "file"');
+  }
+
   // if (ctx.request.files.file.size < 27000) {
   //   _deleteFile(ctx.request.files);
   //   ctx.throw(400, 'file is empty');
@@ -35,8 +40,13 @@ module.exports.params = async (ctx, next) => {
 
 function _deleteFile(files) {
   for (const file of Object.values(files)) {
-    fs.unlink(file.filepath, (err) => {
-      if (err) logger.error(err);
-    });
+    // received more than 1 file in any field with the same name
+    if (Array.isArray(file)) {
+      _deleteFile(file);
+    } else {
+      fs.unlink(file.filepath, (err) => {
+        if (err) logger.error(err);
+      });
+    }
   }
 }
