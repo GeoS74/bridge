@@ -20,10 +20,9 @@ module.exports = async (ctx, next) => {
         };
         return;
       }
-      logger.error(error.detail);
-    } else {
-      logger.error(error.message);
     }
+
+    logger.error(error.message);
 
     ctx.status = 500;
     ctx.body = {
