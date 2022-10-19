@@ -37,9 +37,7 @@ module.exports.delete = async (ctx) => {
     ctx.throw(404, 'provider not found');
   }
   ctx.status = 200;
-  ctx.body = {
-    message: `brand ${provider.title} (id: ${provider.id}) deleted`,
-  };
+  ctx.body = mapper(provider);
 };
 
 async function _getProvider(id) {

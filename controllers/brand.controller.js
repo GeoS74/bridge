@@ -37,9 +37,7 @@ module.exports.delete = async (ctx) => {
     ctx.throw(404, 'brand not found');
   }
   ctx.status = 200;
-  ctx.body = {
-    message: `brand ${brand.title} (id: ${brand.id}) deleted`,
-  };
+  ctx.body = mapper(brand);
 };
 
 async function _getBrand(id) {

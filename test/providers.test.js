@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== 'develop') {
   process.exit();
 }
 
-describe('/test/brands.test.js', () => {
+describe('/test/providers.test.js', () => {
   let _server;
 
   before(async () => {
@@ -22,12 +22,12 @@ describe('/test/brands.test.js', () => {
   after(async () => {
     await db.query('DELETE FROM prices');
     await db.query('DELETE FROM positions');
-    await db.query('DELETE FROM brands');
+    await db.query('DELETE FROM providers');
     _server.close();
   });
 
-  describe('brands CRUD', () => {
-    it('create brands', async () => {
+  describe('providers CRUD', () => {
+    it('create providers', async () => {
       const brand = {
         title: 'КАМАЗ',
       };
@@ -39,50 +39,50 @@ describe('/test/brands.test.js', () => {
         body: JSON.stringify(brand),
       };
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/brands`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/providers`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 201').to.be.equal(201);
       _expectFieldState.call(this, response.data);
       expect(response.data.title, 'сервер возвращает новый title').to.be.equal(brand.title);
 
       optional.body = JSON.stringify({});
-      response = await fetch(`http://localhost:${config.server.port}/api/brands`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/providers`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
     });
 
-    it('read brands', async () => {
+    it('read providers', async () => {
       const optional = {
         headers: {},
         method: 'GET',
       };
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/brands`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/providers`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
       expect(response.data, 'сервер возвращает массив').that.is.an('array');
       _expectFieldState.call(this, response.data[0]);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/${response.data[0].id}`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/providers/${response.data[0].id}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
       _expectFieldState.call(this, response.data);
 
       const nextId = await _getNextId();
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/${nextId}`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/providers/${nextId}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/any`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/providers/any`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
     });
 
-    it('update brands', async () => {
+    it('update providers', async () => {
       const brand = {
         title: 'тест',
       };
@@ -94,9 +94,9 @@ describe('/test/brands.test.js', () => {
         body: JSON.stringify(brand),
       };
 
-      const currBrand = await _getBrand();
+      const currBrand = await _getProviders();
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/brands/${currBrand.id}`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/providers/${currBrand.id}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
       _expectFieldState.call(this, response.data);
@@ -104,32 +104,32 @@ describe('/test/brands.test.js', () => {
 
       const nextId = await _getNextId();
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/${nextId}`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/providers/${nextId}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/any`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/providers/any`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
     });
 
-    it('delete brands', async () => {
+    it('delete providers', async () => {
       const optional = {
         headers: {},
         method: 'DELETE',
       };
 
-      const currBrand = await _getBrand();
+      const currBrand = await _getProviders();
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/brands/${currBrand.id}`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/providers/${currBrand.id}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
       _expectFieldState.call(this, response.data);
       expect(response.data.title, 'сервер возвращает удалённый title').to.be.equal(currBrand.title);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/${currBrand.id}`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/providers/${currBrand.id}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
@@ -157,11 +157,11 @@ function _expectErrorFieldState(data) {
 }
 
 async function _getNextId() {
-  return db.query("select nextval('brands_id_seq') as id")
+  return db.query("select nextval('providers_id_seq') as id")
     .then((res) => res.rows[0].id);
 }
 
-async function _getBrand() {
-  return db.query('select id, title from brands limit 1')
+async function _getProviders() {
+  return db.query('select id, title from providers limit 1')
     .then((res) => res.rows[0]);
 }
