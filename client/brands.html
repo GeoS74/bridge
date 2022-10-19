@@ -6,49 +6,37 @@
 </head>
 
 <body>
-  <div>
-    <button onclick="window.location.href = 'http://localhost:3100/';">На главную</button>
-  </div>
   <h1>Бренды</h1>
 
-
-  <!-- Добавить Бренд -->
-  <input type="submit" id="add" value="Добавить бренд" onclick="addVisibilityFun('addForm')"/>
+  <input type="submit" id="add" value="добавить бренд" />
   <script>
     "use strict"
-    function addVisibilityFun(id) {
-      let elem = document.getElementById(id);
-      let state = elem.style.display;
-      if (state === "") {
-        elem.style.display = "none";
-        addForm.reset();
-        addForm.dataset.action = '';
-      
-      } else {
-        elem.style.display = "";
-        addForm.reset();
-        addForm.dataset.action = 'added';
-      }
-    }   
+    add.addEventListener('click', event => {
+      addForm.hidden = false;
+      addForm.reset();
+      addForm.dataset.action = 'added';
+    })
   </script>
 
-  <form id="addForm" data-action="" style="display: none;">
-    <input type="text" name="title" />
+  <form hidden="hidden" id="addForm" data-action="">
+    <input type="text" id="inputAddForm" name="title" value="123123"/>
     <input type="submit" value="send" />
   </form>
   <script>
     "use strict"
     addForm.addEventListener('submit', event => {
       event.preventDefault();
+      let titleBrend = {"title": inputAddForm.value}
+      console.log(titleBrend)
+      
 
-      const options = {
-        body: new FormData(event.target),
-      };
+      const options = {body: JSON.stringify(titleBrend)};
+      console.log(options)
       let url;
-
       if (event.target.dataset.action === 'added') {
         options.method = 'POST';
         url = '/api/brands';
+        console.log(options)
 
         event.target.querySelector('input[type=submit]').disabled = true;
         fetch(url, options)
@@ -81,60 +69,6 @@
     })
   </script>
 
-
-<!-- Удалить бренд -->
-
-<input type="submit" id="add" value="Удалить бренд" onclick="addVisibilityFun('delForm')"/>
-
-<form id="delForm" data-action="" style="display: none;">
-  <input type="text" name="title" />
-  <input type="submit" value="send" />
-</form>
-<script>
-  "use strict"
-  delForm.addEventListener('submit', event => {
-    event.preventDefault();
-
-    const options = {
-      body: new FormData(event.target),
-    };
-    let url;
-
-    if (event.target.dataset.action === 'added') {
-      options.method = 'POST';
-      url = '/api/brands';
-
-      event.target.querySelector('input[type=submit]').disabled = true;
-      fetch(url, options)
-        .then(async response => {
-          if (response.ok) {
-            const brand = await response.json();
-            addBrand(brand)
-          }
-          else if (response.status === 400) {
-            const res = await response.json();
-            console.log(res);
-          }
-          else {
-            throw new Error(`query status ${response.status}`)
-          }
-        })
-        .catch(error => console.log(error))
-        .finally(_ => {
-          event.target.querySelector('input[type=submit]').disabled = false;
-          event.target.hidden = true;
-        })
-      return;
-    }
-
-    if (event.target.dataset.action === 'updated') {
-      options.method = 'PATCH';
-      url = '/api/brands';
-      return;
-    }
-  })
-</script>
-
   <ul id="list"></ul>
   <script>
     "use strict"
@@ -159,9 +93,9 @@
       if (!event.target.closest('li')) return;
       console.log(event.target.dataset.id)
       
-      editForm.hidden = false;
-      editForm.reset();
-      editForm.dataset.action = 'updated'
+      addForm.hidden = false;
+      addForm.reset();
+      addForm.dataset.action = 'updated'
     })
   </script>
 </body>
