@@ -8,7 +8,7 @@
     "lint:fix": "eslint . --fix",
     "db:init": "node ./libs/db.init.js",
     "db:drop": "node ./libs/db.init.js --drop",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --no-warnings --ignore=node_modules/** **/*.test.js"
   },
   "author": "GeoS",
   "license": "ISC",
@@ -19,12 +19,15 @@
     "koa-router": "^12.0.0",
     "log4js": "^6.7.0",
     "md-conv": "^0.0.30",
+    "node-fetch": "^2.6.7",
     "pg": "^8.8.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "chai": "^4.3.6",
     "eslint": "^8.2.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.2"
+    "eslint-plugin-import": "^2.25.2",
+    "mocha": "^10.1.0"
   }
 }
