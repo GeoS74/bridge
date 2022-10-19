@@ -7,7 +7,7 @@ module.exports.upload = async (ctx, next) => {
   ctx.positions = _readExceltoArray(ctx.request.files.file.filepath);
   _delFile(ctx.request.files.file.filepath);
   await next();
-  
+
   // console.log(ctx.positions.slice(10, 11));
   // ctx.status = 200;
   // ctx.body = 'ok'
@@ -20,7 +20,7 @@ function _readExceltoArray(filePath) {
   const opts = {
     // header: 'A',
     defval: '',
-  }
+  };
   return XLSX.utils.sheet_to_json(worksheet, opts);
 }
 

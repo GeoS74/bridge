@@ -10,14 +10,13 @@ router.get('/', async (ctx) => ctx.redirect('/docs/main'));
 
 router.get('/:fname', async (ctx) => {
   try {
-    const fname = ctx.params.fname;
+    const { fname } = ctx.params;
     const md = await readFile(path.join(__dirname, `../docs/${fname}.md`), { encoding: 'utf8' });
     ctx.set('content-type', 'text/html; charset=utf-8');
-    ctx.body = converter.markdownToHTML(md)
-  }
-  catch (error) {
+    ctx.body = converter.markdownToHTML(md);
+  } catch (error) {
     ctx.status = 404;
-    ctx.body = 'Not Found'
+    ctx.body = 'Not Found';
   }
 });
 
