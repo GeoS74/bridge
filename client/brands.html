@@ -12,29 +12,31 @@
   <script>
     "use strict"
     add.addEventListener('click', event => {
-      editForm.hidden = false;
-      editForm.reset();
-      editForm.dataset.action = 'added';
+      addForm.hidden = false;
+      addForm.reset();
+      addForm.dataset.action = 'added';
     })
   </script>
 
-  <form hidden="hidden" id="editForm" data-action="">
-    <input type="text" name="title" />
+  <form hidden="hidden" id="addForm" data-action="">
+    <input type="text" id="inputAddForm" name="title" value="123123"/>
     <input type="submit" value="send" />
   </form>
   <script>
     "use strict"
-    editForm.addEventListener('submit', event => {
+    addForm.addEventListener('submit', event => {
       event.preventDefault();
+      let titleBrend = {"title": inputAddForm.value}
+      console.log(titleBrend)
+      
 
-      const options = {
-        body: new FormData(event.target),
-      };
+      const options = {body: JSON.stringify(titleBrend)};
+      console.log(options)
       let url;
-
       if (event.target.dataset.action === 'added') {
         options.method = 'POST';
         url = '/api/brands';
+        console.log(options)
 
         event.target.querySelector('input[type=submit]').disabled = true;
         fetch(url, options)
@@ -91,9 +93,9 @@
       if (!event.target.closest('li')) return;
       console.log(event.target.dataset.id)
       
-      editForm.hidden = false;
-      editForm.reset();
-      editForm.dataset.action = 'updated'
+      addForm.hidden = false;
+      addForm.reset();
+      addForm.dataset.action = 'updated'
     })
   </script>
 </body>
