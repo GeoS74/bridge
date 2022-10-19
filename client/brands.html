@@ -6,25 +6,39 @@
 </head>
 
 <body>
+  <div>
+    <button onclick="window.location.href = 'http://localhost:3100/';">На главную</button>
+  </div>
   <h1>Бренды</h1>
 
-  <input type="submit" id="add" value="добавить бренд" />
+
+  <!-- Добавить Бренд -->
+  <input type="submit" id="add" value="Добавить бренд" onclick="addVisibilityFun('addForm')"/>
   <script>
     "use strict"
-    add.addEventListener('click', event => {
-      editForm.hidden = false;
-      editForm.reset();
-      editForm.dataset.action = 'added';
-    })
+    function addVisibilityFun(id) {
+      let elem = document.getElementById(id);
+      let state = elem.style.display;
+      if (state === "") {
+        elem.style.display = "none";
+        addForm.reset();
+        addForm.dataset.action = '';
+      
+      } else {
+        elem.style.display = "";
+        addForm.reset();
+        addForm.dataset.action = 'added';
+      }
+    }   
   </script>
 
-  <form hidden="hidden" id="editForm" data-action="">
+  <form id="addForm" data-action="" style="display: none;">
     <input type="text" name="title" />
     <input type="submit" value="send" />
   </form>
   <script>
     "use strict"
-    editForm.addEventListener('submit', event => {
+    addForm.addEventListener('submit', event => {
       event.preventDefault();
 
       const options = {
@@ -66,6 +80,60 @@
       }
     })
   </script>
+
+
+<!-- Удалить бренд -->
+
+<input type="submit" id="add" value="Удалить бренд" onclick="addVisibilityFun('delForm')"/>
+
+<form id="delForm" data-action="" style="display: none;">
+  <input type="text" name="title" />
+  <input type="submit" value="send" />
+</form>
+<script>
+  "use strict"
+  delForm.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const options = {
+      body: new FormData(event.target),
+    };
+    let url;
+
+    if (event.target.dataset.action === 'added') {
+      options.method = 'POST';
+      url = '/api/brands';
+
+      event.target.querySelector('input[type=submit]').disabled = true;
+      fetch(url, options)
+        .then(async response => {
+          if (response.ok) {
+            const brand = await response.json();
+            addBrand(brand)
+          }
+          else if (response.status === 400) {
+            const res = await response.json();
+            console.log(res);
+          }
+          else {
+            throw new Error(`query status ${response.status}`)
+          }
+        })
+        .catch(error => console.log(error))
+        .finally(_ => {
+          event.target.querySelector('input[type=submit]').disabled = false;
+          event.target.hidden = true;
+        })
+      return;
+    }
+
+    if (event.target.dataset.action === 'updated') {
+      options.method = 'PATCH';
+      url = '/api/brands';
+      return;
+    }
+  })
+</script>
 
   <ul id="list"></ul>
   <script>
