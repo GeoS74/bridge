@@ -7,68 +7,106 @@
 
 <body>
   <h1>Бренды</h1>
-
-  <input type="submit" id="add" value="добавить бренд" />
-  <script>
-    "use strict"
-    add.addEventListener('click', event => {
-      addForm.hidden = false;
-      addForm.reset();
-      addForm.dataset.action = 'added';
-    })
-  </script>
-
-  <form hidden="hidden" id="addForm" data-action="">
-    <input type="text" id="inputAddForm" name="title" value="123123"/>
-    <input type="submit" value="send" />
-  </form>
-  <script>
-    "use strict"
-    addForm.addEventListener('submit', event => {
-      event.preventDefault();
-      let titleBrend = {"title": inputAddForm.value}
-      console.log(titleBrend)
-      
-
-      const options = {body: JSON.stringify(titleBrend)};
-      console.log(options)
-      let url;
-      if (event.target.dataset.action === 'added') {
-        options.method = 'POST';
-        url = '/api/brands';
-        console.log(options)
-
-        event.target.querySelector('input[type=submit]').disabled = true;
-        fetch(url, options)
-          .then(async response => {
-            if (response.ok) {
-              const brand = await response.json();
-              addBrand(brand)
-            }
-            else if (response.status === 400) {
-              const res = await response.json();
-              console.log(res);
-            }
-            else {
-              throw new Error(`query status ${response.status}`)
-            }
+  <div style="display: flex;">
+    <div class="add">
+      <!-- открывает закрывает форму (добаввить бренд)-->
+      <input type="submit" id="add" value="добавить бренд" onclick="addVisibilityFun('addForm')"/>
+      <script>
+        "use strict"
+        function addVisibilityFun(id) {
+          let elem = document.getElementById(id);
+          let state = elem.style.display;
+          if (state === "") {
+            elem.style.display = "none";
+            addForm.reset();
+            addForm.dataset.action = '';
+  
+          } else {
+            elem.style.display = "";
+            addForm.reset();
+            addForm.dataset.action = 'added';
+          }
+        }
+  
+      </script>
+  
+      <form style="display: none;" id="addForm" data-action="">
+        <input type="text" id="inputAddForm" name="title" value="add"/>
+        <input type="submit" value="send" />
+      </form>
+  
+      <!-- отправляет запрос на добавление -->
+      <script>
+        "use strict"
+        document.querySelector('#addForm')
+        .addEventListener('submit', event => {
+          event.preventDefault();
+  
+          const optional = {
+            headers: {},
+            method: 'POST',
+            body: new FormData(event.target),
+          };
+          fetch('http://localhost:3100/api/brands', optional)
+          .then(async res => {
+            const result = await res.json();
+            console.log(result)
           })
-          .catch(error => console.log(error))
-          .finally(_ => {
-            event.target.querySelector('input[type=submit]').disabled = false;
-            event.target.hidden = true;
+        })
+      </script>
+    </div>
+    <div class="del">
+      <!-- открывает закрывает форму (удалить бренд) -->
+      <input type="submit" id="del" value="удалить бренд" onclick="addVisibilityFun('delForm')"/>
+      <script>
+        "use strict"
+        function addVisibilityFun(id) {
+          let elem = document.getElementById(id);
+          let state = elem.style.display;
+          if (state === "") {
+            elem.style.display = "none";
+            addForm.reset();
+            addForm.dataset.action = '';
+    
+          } else {
+            elem.style.display = "";
+            addForm.reset();
+            addForm.dataset.action = 'deleted';
+          }
+        }
+    
+      </script>
+    
+      <form style="display: none;" id="delForm" data-action="">
+        <input type="text" id="inputDelForm" name="title" value="del"/>
+        <input type="submit" value="send" />
+      </form>
+
+      <script>
+        "use strict"
+        document.querySelector('#delForm')
+        .addEventListener('submit', event => {
+          event.preventDefault();
+  
+          const optional = {
+            headers: {},
+            method: 'DELETE',
+            body: new FormData(event.target),
+          };
+          fetch('http://localhost:3100/api/brands', optional)
+          .then(async res => {
+            const result = await res.json();
+            console.log(result)
           })
-        return;
-      }
+        })
+      </script>
+    </div>
+    
+   
+  </div>
 
-      if (event.target.dataset.action === 'updated') {
-        options.method = 'PATCH';
-        url = '/api/brands';
-        return;
-      }
-    })
-  </script>
-
+  
+  <!-- отрисовывает таблицу -->
   <ul id="list"></ul>
   <script>
     "use strict"
@@ -86,18 +124,35 @@
       .catch(error => console.log(error));
 
     function addBrand(brand) {
-      list.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`)
+      let div = document.createElement('div');
+      let button = document.createElement('button');
+      let img = document.createElement('img');
+      button.append(img);
+      button.addEventListener('click', event => {
+        if (confirm(`вы собираетесь удалить бренд!!! ${brand.title}`) === true) {
+          console.log(1)
+        } else console.log(2)
+      })
+      div.className = `li-${brand.id}`;
+      div.style.display = "flex";
+      div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`);
+      div.prepend(button);
+      list.append(div);
+      
     }
 
-    list.addEventListener('click', event => {
-      if (!event.target.closest('li')) return;
-      console.log(event.target.dataset.id)
+    // list.addEventListener('click', event => {
+    //   let elemDel = document.getElementById('inputDelForm')
+    //   elemDel.value = event.target.dataset.id;
+    //   if (!event.target.closest('li')) return;
+    //   console.log(event.target.dataset.id)
       
-      addForm.hidden = false;
-      addForm.reset();
-      addForm.dataset.action = 'updated'
-    })
+    //   addForm.hidden = false;
+    //   addForm.reset();
+    //   addForm.dataset.action = 'updated'
+    // })
   </script>
+  
 </body>
 
 </html>
