@@ -1,158 +1,144 @@
 <!DOCTYPE html>
-<html lang="ru">
-
-<head>
-  <style></style>
-</head>
-
-<body>
-  <h1>Бренды</h1>
-  <div style="display: flex;">
-    <div class="add">
-      <!-- открывает закрывает форму (добаввить бренд)-->
-      <input type="submit" id="add" value="добавить бренд" onclick="addVisibilityFun('addForm')"/>
-      <script>
-        "use strict"
-        function addVisibilityFun(id) {
-          let elem = document.getElementById(id);
-          let state = elem.style.display;
-          if (state === "") {
-            elem.style.display = "none";
-            addForm.reset();
-            addForm.dataset.action = '';
-  
-          } else {
-            elem.style.display = "";
-            addForm.reset();
-            addForm.dataset.action = 'added';
-          }
-        }
-  
-      </script>
-  
-      <form style="display: none;" id="addForm" data-action="">
-        <input type="text" id="inputAddForm" name="title" value="add"/>
-        <input type="submit" value="send" />
-      </form>
-  
-      <!-- отправляет запрос на добавление -->
-      <script>
-        "use strict"
-        document.querySelector('#addForm')
-        .addEventListener('submit', event => {
-          event.preventDefault();
-  
-          const optional = {
-            headers: {},
-            method: 'POST',
-            body: new FormData(event.target),
-          };
-          fetch('http://localhost:3100/api/brands', optional)
-          .then(async res => {
-            const result = await res.json();
-            console.log(result)
-          })
-        })
-      </script>
-    </div>
-    <div class="del">
-      <!-- открывает закрывает форму (удалить бренд) -->
-      <input type="submit" id="del" value="удалить бренд" onclick="addVisibilityFun('delForm')"/>
-      <script>
-        "use strict"
-        function addVisibilityFun(id) {
-          let elem = document.getElementById(id);
-          let state = elem.style.display;
-          if (state === "") {
-            elem.style.display = "none";
-            addForm.reset();
-            addForm.dataset.action = '';
-    
-          } else {
-            elem.style.display = "";
-            addForm.reset();
-            addForm.dataset.action = 'deleted';
-          }
-        }
-    
-      </script>
-    
-      <form style="display: none;" id="delForm" data-action="">
-        <input type="text" id="inputDelForm" name="title" value="del"/>
-        <input type="submit" value="send" />
-      </form>
-
-      <script>
-        "use strict"
-        document.querySelector('#delForm')
-        .addEventListener('submit', event => {
-          event.preventDefault();
-  
-          const optional = {
-            headers: {},
-            method: 'DELETE',
-            body: new FormData(event.target),
-          };
-          fetch('http://localhost:3100/api/brands', optional)
-          .then(async res => {
-            const result = await res.json();
-            console.log(result)
-          })
-        })
-      </script>
-    </div>
-    
-   
-  </div>
-
-  
-  <!-- отрисовывает таблицу -->
-  <ul id="list"></ul>
-  <script>
-    "use strict"
-
-    fetch('/api/brands')
-      .then(async response => {
-        if (response.ok) {
-          const brands = await response.json();
-          brands.map(brand => addBrand(brand))
-        }
-        else {
-          throw new Error(`query status ${response.status}`)
-        }
-      })
-      .catch(error => console.log(error));
-
-    function addBrand(brand) {
-      let div = document.createElement('div');
-      let button = document.createElement('button');
-      let img = document.createElement('img');
-      button.append(img);
-      button.addEventListener('click', event => {
-        if (confirm(`вы собираетесь удалить бренд!!! ${brand.title}`) === true) {
-          console.log(1)
-        } else console.log(2)
-      })
-      div.className = `li-${brand.id}`;
-      div.style.display = "flex";
-      div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`);
-      div.prepend(button);
-      list.append(div);
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Brands</title>
+    <style>
       
-    }
+      #list button {
+        margin: 0;
+        padding: 0;
+        width: 55px;
+        height: 30px;
+      }      
+      ul li {
+        padding-left: 5px;
+        list-style-type: none;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Бренды</h1>
+    <div style="display: flex;">
+      <div class="add">
+        <!-- открывает закрывает форму (добаввить бренд)-->
+        <input type="submit" id="add" value="добавить бренд" onclick="addVisibilityFun('addForm')"/>
+        <script>
+          "use strict"
+          function addVisibilityFun(id) {
+            let elem = document.getElementById(id);
+            let state = elem.style.display;
+            if (state === "") {
+              elem.style.display = "none";
+              addForm.reset();
+              addForm.dataset.action = '';
+    
+            } else {
+              elem.style.display = "";
+              addForm.reset();
+              addForm.dataset.action = 'added';
+            }
+          }
+    
+        </script>
+    
+        <form style="display: none;" id="addForm" data-action="">
+          <input type="text" id="inputAddForm" name="title"/>
+          <input type="submit" value="send" />
+        </form>
+    
+        <!-- отправляет запрос на добавление -->
+        <script>
+          "use strict"
+          document.querySelector('#addForm')
+          .addEventListener('submit', event => {
+            event.preventDefault();
+    
+            const optionalAdd = {
+              headers: {},
+              method: 'POST',
+              body: new FormData(event.target),
+            };
+            fetch('http://localhost:3100/api/brands', optionalAdd)
+            .then(async res => {
+              const result = await res.json();
+              console.log(result)
+            })
+            location.reload();
+          })
+        </script>
+      </div>   
+    
+    </div>
 
-    // list.addEventListener('click', event => {
-    //   let elemDel = document.getElementById('inputDelForm')
-    //   elemDel.value = event.target.dataset.id;
-    //   if (!event.target.closest('li')) return;
-    //   console.log(event.target.dataset.id)
-      
-    //   addForm.hidden = false;
-    //   addForm.reset();
-    //   addForm.dataset.action = 'updated'
-    // })
-  </script>
-  
-</body>
+    
+    <!-- отрисовывает таблицу -->
+    <ul id="list">
+    </ul>
+    <script>
+      "use strict"
 
+      fetch('/api/brands')
+        .then(async response => {
+          if (response.ok) {
+            const brands = await response.json();
+            brands.map(brand => addBrand(brand))
+          }
+          else {
+            throw new Error(`query status ${response.status}`)
+          }
+        })
+        .catch(error => console.log(error));
+       
+      function addBrand(brand) {
+        let div = document.createElement('div');
+        let buttonDel = document.createElement('button');
+        buttonDel.append('DEL')
+        let buttonChenge = document.createElement('button');
+        buttonChenge.append('Chenge')        
+        // let imgDel = document.createElement('img');
+        // imgDel.src = "./img/wastebasket-emoji-clipart-md.png";
+        // imgDel.className = 'imgDel'
+        // button.append(imgDel);
+
+        // Удаление бренда
+        buttonDel.addEventListener('click', event => {
+          if (confirm(`вы собираетесь удалить бренд!!! ${brand.title}`) === true) {
+            fetch(`http://localhost:3100/api/brands/${brand.id}`, {
+              headers: {},
+              method: 'DELETE',
+              body: {},
+            })
+            location.reload()
+          }})
+
+        // Изменение бренда
+        buttonChenge.addEventListener('click', event => {
+          let inputChenge = prompt(`вы собираетесь Изменить бренд!!! ${brand.title}`)
+          const optionalChenge = {
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            method: 'PATCH',
+            body: JSON.stringify({ title: inputChenge }),
+            };
+          fetch(`http://localhost:3100/api/brands/${brand.id}`, optionalChenge)
+          .catch(error => console.log(error))
+          location.reload()
+          })
+
+        div.className = `li-${brand.id}`;
+        div.style.display = "flex";
+        div.style.alignItems = "baseline";
+        div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`);
+        div.prepend(buttonChenge);
+        div.prepend(buttonDel);
+        list.append(div);
+        
+      }
+    </script>
+    
+  </body>
 </html>

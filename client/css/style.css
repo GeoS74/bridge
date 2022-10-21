@@ -1,0 +1,11 @@
+body {
+    background: red;
+    background-color: red;
+}
+
+.add {
+    background: black;
+}
+button {
+    background: blue;
+}
