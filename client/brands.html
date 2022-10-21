@@ -5,7 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <title>Brands</title>
-    <link rel="stylesheet" href="./css/style_brands.css" />
+    <style>
+      
+      #list button {
+        margin: 0;
+        padding: 0;
+        width: 55px;
+        height: 30px;
+      }      
+      ul li {
+        padding-left: 5px;
+        list-style-type: none;
+      }
+    </style>
   </head>
   <body>
     <h1>Бренды</h1>
@@ -33,7 +45,7 @@
         </script>
     
         <form style="display: none;" id="addForm" data-action="">
-          <input type="text" id="inputAddForm" name="title" value="add"/>
+          <input type="text" id="inputAddForm" name="title"/>
           <input type="submit" value="send" />
         </form>
     
@@ -64,11 +76,6 @@
     
     <!-- отрисовывает таблицу -->
     <ul id="list">
-      <li>
-        <button>
-          <img src="./css/style_brands.css" alt="">
-        </button>
-      </li>
     </ul>
     <script>
       "use strict"
@@ -84,15 +91,20 @@
           }
         })
         .catch(error => console.log(error));
-
+       
       function addBrand(brand) {
         let div = document.createElement('div');
-        let button = document.createElement('button');
-        let imgDel = document.createElement('img');
-        imgDel.src = "./img/dustbin.svg";
-        imgDel.className = 'imgDel'
-        button.append(imgDel);
-        button.addEventListener('click', event => {
+        let buttonDel = document.createElement('button');
+        buttonDel.append('DEL')
+        let buttonChenge = document.createElement('button');
+        buttonChenge.append('Chenge')        
+        // let imgDel = document.createElement('img');
+        // imgDel.src = "./img/wastebasket-emoji-clipart-md.png";
+        // imgDel.className = 'imgDel'
+        // button.append(imgDel);
+
+        // Удаление бренда
+        buttonDel.addEventListener('click', event => {
           if (confirm(`вы собираетесь удалить бренд!!! ${brand.title}`) === true) {
             fetch(`http://localhost:3100/api/brands/${brand.id}`, {
               headers: {},
@@ -102,24 +114,30 @@
             location.reload()
           }})
 
+        // Изменение бренда
+        buttonChenge.addEventListener('click', event => {
+          let inputChenge = prompt(`вы собираетесь Изменить бренд!!! ${brand.title}`)
+          const optionalChenge = {
+            headers: {
+            'Content-Type': 'application/json',
+            },
+            method: 'PATCH',
+            body: JSON.stringify({ title: inputChenge }),
+            };
+          fetch(`http://localhost:3100/api/brands/${brand.id}`, optionalChenge)
+          .catch(error => console.log(error))
+          location.reload()
+          })
+
         div.className = `li-${brand.id}`;
         div.style.display = "flex";
+        div.style.alignItems = "baseline";
         div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`);
-        div.prepend(button);
+        div.prepend(buttonChenge);
+        div.prepend(buttonDel);
         list.append(div);
         
       }
-
-      // list.addEventListener('click', event => {
-      //   let elemDel = document.getElementById('inputDelForm')
-      //   elemDel.value = event.target.dataset.id;
-      //   if (!event.target.closest('li')) return;
-      //   console.log(event.target.dataset.id)
-        
-      //   addForm.hidden = false;
-      //   addForm.reset();
-      //   addForm.dataset.action = 'updated'
-      // })
     </script>
     
   </body>
