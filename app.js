@@ -1,5 +1,6 @@
 const Koa = require('koa');
 const { readdir, mkdir } = require('node:fs/promises');
+const serve = require('koa-static');
 
 const errorCatcher = require('./middleware/error.catcher');
 const docsRoutes = require('./routes/docs.routes');
@@ -20,6 +21,7 @@ const utRoutes = require('./routes/ut.routes');
 const app = new Koa();
 
 app.use(errorCatcher);
+app.use(serve('client'));
 app.use(docsRoutes);
 app.use(clientRoutes);
 app.use(brandRoutes);
