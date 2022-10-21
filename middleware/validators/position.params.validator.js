@@ -1,4 +1,4 @@
-module.exports.params = async (ctx, next) => {
+module.exports = async (ctx, next) => {
   const brandId = parseInt(ctx.request?.body?.brandId, 10);
   if (!brandId) {
     ctx.throw(404, 'brand not found');

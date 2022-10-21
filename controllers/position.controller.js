@@ -1,6 +1,22 @@
 const articleConv = require('../libs/article.converter');
 const db = require('../libs/db');
 
+
+function _testDataMake(data, structure) {
+  return {
+    code: data[structure.code] || null,
+    article: data[structure.article] || null,
+    title: data[structure.title] || null,
+    weight: data[structure.weight] || null,
+    width: data[structure.width] || null,
+    height: data[structure.height] || null,
+    length: data[structure.length] || null,
+    manufacturer: data[structure.manufacturer] || null,
+    storage: data[structure.storage] || null,
+    price: data[structure.price] || null,
+  }
+}
+
 module.exports.addBovid = async (ctx) => {
   const start = Date.now();
 
@@ -11,8 +27,12 @@ module.exports.addBovid = async (ctx) => {
       console.log(`writed: ${i}`);
       console.log(process.memoryUsage().heapUsed);
     }
+    // console.log(position)
+    // console.log(_testDataMake(position, ctx.structure))
+    // break;
 
-    const data = await _makeDataBovid(Object.values(position));
+    const data = _testDataMake(position, ctx.structure);
+    data.articleParse = articleConv(position.article)
 
     if (data.articleParse) {
       const pos = await _updatePositionBovid(data);
@@ -21,7 +41,19 @@ module.exports.addBovid = async (ctx) => {
         await _insertPositionBovid(data);
       }
     }
+
+    // const data = await _makeDataBovid(Object.values(position));
+
+    // if (data.articleParse) {
+    //   const pos = await _updatePositionBovid(data);
+
+    //   if (!pos) {
+    //     await _insertPositionBovid(data);
+    //   }
+    // }
   }
+
+  console.log((Date.now() - start) / 1000);
 
   ctx.status = 200;
   ctx.body = {

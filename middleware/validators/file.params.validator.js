@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const logger = require('../../libs/logger');
 
-module.exports.params = async (ctx, next) => {
+module.exports = async (ctx, next) => {
   if (!ctx.request.files) {
     ctx.throw(400, 'file not uploaded');
   }

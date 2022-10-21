@@ -1,10 +1,10 @@
 const Router = require('koa-router');
 const koaBody = require('koa-body');
 
-const fileController = require('../controllers/file.controller');
 const fileValidator = require('../middleware/validators/file.params.validator');
-const positionController = require('../controllers/position.controller');
 const positionValidator = require('../middleware/validators/position.params.validator');
+const reader = require('../middleware/positions.reader');
+const position = require('../controllers/position.controller');
 
 const optional = {
   formidable: {
@@ -23,18 +23,18 @@ const router = new Router({ prefix: '/api/file' });
 router.post(
   '/upload',
   koaBody(optional),
-  fileValidator.params,
-  fileController.upload,
-  positionValidator.params,
-  positionController.add,
+  fileValidator,
+  reader.file,
+  positionValidator,
+  position.add,
 );
 
 router.post(
   '/upload/bovid',
   koaBody(optional),
-  fileValidator.params,
-  fileController.upload,
-  positionController.addBovid,
+  fileValidator,
+  reader.file,
+  position.addBovid,
 );
 
 module.exports = router.routes();

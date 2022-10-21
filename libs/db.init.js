@@ -63,7 +63,13 @@ const data = {
       article TEXT,
       article_parse TEXT,
       title TEXT,
-      amount INTEGER
+      amount INTEGER,
+      storage TEXT,
+      weight REAL,
+      width REAL,
+      height REAL,
+      length REAL,
+      manufacturer TEXT
     );
   `)
     .then(() => logger.info('create table "bovid"'))
