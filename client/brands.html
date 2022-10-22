@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
     <link rel="stylesheet" href="./css/style_brends.css">
-    <title>Brands</title>
+    <title>Бренды</title>
     
   </head>
   <body>
@@ -14,31 +14,59 @@
     </div>
     <h1>Бренды</h1>
     
-    <div style="display: flex;">
-      <div class="add">
-        <!-- открывает закрывает форму (добаввить бренд)-->
-        <input type="submit" id="add" value="добавить бренд" onclick="addVisibilityFun('addForm')"/>
-        <script>
-          "use strict"
-          function addVisibilityFun(id) {
-            let elem = document.getElementById(id);
-            let state = elem.style.display;
-            if (state === "") {
-              elem.style.display = "none";
+    <div>      
+      <div style="display: flex;">
+        <div class="add">
+          <!-- открывает закрывает форму (добаввить бренд)-->
+          <input type="submit" id="add" value="добавить бренд" onclick="addVisibilityFun('addForm')"/>
+        </div>
+        <div class="search">
+          <!-- открывает закрывает форму (Поиск бренд)-->
+          <input type="submit" id="search" value="поиск бренда" onclick="addVisibilityFun('searchForm')"/>
+        </div> 
+      </div>
+      <script>
+        "use strict"
+        function addVisibilityFun(id) {
+          let elemAdd= document.getElementById('addForm');
+          let elemSearch = document.getElementById('searchForm');
+          let stateAdd = elemAdd.style.display;
+          let stateSearch = elemSearch.style.display;
+          if (id === 'addForm') {
+            if (stateAdd === "") {
+              elemAdd.style.display = "none";
               addForm.reset();
               addForm.dataset.action = '';
-    
+  
             } else {
-              elem.style.display = "";
-              addForm.reset();
-              addForm.dataset.action = 'added';
-            }
+                elemSearch.style.display = "none";
+                elemAdd.style.display = "";
+                addForm.reset();
+                addForm.dataset.action = 'added';
           }
+          } else {
+              if (stateSearch === "") {
+                elemSearch.style.display = "none";
+                searchForm.reset();
+                searchForm.dataset.action = '';
     
-        </script>
+              } else {
+                elemAdd.style.display = "none";
+                elemSearch.style.display = "";
+                searchForm.reset();
+                searchForm.dataset.action = 'added';
+          }}
+        }
+  
+      </script>
     
         <form style="display: none;" id="addForm" data-action="">
-          <input type="text" id="inputAddForm" name="title"/>
+          <input type="text" id="inputAddForm" name="title" placeholder="Добавить бренд"/>
+          <input type="submit" value="send" />
+        </form>
+
+        <form style="display: none;" id="searchForm" data-action="">
+          <input type="text" id="inputAddForm" name="title" placeholder="Добавить поставщика"/>
           <input type="submit" value="send" />
         </form>
     
@@ -61,8 +89,32 @@
             })
             location.reload();
           })
+        </script>     
+        
+    
+        
+    
+        <!-- отправляет запрос на добавление -->
+        <!-- <script>
+          "use strict"
+          document.querySelector('#addForm')
+          .addEventListener('submit', event => {
+            event.preventDefault();
+    
+            const optionalAdd = {
+              headers: {},
+              method: 'POST',
+              body: new FormData(event.target),
+            };
+            fetch('http://localhost:3100/api/brands', optionalAdd)
+            .then(async res => {
+              const result = await res.json();
+              console.log(result)
+            })
+            location.reload();
+          })
         </script>
-      </div>   
+      </div>  -->
     
     </div>
 
