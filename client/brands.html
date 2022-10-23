@@ -9,6 +9,7 @@
     
   </head>
   <body>
+
     <div>
       <button onclick="window.location.href = 'http://localhost:3100/';">На главную</button>
     </div>
@@ -66,7 +67,7 @@
         </form>
 
         <form style="display: none;" id="searchForm" data-action="">
-          <input type="text" id="inputAddForm" name="title" placeholder="Добавить поставщика"/>
+          <input type="text" id="inputsearchForm" name="title" placeholder="Поиск бренда"/>
           <input type="submit" value="send" />
         </form>
     
@@ -88,42 +89,37 @@
               console.log(result)
             })
             location.reload();
-          })
-        </script>     
-        
+          })       
     
-        
-    
-        <!-- отправляет запрос на добавление -->
-        <!-- <script>
-          "use strict"
-          document.querySelector('#addForm')
+        // отправляет запрос на поиск        
+          document.querySelector('#searchForm')
           .addEventListener('submit', event => {
+            let adc = document.querySelector('#inputsearchForm').value;         
             event.preventDefault();
+            
     
-            const optionalAdd = {
-              headers: {},
-              method: 'POST',
-              body: new FormData(event.target),
-            };
-            fetch('http://localhost:3100/api/brands', optionalAdd)
-            .then(async res => {
+            fetch('http://localhost:3100/api/brands')
+              .then(async res => {              
               const result = await res.json();
-              console.log(result)
+              console.log(result);
+              // addBrand(result);
             })
-            location.reload();
+            // location.reload();
           })
         </script>
-      </div>  -->
-    
-    </div>
-
+    <!-- отрисовывает поиск -->
+    <ul id="listSearch" style="display: none;">
+    </ul>
     
     <!-- отрисовывает таблицу -->
-    <ul id="list">
+    <ul id="list" style="display: block;">
     </ul>
     <script>
       "use strict"
+
+      let constForm = 0
+
+      
 
       fetch('/api/brands')
         .then(async response => {
@@ -138,11 +134,10 @@
         .catch(error => console.log(error));
        
       function addBrand(brand) {
+        // console.log(brand);
         let div = document.createElement('div');
         let buttonDel = document.createElement('button');
-        // buttonDel.append('DEL')
         let buttonChenge = document.createElement('button');
-        // buttonChenge.append('Chenge')        
         let imgDel = document.createElement('img');
         imgDel.src = "./img/dustbin.svg";
         imgDel.className = 'imgDel'
@@ -161,7 +156,7 @@
               method: 'DELETE',
               body: {},
             })
-            location.reload()
+            // location.reload()
           }})
 
         // Изменение бренда
@@ -180,8 +175,6 @@
           })
 
         div.className = `li-${brand.id}`;
-        // div.style.display = "flex";
-        // div.style.alignItems = "center";
         div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`);
         div.prepend(buttonChenge);
         div.prepend(buttonDel);
