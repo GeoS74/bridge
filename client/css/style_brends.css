@@ -1,3 +1,9 @@
+#listSearch div {
+  display: flex;
+  align-items: center;
+  margin-top: 3px;
+}
+
 #list div {
   display: flex;
   align-items: center;
@@ -14,6 +20,13 @@
   width: 20px;
   padding: 0;
   margin: 0;
+}
+
+#listSearch button {
+  margin-right: 3px;
+  padding: 0;
+  width: 25px;
+  height: 30px;
 }
 
 #list button {
