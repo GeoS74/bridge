@@ -176,6 +176,7 @@
             body: JSON.stringify({ title: inputChenge }),
             };
           fetch(`http://localhost:3100/api/brands/${brand.id}`, optionalChenge)
+          .then(location.reload())
           .catch(error => console.log(error))
           location.reload()
           })

@@ -9,102 +9,154 @@
     
   </head>
   <body>
+
     <div>
       <button onclick="window.location.href = 'http://localhost:3100/';">На главную</button>
     </div>
     <h1>Поставщики</h1>
     
-    <div style="display: flex;">
-      <div class="add">
-        <!-- открывает закрывает форму (добаввить бренд)-->
-        <input type="submit" id="add" value="добавить поставщика" onclick="addVisibilityFun('addForm')"/>
-        <script>
-          "use strict"
-          function addVisibilityFun(id) {
-            let elem = document.getElementById(id);
-            let state = elem.style.display;
-            if (state === "") {
-              elem.style.display = "none";
+    <div>      
+      <div style="display: flex;">
+        <div class="add">
+          <!-- открывает закрывает форму (добаввить поставщика)-->
+          <input type="submit" id="add" value="добавить поставщика" onclick="addVisibilityFun('addForm')"/>
+        </div>
+        <div class="search">
+          <!-- открывает закрывает форму (Поиск поставщика)-->
+          <input type="submit" id="search" value="поиск поставщика" onclick="addVisibilityFun('searchForm')"/>
+        </div>
+        <div>
+          <!-- кнопка обновления страницы поставщткт -->
+          <input type="submit" id="refresh" value="Все поставщики" onclick="location.reload()"/>
+        </div>
+      </div>
+      <form style="display: none;" id="addForm" data-action="">
+        <input type="text" id="inputAddForm" name="title" placeholder="Добавить поставщика"/>
+        <input type="submit" value="send" />
+      </form>
+
+      <form style="display: none;" id="searchForm" data-action="">
+        <input type="text" id="inputsearchForm" name="title" placeholder="Поиск поставщика"/>
+        <input type="submit" value="send" />
+      </form>
+
+      <!-- отрисовывает поиск -->
+      <ul id="listSearch" style="display: block;">
+      </ul>
+  
+      <!-- отрисовывает таблицу -->
+      <ul id="list" style="display: block;">
+      </ul>
+
+      <script>
+        "use strict"
+        // функция определяющая какая форма открыта а какая спрятана
+        function addVisibilityFun(id) {
+          let elemAdd= document.getElementById('addForm');
+          let elemSearch = document.getElementById('searchForm');
+          let stateAdd = elemAdd.style.display;
+          let stateSearch = elemSearch.style.display;
+          if (id === 'addForm') {
+            if (stateAdd === "") {
+              elemAdd.style.display = "none";
               addForm.reset();
               addForm.dataset.action = '';
-    
+  
             } else {
-              elem.style.display = "";
-              addForm.reset();
-              addForm.dataset.action = 'added';
-            }
+                elemSearch.style.display = "none";
+                elemAdd.style.display = "";
+                addForm.reset();
+                addForm.dataset.action = 'added';
           }
+          } else {
+              if (stateSearch === "") {
+                elemSearch.style.display = "none";
+                searchForm.reset();
+                searchForm.dataset.action = '';
     
-        </script>
-    
-        <form style="display: none;" id="addForm" data-action="">
-          <input type="text" id="inputAddForm" name="title"/>
-          <input type="submit" value="send" />
-        </form>
-    
-        <!-- отправляет запрос на добавление -->
-        <script>
-          "use strict"
-          document.querySelector('#addForm')
-          .addEventListener('submit', event => {
-            event.preventDefault();
-    
-            const optionalAdd = {
-              headers: {},
-              method: 'POST',
-              body: new FormData(event.target),
-            };
-            fetch('http://localhost:3100/api/brands', optionalAdd)
-            .then(async res => {
-              const result = await res.json();
-              console.log(result)
-            })
-            location.reload();
+              } else {
+                elemAdd.style.display = "none";
+                elemSearch.style.display = "";
+                searchForm.reset();
+                searchForm.dataset.action = 'added';
+          }}
+        }  
+      </script>      
+      <script>
+        "use strict"
+        // отправляет запрос на добавление
+        document.querySelector('#addForm')
+        .addEventListener('submit', event => {
+          event.preventDefault();
+  
+          const optionalAdd = {
+            headers: {},
+            method: 'POST',
+            body: new FormData(event.target),
+          };
+          fetch('http://localhost:3100/api/providers', optionalAdd)
+          .then(async res => {
+            const result = await res.json();
           })
-        </script>
-      </div>   
-    
-    </div>
-
-    
-    <!-- отрисовывает таблицу -->
-    <ul id="list">
-    </ul>
-    <script>
-      "use strict"
-
-      fetch('/api/brands')
-        .then(async response => {
-          if (response.ok) {
-            const brands = await response.json();
-            brands.map(brand => addBrand(brand))
-          }
-          else {
-            throw new Error(`query status ${response.status}`)
-          }
+          location.reload();
+        })       
+  
+        // отправляет запрос на поиск          
+        document.querySelector('#searchForm')
+        .addEventListener('submit', event => {
+          document.getElementById('listSearch').replaceChildren();
+          let valueInputSearch = document.querySelector('#inputsearchForm').value;
+          let listSearch = [];
+          event.preventDefault();            
+  
+          fetch('http://localhost:3100/api/providers')
+            .then(async res => {              
+            const result = await res.json();
+          for (let key in result) {
+            if (valueInputSearch === result[key].title) {
+              let i = {};
+              i.id = result[key].id;
+              i.title = result[key].title;
+              listSearch.push(i)
+            }};          
+          listSearch.map(brand => addBrand(brand, 1));
+          })
         })
-        .catch(error => console.log(error));
-       
-      function addBrand(brand) {
+
+        // запрос на всех поставщиков
+        fetch('/api/providers')
+        .then(async response => {
+        if (response.ok) {
+          const providers = await response.json();
+          providers.map(provider => addBrand(provider))
+        }
+        else {
+          throw new Error(`query status ${response.status}`)
+        }
+      })
+      .catch(error => console.log(error));
+      </script>    
+      <script>
+      "use strict"       
+      function addBrand(brand, idForm = 'list') {
         let div = document.createElement('div');
+
+        // создание кнопок удаление и изменение
         let buttonDel = document.createElement('button');
-        // buttonDel.append('DEL')
         let buttonChenge = document.createElement('button');
-        // buttonChenge.append('Chenge')        
         let imgDel = document.createElement('img');
         imgDel.src = "./img/dustbin.svg";
         imgDel.className = 'imgDel'
         buttonDel.append(imgDel);
-
         let imgChenge = document.createElement('img');
         imgChenge.src = "./img/pencil.svg";
         imgChenge.className = 'imgChenge'
         buttonChenge.append(imgChenge);
 
-        // Удаление бренда
+        // запрос удаление поставщика
         buttonDel.addEventListener('click', event => {
-          if (confirm(`вы собираетесь удалить бренд!!! ${brand.title}`) === true) {
-            fetch(`http://localhost:3100/api/brands/${brand.id}`, {
+          if (confirm(`вы собираетесь удалить поставщика!!! ${brand.title}`) === true) {
+            fetch(`http://localhost:3100/api/providers/${brand.id}`, {
               headers: {},
               method: 'DELETE',
               body: {},
@@ -112,9 +164,9 @@
             location.reload()
           }})
 
-        // Изменение бренда
+        // запрос изменение поставщика
         buttonChenge.addEventListener('click', event => {
-          let inputChenge = prompt(`вы собираетесь Изменить бренд!!! ${brand.title}`)
+          let inputChenge = prompt(`вы собираетесь Изменить поставщика!!! ${brand.title}`)
           const optionalChenge = {
             headers: {
             'Content-Type': 'application/json',
@@ -122,21 +174,34 @@
             method: 'PATCH',
             body: JSON.stringify({ title: inputChenge }),
             };
-          fetch(`http://localhost:3100/api/brands/${brand.id}`, optionalChenge)
+          fetch(`http://localhost:3100/api/providers/${brand.id}`, optionalChenge)
+          .then(location.reload())
           .catch(error => console.log(error))
-          location.reload()
+          
           })
 
+        // создание строчки с поставщиком и кнопки удаление и изменения
+        let elemList= document.getElementById('list');
+        let elemListSearch = document.getElementById('listSearch');
         div.className = `li-${brand.id}`;
-        // div.style.display = "flex";
-        // div.style.alignItems = "center";
         div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`);
         div.prepend(buttonChenge);
         div.prepend(buttonDel);
-        list.append(div);
+        
+        // отрисовки основного списка поставщиков или списка поиска. list это основной список
+        if (idForm === 'list') {
+          elemListSearch.style.display = "none";
+          elemList.style.display = "block";
+          list.append(div);
+        } else {
+          elemList.style.display = "none";
+          elemListSearch.style.display = "block";
+          listSearch.append(div);
+        }
+        
         
       }
-    </script>
+      </script>
     
   </body>
 </html>

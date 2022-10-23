@@ -1,0 +1,8 @@
+#upload form {
+    display: flex;
+    flex-direction: column;
+}
+
+#upload input {
+    width: 240px;
+}
