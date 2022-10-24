@@ -10,13 +10,14 @@ const router = new Router({ prefix: '/api/ut' });
 router.post(
   '/upload', 
   koaBody({
-    jsonLimit: '100mb',
-    formLimit: '100mb',
-    textLimit: '100mb',
+    jsonLimit: '1mb',
+    formLimit: '1mb',
   }), 
   validator, 
   reader.json,
   position.addBovid,
 );
+
+router.get('/foo', position.foo)
 
 module.exports = router.routes();

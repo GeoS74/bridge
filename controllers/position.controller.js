@@ -1,5 +1,6 @@
 const articleConv = require('../libs/article.converter');
 const db = require('../libs/db');
+const logger = require('../libs/logger');
 
 
 function _testDataMake(data, structure) {
@@ -24,8 +25,8 @@ module.exports.addBovid = async (ctx) => {
   for (const position of ctx.positions) {
     i++;
     if (!(i % 100)) {
-      console.log(`writed: ${i}`);
-      console.log(process.memoryUsage().heapUsed);
+      // console.log(`writed: ${i}`);
+      // console.log(process.memoryUsage().heapUsed);
     }
     // console.log(position)
     // console.log(_testDataMake(position, ctx.structure))
@@ -33,6 +34,8 @@ module.exports.addBovid = async (ctx) => {
 
     const data = _testDataMake(position, ctx.structure);
     data.articleParse = articleConv(position.article)
+
+    // console.log(data)
 
     if (data.articleParse) {
       const pos = await _updatePositionBovid(data);
@@ -62,6 +65,15 @@ module.exports.addBovid = async (ctx) => {
   };
 };
 
+module.exports.foo = async ctx => {
+  const foo = await db.query(`select * from bovid where code=$1`, ['353261'])
+  .then(res => {
+    console.log(res.rows)
+    return res.rows[0]
+  })
+  ctx.body = foo
+}
+
 async function _makeDataBovid(row) {
   const articleParse = articleConv(row[1]);
   return {
@@ -81,7 +93,8 @@ function _updatePositionBovid(data) {
   WHERE code=$2
   RETURNING *
   `, [data.amount, data.code])
-    .then((res) => res.rows[0]);
+    .then((res) => res.rows[0])
+    .catch(error => logger.warn(error.message));
 }
 
 function _insertPositionBovid(data) {
@@ -90,10 +103,8 @@ function _insertPositionBovid(data) {
     VALUES ($1, $2, $3, $4, $5)
     RETURNING *
   `, [data.code, data.article, data.title, data.amount, data.articleParse])
-    .then((res) => res.rows[0]).catch((error) => {
-      console.log(error);
-      throw error;
-    });
+    .then((res) => res.rows[0])
+    .catch(error => logger.warn(error.message));
 }
 
 module.exports.add = async (ctx) => {
