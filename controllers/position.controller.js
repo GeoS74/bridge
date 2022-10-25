@@ -1,4 +1,4 @@
-const articleConv = require('../libs/article.converter');
+const articleParser = require('../libs/article.parser');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 
@@ -23,17 +23,14 @@ module.exports.addBovid = async (ctx) => {
 
   let i = 0;
   for (const position of ctx.positions) {
-    i++;
-    if (!(i % 100)) {
-      // console.log(`writed: ${i}`);
-      // console.log(process.memoryUsage().heapUsed);
-    }
-    // console.log(position)
-    // console.log(_testDataMake(position, ctx.structure))
-    // break;
+    // i++;
+    // if (!(i % 100)) {
+    //   console.log(`writed: ${i}`);
+    //   console.log(process.memoryUsage().heapUsed);
+    // }
 
     const data = _testDataMake(position, ctx.structure);
-    data.articleParse = articleConv(position.article)
+    data.articleParse = articleParser(position.article)
 
     // console.log(data)
 
@@ -74,16 +71,16 @@ module.exports.foo = async ctx => {
   ctx.body = foo
 }
 
-async function _makeDataBovid(row) {
-  const articleParse = articleConv(row[1]);
-  return {
-    code: row[0],
-    article: row[1],
-    title: row[2],
-    amount: row[3] || null,
-    articleParse,
-  };
-}
+// async function _makeDataBovid(row) {
+//   const articleParse = articleConv(row[1]);
+//   return {
+//     code: row[0],
+//     article: row[1],
+//     title: row[2],
+//     amount: row[3] || null,
+//     articleParse,
+//   };
+// }
 
 function _updatePositionBovid(data) {
   return db.query(`UPDATE bovid
@@ -139,7 +136,7 @@ module.exports.add = async (ctx) => {
 };
 
 async function _makeData(row, brandId, providerId) {
-  const articleParse = articleConv(row[1]);
+  // const articleParse = articleConv(row[1]);
   return {
     bovidId: await _getBovidId(articleParse) || null,
     brandId,

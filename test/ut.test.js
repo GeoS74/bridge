@@ -12,7 +12,7 @@ if (process.env.NODE_ENV !== 'develop') {
   process.exit();
 }
 
-describe('/test/brands.test.js', () => {
+describe('/test/ut.test.js', () => {
   let _server;
 
   before(async () => {
@@ -25,7 +25,7 @@ describe('/test/brands.test.js', () => {
     _server.close();
   });
 
-  describe('brands CRUD', () => {
+  describe('sync 1C', () => {
     it('receiving data from 1C', async () => {
       const positions = {
         json_data: JSON.stringify({})
