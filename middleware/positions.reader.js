@@ -11,6 +11,7 @@ module.exports.json = async (ctx, next) => {
   }
 
   ctx.structure = {
+    uid: 'id',
     code: 'code',
     article: 'article',
     title: 'name',
@@ -31,6 +32,7 @@ module.exports.file = async (ctx, next) => {
   _delFile(ctx.request.files.file.filepath);
 
   ctx.structure = {
+    uid: null,
     code: ctx.request.body?.code,
     article: ctx.request.body?.article,
     title: ctx.request.body?.title,

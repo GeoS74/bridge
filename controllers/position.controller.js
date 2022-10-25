@@ -2,9 +2,145 @@ const articleParser = require('../libs/article.parser');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 
+module.exports.addBovid = async (ctx) => {
+  const start = Date.now();
 
-function _testDataMake(data, structure) {
+  for (const position of ctx.positions) {
+    const data = _makeData(position, ctx.structure);
+
+    if (data.articleParse) {
+      const pos = data.uid ? await _updatePositionBovidByUID(data) : await _updatePositionBovidByCode(data);
+
+      if (!pos) {
+        await _insertPositionBovid(data);
+      }
+    }
+  }
+
+  logger.info((Date.now() - start) / 1000);
+
+  ctx.status = 200;
+  ctx.body = {
+    message: 'bovid nomenclature upload',
+  };
+};
+
+function _updatePositionBovidByUID(data) {
+  return db.query(`UPDATE bovid
+  SET
+    updatedat=DEFAULT,
+    article=$2,
+    article_parse=$3,
+    title=$4,
+    amount=$5,
+    storage=$6,
+    weight=$7,
+    width=$8,
+    height=$9,
+    length=$10,
+    manufacturer=$11
+  WHERE uid=$1
+  RETURNING *
+  `, [
+    data.uid,
+    data.article,
+    data.articleParse,
+    data.title,
+    data.amount,
+    data.storage,
+    data.weight,
+    data.width,
+    data.height,
+    data.length,
+    data.manufacturer,
+  ])
+    .then((res) => res.rows[0])
+    .catch(error => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
+}
+
+function _updatePositionBovidByCode(data) {
+  return db.query(`UPDATE bovid
+  SET
+    updatedat=DEFAULT,
+    article=$2,
+    article_parse=$3,
+    title=$4,
+    amount=$5,
+    storage=$6,
+    weight=$7,
+    width=$8,
+    height=$9,
+    length=$10,
+    manufacturer=$11
+  WHERE code=$1
+  RETURNING *
+  `, [
+    data.code,
+    data.article,
+    data.articleParse,
+    data.title,
+    data.amount,
+    data.storage,
+    data.weight,
+    data.width,
+    data.height,
+    data.length,
+    data.manufacturer,
+  ])
+    .then((res) => res.rows[0])
+    .catch(error => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
+}
+
+function _insertPositionBovid(data) {
+  return db.query(`INSERT INTO bovid
+    (
+      uid, 
+      code,
+      article, 
+      article_parse, 
+      title, 
+      amount, 
+      storage,
+      weight,
+      width,
+      height,
+      length,
+      manufacturer
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+    RETURNING *
+  `, [
+    data.uid,
+    data.code,
+    data.article,
+    data.articleParse,
+    data.title,
+    data.amount,
+    data.storage,
+    data.weight,
+    data.width,
+    data.height,
+    data.length,
+    data.manufacturer,
+  ])
+    .then((res) => res.rows[0])
+    .catch(error => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
+}
+
+function _getAmount(storages) {
+  if (storages) {
+    let amount = 0;
+    for (const storage of storages) {
+      amount += +storage.amount;
+    }
+    return amount;
+  }
+  return null;
+}
+
+function _makeData(data, structure) {
   return {
+    uid: data[structure.uid] || null,
     code: data[structure.code] || null,
     article: data[structure.article] || null,
     title: data[structure.title] || null,
@@ -13,96 +149,21 @@ function _testDataMake(data, structure) {
     height: data[structure.height] || null,
     length: data[structure.length] || null,
     manufacturer: data[structure.manufacturer] || null,
-    storage: data[structure.storage] || null,
+    storage: data[structure.storage] ? JSON.stringify(data[structure.storage]) : null,
     price: data[structure.price] || null,
+    amount: _getAmount(data[structure.storage]) || null,
+    articleParse: articleParser(data[structure.article]) || null,
+    titleParse: articleParser(data[structure.title]) || null,
   }
 }
 
-module.exports.addBovid = async (ctx) => {
-  const start = Date.now();
 
-  let i = 0;
-  for (const position of ctx.positions) {
-    // i++;
-    // if (!(i % 100)) {
-    //   console.log(`writed: ${i}`);
-    //   console.log(process.memoryUsage().heapUsed);
-    // }
 
-    const data = _testDataMake(position, ctx.structure);
-    data.articleParse = articleParser(position.article)
 
-    // console.log(data)
 
-    if (data.articleParse) {
-      const pos = await _updatePositionBovid(data);
 
-      if (!pos) {
-        await _insertPositionBovid(data);
-      }
-    }
 
-    // const data = await _makeDataBovid(Object.values(position));
 
-    // if (data.articleParse) {
-    //   const pos = await _updatePositionBovid(data);
-
-    //   if (!pos) {
-    //     await _insertPositionBovid(data);
-    //   }
-    // }
-  }
-
-  console.log((Date.now() - start) / 1000);
-
-  ctx.status = 200;
-  ctx.body = {
-    message: 'bovid nomenclature upload',
-    time: (Date.now() - start) / 1000,
-  };
-};
-
-module.exports.foo = async ctx => {
-  const foo = await db.query(`select * from bovid where code=$1`, ['353261'])
-  .then(res => {
-    console.log(res.rows)
-    return res.rows[0]
-  })
-  ctx.body = foo
-}
-
-// async function _makeDataBovid(row) {
-//   const articleParse = articleConv(row[1]);
-//   return {
-//     code: row[0],
-//     article: row[1],
-//     title: row[2],
-//     amount: row[3] || null,
-//     articleParse,
-//   };
-// }
-
-function _updatePositionBovid(data) {
-  return db.query(`UPDATE bovid
-  SET
-    updatedat=DEFAULT,
-    amount=$1
-  WHERE code=$2
-  RETURNING *
-  `, [data.amount, data.code])
-    .then((res) => res.rows[0])
-    .catch(error => logger.warn(error.message));
-}
-
-function _insertPositionBovid(data) {
-  return db.query(`INSERT INTO bovid
-    (code, article, title, amount, article_parse)
-    VALUES ($1, $2, $3, $4, $5)
-    RETURNING *
-  `, [data.code, data.article, data.title, data.amount, data.articleParse])
-    .then((res) => res.rows[0])
-    .catch(error => logger.warn(error.message));
-}
 
 module.exports.add = async (ctx) => {
   const { brandId, providerId } = ctx.request.body;
@@ -116,7 +177,7 @@ module.exports.add = async (ctx) => {
       console.log(process.memoryUsage().heapUsed);
     }
 
-    const data = await _makeData(Object.values(position), brandId, providerId);
+    const data = await _makeData_(Object.values(position), brandId, providerId);
 
     if (data.articleParse) {
       let pos = await _updatePosition(data);
@@ -135,7 +196,7 @@ module.exports.add = async (ctx) => {
   };
 };
 
-async function _makeData(row, brandId, providerId) {
+async function _makeData_(row, brandId, providerId) {
   // const articleParse = articleConv(row[1]);
   return {
     bovidId: await _getBovidId(articleParse) || null,

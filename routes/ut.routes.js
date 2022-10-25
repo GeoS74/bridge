@@ -10,15 +10,12 @@ const router = new Router({ prefix: '/api/ut' });
 router.post(
   '/upload',
   koaBody({
-    jsonLimit: '1mb',
-    formLimit: '1mb',
+    jsonLimit: '2mb',
+    formLimit: '2mb',
   }),
   validator,
   reader.json,
   position.addBovid,
 );
-
-// delete this route
-router.get('/foo', position.foo)
 
 module.exports = router.routes();
