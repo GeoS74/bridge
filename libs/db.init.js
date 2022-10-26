@@ -64,12 +64,12 @@ const data = {
       article TEXT,
       article_parse TEXT,
       title TEXT,
-      amount REAL,
+      amount REAL DEFAULT 0,
       storage TEXT,
-      weight REAL,
-      width REAL,
-      height REAL,
-      length REAL,
+      weight REAL DEFAULT 0,
+      width REAL DEFAULT 0,
+      height REAL DEFAULT 0,
+      length REAL DEFAULT 0,
       manufacturer TEXT
     );
   `)

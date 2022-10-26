@@ -19,7 +19,7 @@ module.exports.addBovid = async (ctx) => {
     }
   }
 
-  logger.info((Date.now() - start) / 1000);
+  logger.info('upload positions complete', (Date.now() - start) / 1000);
 
   ctx.status = 200;
   ctx.body = {

@@ -22,6 +22,7 @@ const app = new Koa();
 
 app.use(errorCatcher);
 app.use(serve('client'));
+app.use(serve('docs'));
 app.use(docsRoutes);
 app.use(clientRoutes);
 app.use(brandRoutes);
