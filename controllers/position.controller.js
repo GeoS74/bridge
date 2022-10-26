@@ -129,18 +129,25 @@ function _insertPositionBovid(data) {
     .catch((error) => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
 }
 
-function _getAmount(storages) {
-  if (storages) {
-    let amount = 0;
+function _sumAmount(storages) {
+  let amount = 0;
+  if (storages && Array.isArray(storages)) {
     for (const storage of storages) {
       amount += +storage.amount;
     }
-    return amount;
   }
-  return null;
+  return amount;
+}
+
+function _checkStorage(storage) {
+  if (storage && Array.isArray(storage)) {
+    return storage.filter((s) => +s.amount >= 0);
+  }
+  return [];
 }
 
 function _makeData(data, structure) {
+  const storage = _checkStorage(data[structure.storage]);
   return {
     uid: data[structure.uid] || null,
     code: data[structure.code] || null,
@@ -151,9 +158,9 @@ function _makeData(data, structure) {
     height: data[structure.height] || null,
     length: data[structure.length] || null,
     manufacturer: data[structure.manufacturer] || null,
-    storage: data[structure.storage] ? JSON.stringify(data[structure.storage]) : null,
+    storage: JSON.stringify(storage),
     price: data[structure.price] || null,
-    amount: _getAmount(data[structure.storage]) || null,
+    amount: _sumAmount(storage),
     articleParse: articleParser(data[structure.article]) || null,
     titleParse: articleParser(data[structure.title]) || null,
   };

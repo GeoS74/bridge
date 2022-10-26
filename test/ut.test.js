@@ -18,15 +18,12 @@ describe('/test/ut.test.js', () => {
 
   before(async () => {
     _server = app.listen(config.server.port);
-    await db.query('DELETE FROM prices');
-    await db.query('DELETE FROM positions');
-    await db.query('DELETE FROM bovid');
   });
 
   after(async () => {
-    // await db.query('DELETE FROM prices');
-    // await db.query('DELETE FROM positions');
-    // await db.query('DELETE FROM bovid');
+    await db.query('DELETE FROM prices');
+    await db.query('DELETE FROM positions');
+    await db.query('DELETE FROM bovid');
     _server.close();
   });
 
@@ -42,10 +39,10 @@ describe('/test/ut.test.js', () => {
     length: '0.7',
     manufacturer: 'Урал',
     storage: [],
-  }
+  };
 
-  describe('sync 1C', () => {
-    it('receiving data from 1C', async () => {
+  describe('receiving data from 1C', () => {
+    it('insert and update positions', async () => {
       let positions = { json_data: JSON.stringify([position]) };
       const optional = {
         headers: { 'Content-Type': 'application/json' },
@@ -53,7 +50,7 @@ describe('/test/ut.test.js', () => {
         body: JSON.stringify(positions),
       };
 
-      //use function _insertPositionBovid
+      // use function _insertPositionBovid
       let response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
@@ -64,7 +61,7 @@ describe('/test/ut.test.js', () => {
       positions = { json_data: JSON.stringify([position]) };
       optional.body = JSON.stringify(positions);
 
-      //use function _updatePositionBovidByUID
+      // use function _updatePositionBovidByUID
       response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
@@ -77,20 +74,55 @@ describe('/test/ut.test.js', () => {
       positions = { json_data: JSON.stringify([position]) };
       optional.body = JSON.stringify(positions);
 
-      //use function _updatePositionBovidByCode
+      // use function _updatePositionBovidByCode
       response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
 
       testPosition = await _getPositionByID(testPosition.id);
       expect(testPosition.title, 'сервер изменил title').to.be.equal(position.name);
+    });
 
+    it('data error handling', async () => {
+      const optional = {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        body: null,
+      };
 
+      let response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+        .then(_getData);
+      expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
+      _expectErrorFieldState.call(this, response.data);
 
-      
-      position.name = 'test2';
-      position.id = null;
-      position.code = null;
+      let positions = { json_data: null };
+      optional.body = JSON.stringify(positions);
+
+      response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+        .then(_getData);
+      expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
+      _expectErrorFieldState.call(this, response.data);
+
+      positions = { json_data: {} };
+      optional.body = JSON.stringify(positions);
+
+      response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+        .then(_getData);
+      expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
+      _expectErrorFieldState.call(this, response.data);
+
+      positions = { json_data: JSON.stringify({}) };
+      optional.body = JSON.stringify(positions);
+
+      response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+        .then(_getData);
+      expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
+      _expectErrorFieldState.call(this, response.data);
+
+      position.id = uuidv4();
+      position.code = '654321';
+      position.storage = [{ amount: 1 }, { amount: -5 }, { amount: 4 }];
+
       positions = { json_data: JSON.stringify([position]) };
       optional.body = JSON.stringify(positions);
 
@@ -98,22 +130,21 @@ describe('/test/ut.test.js', () => {
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
 
-      // testPosition = await _getPositionByID(testPosition.id);
-      // expect(testPosition.title, 'сервер изменил title').to.be.equal(position.name);
+      const testPosition = await _getPositionByUID(position.id);
+      expect(testPosition.amount, 'сервер правильно обрабатывает отрицательные остатки')
+        .to.be.equal(5);
     });
   });
 });
 
 async function _getPositionByID(id) {
-  return db.query(`SELECT * FROM bovid
-  WHERE id=$1`, [id])
-    .then(res => res.rows[0])
+  return db.query('SELECT * FROM bovid WHERE id=$1', [id])
+    .then((res) => res.rows[0]);
 }
 
 async function _getPositionByUID(uid) {
-  return db.query(`SELECT * FROM bovid
-  WHERE uid=$1`, [uid])
-    .then(res => res.rows[0])
+  return db.query('SELECT * FROM bovid WHERE uid=$1', [uid])
+    .then((res) => res.rows[0]);
 }
 
 async function _getData(response) {
@@ -121,4 +152,10 @@ async function _getData(response) {
     status: response.status,
     data: await response.json(),
   };
+}
+
+function _expectErrorFieldState(data) {
+  expect(data, 'сервер возвращает объект с описанием ошибки')
+    .that.is.an('object')
+    .to.have.property('error');
 }
