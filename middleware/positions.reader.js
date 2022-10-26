@@ -5,9 +5,15 @@ const logger = require('../libs/logger');
 
 module.exports.json = async (ctx, next) => {
   try {
-    ctx.positions = JSON.parse(ctx.request.body.json_data);
+    const positions = JSON.parse(ctx.request.body.json_data);
+
+    if (!Array.isArray(positions)) {
+      throw new Error();
+    }
+
+    ctx.positions = positions;
   } catch (error) {
-    ctx.throw(400, 'bad json')
+    ctx.throw(400, 'bad json');
   }
 
   ctx.structure = {
@@ -22,7 +28,7 @@ module.exports.json = async (ctx, next) => {
     manufacturer: 'manufacturer',
     storage: 'storage',
     price: null,
-  }
+  };
 
   await next();
 };
@@ -43,7 +49,7 @@ module.exports.file = async (ctx, next) => {
     manufacturer: ctx.request.body?.manufacturer,
     storage: null,
     price: ctx.request.body?.price,
-  }
+  };
 
   await next();
 

@@ -9,7 +9,9 @@ module.exports.addBovid = async (ctx) => {
     const data = _makeData(position, ctx.structure);
 
     if (data.articleParse) {
-      const pos = data.uid ? await _updatePositionBovidByUID(data) : await _updatePositionBovidByCode(data);
+      const pos = data.uid
+        ? await _updatePositionBovidByUID(data)
+        : await _updatePositionBovidByCode(data);
 
       if (!pos) {
         await _insertPositionBovid(data);
@@ -21,7 +23,7 @@ module.exports.addBovid = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = {
-    message: 'bovid nomenclature upload',
+    message: 'upload positions complete',
   };
 };
 
@@ -55,7 +57,7 @@ function _updatePositionBovidByUID(data) {
     data.manufacturer,
   ])
     .then((res) => res.rows[0])
-    .catch(error => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
+    .catch((error) => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
 }
 
 function _updatePositionBovidByCode(data) {
@@ -88,7 +90,7 @@ function _updatePositionBovidByCode(data) {
     data.manufacturer,
   ])
     .then((res) => res.rows[0])
-    .catch(error => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
+    .catch((error) => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
 }
 
 function _insertPositionBovid(data) {
@@ -124,7 +126,7 @@ function _insertPositionBovid(data) {
     data.manufacturer,
   ])
     .then((res) => res.rows[0])
-    .catch(error => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
+    .catch((error) => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
 }
 
 function _getAmount(storages) {
@@ -154,16 +156,8 @@ function _makeData(data, structure) {
     amount: _getAmount(data[structure.storage]) || null,
     articleParse: articleParser(data[structure.article]) || null,
     titleParse: articleParser(data[structure.title]) || null,
-  }
+  };
 }
-
-
-
-
-
-
-
-
 
 module.exports.add = async (ctx) => {
   const { brandId, providerId } = ctx.request.body;
@@ -171,7 +165,7 @@ module.exports.add = async (ctx) => {
 
   let i = 0;
   for (const position of ctx.positions) {
-    i++;
+    i += 1;
     if (!(i % 100)) {
       console.log(`writed: ${i}`);
       console.log(process.memoryUsage().heapUsed);
