@@ -7,6 +7,9 @@ module.exports.addBovid = async (ctx) => {
 
   for (const position of ctx.positions) {
     const data = _makeData(position, ctx.structure);
+    // console.log(position);
+    // console.log(data);
+    // break;
 
     if (data.articleParse) {
       const pos = data.uid

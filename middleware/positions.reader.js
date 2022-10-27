@@ -2,6 +2,7 @@ const XLSX = require('xlsx');
 const fs = require('fs');
 
 const logger = require('../libs/logger');
+const columnNameToNumber = require('../libs/column.name.converter');
 
 module.exports.json = async (ctx, next) => {
   try {
@@ -39,31 +40,37 @@ module.exports.file = async (ctx, next) => {
 
   ctx.structure = {
     uid: null,
-    code: ctx.request.body?.code,
-    article: ctx.request.body?.article,
-    title: ctx.request.body?.title,
-    weight: ctx.request.body?.weight,
-    width: ctx.request.body?.width,
-    height: ctx.request.body?.height,
-    length: ctx.request.body?.length,
-    manufacturer: ctx.request.body?.manufacturer,
+    code: _getColumnNumber(ctx.request.body?.code),
+    article: _getColumnNumber(ctx.request.body?.article),
+    title: _getColumnNumber(ctx.request.body?.title),
+    weight: _getColumnNumber(ctx.request.body?.weight),
+    width: _getColumnNumber(ctx.request.body?.width),
+    height: _getColumnNumber(ctx.request.body?.height),
+    length: _getColumnNumber(ctx.request.body?.length),
+    manufacturer: _getColumnNumber(ctx.request.body?.manufacturer),
     storage: null,
-    price: ctx.request.body?.price,
+    price: _getColumnNumber(ctx.request.body?.price),
   };
 
-  await next();
+  const startRow = ctx.request.body?.startRow;
+  if (startRow) {
+    ctx.positions = ctx.positions.slice(startRow - 1);
+  }
 
-  // console.log(ctx.positions.slice(10, 11));
-  // ctx.status = 200;
-  // ctx.body = 'ok'
+  await next();
 };
+
+function _getColumnNumber(name) {
+  const columnNumber = parseInt(name, 10) || columnNameToNumber(name);
+  return columnNumber ? columnNumber - 1 : null;
+}
 
 function _readExceltoArray(filePath) {
   const workbook = XLSX.readFile(filePath);
   const sheetName = workbook.SheetNames[0];
   const worksheet = workbook.Sheets[sheetName];
   const opts = {
-    // header: 'A',
+    header: 1,
     defval: '',
   };
   return XLSX.utils.sheet_to_json(worksheet, opts);

@@ -30,7 +30,7 @@ router.post(
 );
 
 router.post(
-  '/upload/bovid',
+  '/upload/ut',
   koaBody(optional),
   fileValidator,
   reader.file,
