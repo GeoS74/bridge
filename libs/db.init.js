@@ -65,7 +65,7 @@ const data = {
       article_parse TEXT,
       title TEXT,
       amount REAL DEFAULT 0,
-      storage TEXT,
+      storage JSON,
       weight REAL DEFAULT 0,
       width REAL DEFAULT 0,
       height REAL DEFAULT 0,
