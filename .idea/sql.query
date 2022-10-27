@@ -27,3 +27,6 @@ offset 150 limit 10;
 
 -- query count compare positions
 select count(*) from positions where bovid_id is not null;
+
+insert into positions (brand_id, provider_id) values (1, 1), (2, 2);
+insert into prices (position_id, price) values (1, 150), (1, 250), (2, 777);

@@ -81,12 +81,13 @@ const data = {
       id SERIAL PRIMARY KEY,
       createdat TIMESTAMP NOT NULL DEFAULT NOW(),
       updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
-      brand_id INTEGER NOT NULL REFERENCES brands,
-      provider_id INTEGER NOT NULL REFERENCES providers,
+      brand_id INTEGER NOT NULL REFERENCES brands ON DELETE CASCADE,
+      provider_id INTEGER NOT NULL REFERENCES providers ON DELETE CASCADE,
       bovid_id INTEGER REFERENCES bovid,
       article TEXT,
       article_parse TEXT,
-      title TEXT
+      title TEXT,
+      amount REAL DEFAULT 0
     );
     CREATE INDEX positions_idx ON positions (article_parse, brand_id, provider_id);
   `)
@@ -97,7 +98,7 @@ const data = {
     CREATE TABLE prices (
       id BIGSERIAL PRIMARY KEY,
       createdat TIMESTAMP NOT NULL DEFAULT NOW(),
-      position_id INTEGER NOT NULL REFERENCES positions,
+      position_id INTEGER NOT NULL REFERENCES positions ON DELETE CASCADE,
       price REAL NOT NULL
     );
     CREATE INDEX prices_idx ON prices (position_id);

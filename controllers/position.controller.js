@@ -7,9 +7,6 @@ module.exports.addBovid = async (ctx) => {
 
   for (const position of ctx.positions) {
     const data = _makeData(position, ctx.structure);
-    // console.log(position);
-    // console.log(data);
-    // break;
 
     if (data.articleParse) {
       const pos = data.uid
@@ -173,13 +170,32 @@ module.exports.add = async (ctx) => {
   const { brandId, providerId } = ctx.request.body;
   const start = Date.now();
 
-  let i = 0;
   for (const position of ctx.positions) {
-    i += 1;
-    if (!(i % 100)) {
-      console.log(`writed: ${i}`);
-      console.log(process.memoryUsage().heapUsed);
+    const data = _makeData(position, ctx.structure);
+
+    if (data.articleParse) {
+      const pos = data.uid
+        ? await _updatePositionBovidByUID(data)
+        : await _updatePositionBovidByCode(data);
+
+      if (!pos) {
+        await _insertPositionBovid(data);
+      }
     }
+  }
+
+  logger.info('upload positions complete', (Date.now() - start) / 1000);
+
+  ctx.status = 200;
+  ctx.body = {
+    message: 'upload positions complete',
+  };
+
+
+
+  
+
+  for (const position of ctx.positions) {
 
     const data = await _makeData_(Object.values(position), brandId, providerId);
 
