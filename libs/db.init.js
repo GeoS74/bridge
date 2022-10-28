@@ -72,6 +72,7 @@ const data = {
       length REAL DEFAULT 0,
       manufacturer TEXT
     );
+    CREATE INDEX bovid_idx ON positions (article_parse);
   `)
     .then(() => logger.info('create table "bovid"'))
     .catch((error) => logger.warn(error.message));
@@ -87,9 +88,10 @@ const data = {
       article TEXT,
       article_parse TEXT,
       title TEXT,
+      title_parse TEXT,
       amount REAL DEFAULT 0
     );
-    CREATE INDEX positions_idx ON positions (article_parse, brand_id, provider_id);
+    CREATE INDEX positions_idx ON positions (article_parse, title_parse, brand_id, provider_id);
   `)
     .then(() => logger.info('create table "positions"'))
     .catch((error) => logger.warn(error.message));

@@ -1,4 +1,5 @@
 const articleParser = require('../libs/article.parser');
+const priceHandler = require('../libs/price.handler');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 
@@ -6,16 +7,20 @@ module.exports.addBovid = async (ctx) => {
   const start = Date.now();
 
   for (const position of ctx.positions) {
-    const data = _makeData(position, ctx.structure);
+    const data = _makeData(position, ctx.structure, 'isBovid');
 
-    if (data.articleParse) {
-      const pos = data.uid
-        ? await _updatePositionBovidByUID(data)
-        : await _updatePositionBovidByCode(data);
+    try {
+      if (data.articleParse) {
+        const pos = data.uid
+          ? await _updatePositionBovidByUID(data)
+          : await _updatePositionBovidByCode(data);
 
-      if (!pos) {
-        await _insertPositionBovid(data);
+        if (!pos) {
+          await _insertPositionBovid(data);
+        }
       }
+    } catch (error) {
+      logger.error(`код ${data.code} артикул ${data.article}`, error.message);
     }
   }
 
@@ -23,7 +28,7 @@ module.exports.addBovid = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = {
-    message: 'upload positions complete',
+    message: `upload positions complete in ${(Date.now() - start) / 1000}`,
   };
 };
 
@@ -56,8 +61,7 @@ function _updatePositionBovidByUID(data) {
     data.length,
     data.manufacturer,
   ])
-    .then((res) => res.rows[0])
-    .catch((error) => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
+    .then((res) => res.rows[0]);
 }
 
 function _updatePositionBovidByCode(data) {
@@ -89,8 +93,7 @@ function _updatePositionBovidByCode(data) {
     data.length,
     data.manufacturer,
   ])
-    .then((res) => res.rows[0])
-    .catch((error) => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
+    .then((res) => res.rows[0]);
 }
 
 function _insertPositionBovid(data) {
@@ -125,8 +128,7 @@ function _insertPositionBovid(data) {
     data.length,
     data.manufacturer,
   ])
-    .then((res) => res.rows[0])
-    .catch((error) => logger.error(`код ${data.code} артикул ${data.article}`, error.message));
+    .then((res) => res.rows[0]);
 }
 
 function _sumAmount(storages) {
@@ -146,7 +148,7 @@ function _checkStorage(storage) {
   return [];
 }
 
-function _makeData(data, structure) {
+function _makeData(data, structure, isBovid) {
   const storage = _checkStorage(data[structure.storage]);
   return {
     uid: data[structure.uid] || null,
@@ -159,28 +161,41 @@ function _makeData(data, structure) {
     length: data[structure.length] || null,
     manufacturer: data[structure.manufacturer] || null,
     storage: JSON.stringify(storage),
-    price: data[structure.price] || null,
-    amount: _sumAmount(storage),
+    price: priceHandler(data[structure.price]),
+    amount: isBovid ? _sumAmount(storage) : (data[structure.amount] || null),
     articleParse: articleParser(data[structure.article]) || null,
     titleParse: articleParser(data[structure.title]) || null,
   };
 }
 
 module.exports.add = async (ctx) => {
-  const { brandId, providerId } = ctx.request.body;
   const start = Date.now();
+  const { brandId, providerId } = ctx.request.body;
 
+  let i = 0;
   for (const position of ctx.positions) {
+    i += 1;
+    if (!(i % 500)) {
+      logger.info(`upload ${i} in ${ctx.positions.length}`);
+    }
+
     const data = _makeData(position, ctx.structure);
 
-    if (data.articleParse) {
-      const pos = data.uid
-        ? await _updatePositionBovidByUID(data)
-        : await _updatePositionBovidByCode(data);
+    try {
+      let pos = await _updatePosition(data, brandId, providerId);
+
+      if (!pos?.bovid_id && data.articleParse) {
+        data.bovidId = await _getBovidId(data.articleParse);
+        await _updatePosition(data, brandId, providerId);
+      }
 
       if (!pos) {
-        await _insertPositionBovid(data);
+        pos = await _insertPosition(data, brandId, providerId);
       }
+
+      await _insertPrice(pos.id, data.price);
+    } catch (error) {
+      logger.error(`артикул ${data.article} наименование ${data.title}`, error.message);
     }
   }
 
@@ -188,46 +203,9 @@ module.exports.add = async (ctx) => {
 
   ctx.status = 200;
   ctx.body = {
-    message: 'upload positions complete',
-  };
-
-
-
-  
-
-  for (const position of ctx.positions) {
-
-    const data = await _makeData_(Object.values(position), brandId, providerId);
-
-    if (data.articleParse) {
-      let pos = await _updatePosition(data);
-
-      if (!pos) {
-        pos = await _insertPosition(data);
-      }
-      await _insertPrice(pos.id, data.price);
-    }
-  }
-
-  ctx.status = 200;
-  ctx.body = {
-    message: 'file upload',
-    time: (Date.now() - start) / 1000,
+    message: `upload ${ctx.positions.length} positions complete in ${(Date.now() - start) / 1000}`,
   };
 };
-
-async function _makeData_(row, brandId, providerId) {
-  // const articleParse = articleConv(row[1]);
-  return {
-    bovidId: await _getBovidId(articleParse) || null,
-    brandId,
-    providerId,
-    article: row[1],
-    title: row[2],
-    articleParse,
-    price: row[3],
-  };
-}
 
 function _getBovidId(articleParse) {
   return db.query(`SELECT id FROM bovid
@@ -236,23 +214,55 @@ function _getBovidId(articleParse) {
     .then((res) => res.rows[0]?.id);
 }
 
-function _updatePosition(data) {
+function _updatePosition(data, brandId, providerId) {
   return db.query(`UPDATE positions
   SET
     updatedat=DEFAULT,
-    title=$1
-  WHERE article_parse=$2 AND brand_id=$3 AND provider_id=$4
+    bovid_id=$1,
+    article=$2,
+    article_parse=$3,
+    title=$4,
+    title_parse=$5,
+    amount=$6
+  WHERE article_parse=$3 AND title_parse=$5 AND brand_id=$7 AND provider_id=$8
   RETURNING *
-  `, [data.title, data.articleParse, data.brandId, data.providerId])
+  `, [
+    data.bovidId,
+    data.article,
+    data.articleParse,
+    data.title,
+    data.titleParse,
+    data.amount,
+    brandId,
+    providerId,
+  ])
     .then((res) => res.rows[0]);
 }
 
-function _insertPosition(data) {
+function _insertPosition(data, brandId, providerId) {
   return db.query(`INSERT INTO positions
-    (bovid_id, brand_id, provider_id, article, title, article_parse)
-    VALUES ($1, $2, $3, $4, $5, $6)
+    (
+      brand_id, 
+      provider_id, 
+      bovid_id, 
+      article, 
+      article_parse,
+      title, 
+      title_parse,
+      amount
+    )
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *
-  `, [data.bovidId, data.brandId, data.providerId, data.article, data.title, data.articleParse])
+  `, [
+    brandId,
+    providerId,
+    data.bovidId,
+    data.article,
+    data.articleParse,
+    data.title,
+    data.titleParse,
+    data.amount,
+  ])
     .then((res) => res.rows[0]);
 }
 

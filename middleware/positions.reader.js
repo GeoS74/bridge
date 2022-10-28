@@ -29,6 +29,7 @@ module.exports.json = async (ctx, next) => {
     manufacturer: 'manufacturer',
     storage: 'storage',
     price: null,
+    amount: null,
   };
 
   await next();
@@ -50,6 +51,7 @@ module.exports.file = async (ctx, next) => {
     manufacturer: _getColumnNumber(ctx.request.body?.manufacturer),
     storage: null,
     price: _getColumnNumber(ctx.request.body?.price),
+    amount: _getColumnNumber(ctx.request.body?.amount),
   };
 
   const startRow = ctx.request.body?.startRow;
