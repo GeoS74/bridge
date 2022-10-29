@@ -1,14 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/style_brends.css">
+  <title>Бренды</title>
+
 </head>
+
 <body>
-    <div>
-        <button onclick="window.location.href = 'http://localhost:3100/';">asdasd</button>
+
+  <div>
+    <button onclick="window.location.href = '/'">На главную</button>
+  </div>
+  <h1>Бренды</h1>
+
+  <div>
+    <div style="display: flex;">
+      <div class="add">
+        <!-- открывает закрывает форму (добаввить бренд)-->
+        <input type="submit" id="add" value="добавить бренд" data-toggle-id="form" data-action="add" />
+      </div>
+      <div class="search">
+        <!-- открывает закрывает форму (Поиск бренд)-->
+        <input type="submit" id="search" value="поиск бренда" data-toggle-id="form" data-action="search" onclick="" />
+      </div>
+      <div>
+        <!-- кнопка обновления страницы бренды -->
+        <input type="submit" id="refresh" value="Все бренды" onclick="allBrends()" />
+      </div>
     </div>
+
+
+    <form id="form" hidden data-action="all">
+      <input type="text" id="inputForm" name="title" placeholder="" />
+      <input type="submit" value="send" />
+    </form>
+
+    <!-- отрисовывает таблицу -->
+    <ul id="list" style="display: block;">
+    </ul>
+
+    <script>
+      "use strict"
+      let lastActionButtun = "";
+      const elemForm = document.getElementById("form");
+      const elemList = document.getElementById("list");
+      const elemInput = document.getElementById("inputForm");
+
+      // в зависимости от того какая кнопка нажата открывает или закрывает форму
+      function ActionButtun(dataAction) {
+        if (dataAction === "add") {
+          if (lastActionButtun === "add") {
+            elemForm.setAttribute("data-action", "all");
+            elemForm.setAttribute("hidden", "");
+            lastActionButtun = "";
+          } else if (lastActionButtun !== "add") {
+            elemForm.setAttribute("data-action", "add");
+            elemForm.removeAttribute("hidden");
+            lastActionButtun = "add";
+          }
+        } else if (dataAction === "search") {
+          if (lastActionButtun === "search") {
+            elemForm.setAttribute("data-action", "all");
+            elemForm.setAttribute("hidden", "")
+            lastActionButtun = ""
+          } else if (lastActionButtun !== "search") {
+            elemForm.setAttribute("data-action", "search");
+            elemForm.removeAttribute("hidden");
+            lastActionButtun = "search";
+          }
+        }
+      };
+
+      // запрос на все бренды
+      function allBrends() {
+        fetch('/api/brands')
+          .then(async response => {
+            if (response.ok) {
+              const brands = await response.json();
+              elemList.innerHTML = "";
+              brands.map(brand => listOutputBrand(brand))
+            }
+            else {
+              throw new Error(`query status ${response.status}`)
+            }
+          })
+          .catch(error => console.log(error));
+      };
+
+      // отрисовывает кнопки удаление и изменение, а также список brand
+      function listOutputBrand(brand) {
+        let div = document.createElement('div');
+
+        // создание кнопок удаление и изменение
+        let buttonDel = document.createElement('button');
+        let buttonChenge = document.createElement('button');
+        let imgDel = document.createElement('img');
+        imgDel.src = "./img/dustbin.svg";
+        imgDel.className = 'imgDel'
+        buttonDel.append(imgDel);
+        let imgChenge = document.createElement('img');
+        imgChenge.src = "./img/pencil.svg";
+        imgChenge.className = 'imgChenge'
+        buttonChenge.append(imgChenge);
+
+        // запрос удаление бренда
+        buttonDel.addEventListener('click', event => {
+          if (confirm(`вы собираетесь удалить бренд!!! ${brand.title}`) === true) {
+            fetch(`/api/brands/${brand.id}`, {
+              headers: {},
+              method: 'DELETE',
+              body: {},
+            })
+              .then(async response => {
+                if (response.ok) {
+                  allBrends()
+                }
+                else {
+                  throw new Error(`query status ${response.status}`)
+                }
+              })
+              .catch(error => console.log(error));
+          }
+        });
+
+        // запрос изменение бренда
+        buttonChenge.addEventListener('click', event => {
+          let elemLi = document.querySelector(`li[data-id="${brand.id}"]`)
+          let elemLiText = elemLi.textContent
+
+
+
+
+          // let inputChenge = prompt(`вы собираетесь Изменить бренд!!! ${brand.title}`)
+          console.log(brand.id)
+          const optionalChenge = {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            method: 'PATCH',
+            body: JSON.stringify({ title: inputChenge }),
+          };
+          fetch(`/api/brands/${brand.id}`, optionalChenge)
+            .then(allBrends())
+            .catch(error => console.log(error))
+        });
+
+        // создание строчки с брендом и кнопки удаление и изменения
+        div.className = `li-${brand.id}`;
+        div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`);
+        div.prepend(buttonChenge);
+        div.prepend(buttonDel);
+        list.append(div);
+      };
+
+      if (elemForm.dataset.action === "all") {
+        allBrends();
+      };
+
+      // поиск и добавление
+      elemForm.addEventListener('submit', event => {
+        event.preventDefault();
+        // отправляет запрос на добавление
+        if (elemForm.dataset.action === "add") {
+          const optionalAdd = {
+            headers: {},
+            method: 'POST',
+            body: new FormData(event.target),
+          };
+          fetch('/api/brands', optionalAdd)
+            .then(async res => {
+              const result = await res.json();
+              elemList.innerHTML = "";
+              allBrends();
+              elemInput.value = "";
+            })
+          // отправляет запрос на поиск
+        } else if (elemForm.dataset.action === "search") {
+          elemList.replaceChildren();
+          let valueInputSearch = elemInput.value;
+          let listSearch = [];
+          event.preventDefault();
+
+          fetch('/api/brands')
+            .then(async res => {
+              const result = await res.json();
+              for (let key in result) {
+                if (valueInputSearch === result[key].title) {
+                  let i = {};
+                  i.id = result[key].id;
+                  i.title = result[key].title;
+                  listSearch.push(i)
+                }
+              };
+              elemList.innerHTML = "";
+              listSearch.map(brand => listOutputBrand(brand));
+              elemInput.value = "";
+            })
+        }
+      });
+
+      // скрывакт и отрисовывает форму
+      document.addEventListener('click', function (event) {
+        // ловим toggleId и по ней определяем кнопку. открывая и закрывая форму
+        let id = event.target.dataset.toggleId;
+        if (!id) return;
+        let elem = document.getElementById(id);
+        // определяем какую форму открыть
+        if (event.target.dataset.action === "add") {
+          elemInput.placeholder = "Добавить бренд";
+          ActionButtun("add");
+        } else {
+          elemInput.placeholder = "Поиск бренда";
+          ActionButtun("search");
+        }
+      });      
+    </script>
+
 </body>
+
 </html>
