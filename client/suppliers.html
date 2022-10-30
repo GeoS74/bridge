@@ -1,144 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <link rel="stylesheet" href="./css/style_suppliers.css">
-    <title>Поставщики</title>
-    
-  </head>
-  <body>
 
-    <div>
-      <button onclick="window.location.href = 'http://localhost:3100/';">На главную</button>
-    </div>
-    <h1>Поставщики</h1>
-    
-    <div>      
-      <div style="display: flex;">
-        <div class="add">
-          <!-- открывает закрывает форму (добаввить поставщика)-->
-          <input type="submit" id="add" value="добавить поставщика" onclick="addVisibilityFun('addForm')"/>
-        </div>
-        <div class="search">
-          <!-- открывает закрывает форму (Поиск поставщика)-->
-          <input type="submit" id="search" value="поиск поставщика" onclick="addVisibilityFun('searchForm')"/>
-        </div>
-        <div>
-          <!-- кнопка обновления страницы поставщткт -->
-          <input type="submit" id="refresh" value="Все поставщики" onclick="location.reload()"/>
-        </div>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/style_brends.css">
+  <title>Поставщики</title>
+
+</head>
+
+<body>
+
+  <div>
+    <button onclick="window.location.href = '/'">На главную</button>
+  </div>
+  <h1>Поставщики</h1>
+
+  <div>
+    <div style="display: flex;">
+      <div class="add">
+        <!-- открывает закрывает форму (добаввить поставщика)-->
+        <input type="submit" id="add" value="добавить поставщика" data-toggle-id="form" data-action="add" />
       </div>
-      <form style="display: none;" id="addForm" data-action="">
-        <input type="text" id="inputAddForm" name="title" placeholder="Добавить поставщика"/>
-        <input type="submit" value="send" />
-      </form>
+      <div class="search">
+        <!-- открывает закрывает форму (Поиск поставщика)-->
+        <input type="submit" id="search" value="поиск поставщика" data-toggle-id="form" data-action="search"
+          onclick="" />
+      </div>
+      <div>
+        <!-- кнопка обновления страницы поставщики -->
+        <input type="submit" id="refresh" value="Все поставщики" onclick="allBrends()" />
+      </div>
+    </div>
 
-      <form style="display: none;" id="searchForm" data-action="">
-        <input type="text" id="inputsearchForm" name="title" placeholder="Поиск поставщика"/>
-        <input type="submit" value="send" />
-      </form>
 
-      <!-- отрисовывает поиск -->
-      <ul id="listSearch" style="display: block;">
-      </ul>
-  
-      <!-- отрисовывает таблицу -->
-      <ul id="list" style="display: block;">
-      </ul>
+    <form id="form" hidden data-action="all">
+      <input type="text" id="inputForm" name="title" placeholder="" />
+      <input type="submit" value="send" />
+    </form>
 
-      <script>
-        "use strict"
-        // функция определяющая какая форма открыта а какая спрятана
-        function addVisibilityFun(id) {
-          let elemAdd= document.getElementById('addForm');
-          let elemSearch = document.getElementById('searchForm');
-          let stateAdd = elemAdd.style.display;
-          let stateSearch = elemSearch.style.display;
-          if (id === 'addForm') {
-            if (stateAdd === "") {
-              elemAdd.style.display = "none";
-              addForm.reset();
-              addForm.dataset.action = '';
-  
-            } else {
-                elemSearch.style.display = "none";
-                elemAdd.style.display = "";
-                addForm.reset();
-                addForm.dataset.action = 'added';
+    <!-- отрисовывает таблицу -->
+    <ul id="list" style="display: block;">
+    </ul>
+
+    <script>
+      "use strict"
+      let lastActionButtun = "";
+      const elemForm = document.getElementById("form");
+      const elemList = document.getElementById("list");
+      const elemInput = document.getElementById("inputForm");
+
+      // в зависимости от того какая кнопка нажата открывает или закрывает форму
+      function ActionButtun(dataAction) {
+        if (dataAction === "add") {
+          if (lastActionButtun === "add") {
+            elemForm.setAttribute("data-action", "all");
+            elemForm.setAttribute("hidden", "");
+            lastActionButtun = "";
+          } else if (lastActionButtun !== "add") {
+            elemForm.setAttribute("data-action", "add");
+            elemForm.removeAttribute("hidden");
+            lastActionButtun = "add";
           }
-          } else {
-              if (stateSearch === "") {
-                elemSearch.style.display = "none";
-                searchForm.reset();
-                searchForm.dataset.action = '';
-    
-              } else {
-                elemAdd.style.display = "none";
-                elemSearch.style.display = "";
-                searchForm.reset();
-                searchForm.dataset.action = 'added';
-          }}
-        }  
-      </script>      
-      <script>
-        "use strict"
-        // отправляет запрос на добавление
-        document.querySelector('#addForm')
-        .addEventListener('submit', event => {
-          event.preventDefault();
-  
-          const optionalAdd = {
-            headers: {},
-            method: 'POST',
-            body: new FormData(event.target),
-          };
-          fetch('http://localhost:3100/api/providers', optionalAdd)
-          .then(async res => {
-            const result = await res.json();
-          })
-          location.reload();
-        })       
-  
-        // отправляет запрос на поиск          
-        document.querySelector('#searchForm')
-        .addEventListener('submit', event => {
-          document.getElementById('listSearch').replaceChildren();
-          let valueInputSearch = document.querySelector('#inputsearchForm').value;
-          let listSearch = [];
-          event.preventDefault();            
-  
-          fetch('http://localhost:3100/api/providers')
-            .then(async res => {              
-            const result = await res.json();
-          for (let key in result) {
-            if (valueInputSearch === result[key].title) {
-              let i = {};
-              i.id = result[key].id;
-              i.title = result[key].title;
-              listSearch.push(i)
-            }};          
-          listSearch.map(brand => addBrand(brand, 1));
-          })
-        })
+        } else if (dataAction === "search") {
+          if (lastActionButtun === "search") {
+            elemForm.setAttribute("data-action", "all");
+            elemForm.setAttribute("hidden", "")
+            lastActionButtun = ""
+          } else if (lastActionButtun !== "search") {
+            elemForm.setAttribute("data-action", "search");
+            elemForm.removeAttribute("hidden");
+            lastActionButtun = "search";
+          }
+        }
+      };
 
-        // запрос на всех поставщиков
+      // запрос на все поставщики
+      function allBrends() {
         fetch('/api/providers')
-        .then(async response => {
-        if (response.ok) {
-          const providers = await response.json();
-          providers.map(provider => addBrand(provider))
-        }
-        else {
-          throw new Error(`query status ${response.status}`)
-        }
-      })
-      .catch(error => console.log(error));
-      </script>    
-      <script>
-      "use strict"       
-      function addBrand(brand, idForm = 'list') {
+          .then(async response => {
+            if (response.ok) {
+              const brands = await response.json();
+              elemList.innerHTML = "";
+              brands.map(brand => listOutputBrand(brand))
+            }
+            else {
+              throw new Error(`query status ${response.status}`)
+            }
+          })
+          .catch(error => console.log(error));
+      };
+
+      // отрисовывает кнопки удаление и изменение, а также список brand
+      function listOutputBrand(brand) {
         let div = document.createElement('div');
 
         // создание кнопок удаление и изменение
@@ -156,52 +111,153 @@
         // запрос удаление поставщика
         buttonDel.addEventListener('click', event => {
           if (confirm(`вы собираетесь удалить поставщика!!! ${brand.title}`) === true) {
-            fetch(`http://localhost:3100/api/providers/${brand.id}`, {
+            fetch(`/api/providers/${brand.id}`, {
               headers: {},
               method: 'DELETE',
               body: {},
             })
-            location.reload()
-          }})
+              .then(async response => {
+                if (response.ok) {
+                  allBrends()
+                }
+                else {
+                  throw new Error(`query status ${response.status}`)
+                }
+              })
+              .catch(error => console.log(error));
+          }
+        });
 
         // запрос изменение поставщика
         buttonChenge.addEventListener('click', event => {
-          let inputChenge = prompt(`вы собираетесь Изменить поставщика!!! ${brand.title}`)
-          const optionalChenge = {
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            method: 'PATCH',
-            body: JSON.stringify({ title: inputChenge }),
+          let elemLi = document.querySelector(`li[data-id="${brand.id}"]`);
+          let elemLiText = elemLi.textContent;
+          let inputToChenge = document.createElement("input");
+          inputToChenge.value = elemLiText;
+          let buttonTOChengeOk = document.createElement("button");
+          buttonTOChengeOk.innerText = "ок";
+          let buttonTOChengeСancel = document.createElement("button");
+          buttonTOChengeСancel.style.width = "52px";
+          buttonTOChengeСancel.innerText = "отмена";
+          elemLi.textContent = "";
+          elemLi.append(inputToChenge);
+          elemLi.append(buttonTOChengeOk);
+          elemLi.append(buttonTOChengeСancel);
+
+          // при нажатии кнопки ok при изменении
+          buttonTOChengeOk.addEventListener('click', event => {
+            const optionalChenge = {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              method: 'PATCH',
+              body: JSON.stringify({ title: inputToChenge.value }),
             };
-          fetch(`http://localhost:3100/api/providers/${brand.id}`, optionalChenge)
-          .then(location.reload())
-          .catch(error => console.log(error))
-          
-          })
+
+            fetch(`/api/providers/${brand.id}`, optionalChenge)
+              .then(async response => {
+                if (response.ok) {
+                  allBrends()
+                }
+                else {
+                  throw new Error(`query status ${response.status}`)
+                }
+              })
+              .catch(error => console.log(error));
+          });
+          // при нажатии кнопки отмена при изменении
+          buttonTOChengeСancel.addEventListener('click', event => {
+            elemLi.textContent = elemLiText
+            inputToChenge.remove();
+            buttonTOChengeOk.remove();
+            buttonTOChengeСancel.remove();
+          });
+        });
 
         // создание строчки с поставщиком и кнопки удаление и изменения
-        let elemList= document.getElementById('list');
-        let elemListSearch = document.getElementById('listSearch');
         div.className = `li-${brand.id}`;
         div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`);
         div.prepend(buttonChenge);
         div.prepend(buttonDel);
-        
-        // отрисовки основного списка поставщиков или списка поиска. list это основной список
-        if (idForm === 'list') {
-          elemListSearch.style.display = "none";
-          elemList.style.display = "block";
-          list.append(div);
-        } else {
-          elemList.style.display = "none";
-          elemListSearch.style.display = "block";
-          listSearch.append(div);
+        list.append(div);
+      };
+
+      if (elemForm.dataset.action === "all") {
+        allBrends();
+      };
+
+      // поиск и добавление
+      elemForm.addEventListener('submit', event => {
+        event.preventDefault();
+        // отправляет запрос на добавление
+        if (elemForm.dataset.action === "add") {
+          const optionalAdd = {
+            headers: {},
+            method: 'POST',
+            body: new FormData(event.target),
+          };
+          fetch('/api/providers', optionalAdd)
+            .then(async response => {
+              if (response.ok) {
+                const result = await response.json();
+                elemList.innerHTML = "";
+                allBrends();
+                elemInput.value = "";
+              }
+              else {
+                throw new Error(`query status ${response.status}`)
+              }
+            })
+            .catch(error => console.log(error));
+
+          // отправляет запрос на поиск
+        } else if (elemForm.dataset.action === "search") {
+          elemList.replaceChildren();
+          let valueInputSearch = elemInput.value;
+          let listSearch = [];
+          event.preventDefault();
+
+          fetch('/api/providers')
+            .then(async response => {
+              if (response.ok) {
+                const result = await response.json();
+                for (let key in result) {
+                  if (valueInputSearch === result[key].title) {
+                    let i = {};
+                    i.id = result[key].id;
+                    i.title = result[key].title;
+                    listSearch.push(i)
+                  }
+                };
+                elemList.innerHTML = "";
+                listSearch.map(brand => listOutputBrand(brand));
+                elemInput.value = "";
+              }
+              else {
+                throw new Error(`query status ${response.status}`)
+              }
+            })
+            .catch(error => console.log(error));
         }
-        
-        
-      }
-      </script>
-    
-  </body>
+      });
+
+      // скрывакт и отрисовывает форму
+      document.addEventListener('click', function (event) {
+        // ловим toggleId и по ней определяем кнопку. открывая и закрывая форму
+        let id = event.target.dataset.toggleId;
+        if (!id) return;
+        let elem = document.getElementById(id);
+        // определяем какую форму открыть
+        if (event.target.dataset.action === "add") {
+          elemInput.placeholder = "Добавить поставщика";
+          ActionButtun("add");
+        } else {
+          elemInput.placeholder = "Поиск поставщика";
+          ActionButtun("search");
+        }
+      });      
+    </script>
+
+</body>
+
 </html>

@@ -129,18 +129,48 @@
 
         // запрос изменение бренда
         buttonChenge.addEventListener('click', event => {
-          let inputChenge = prompt(`вы собираетесь Изменить бренд!!! ${brand.title}`)
-          console.log(brand.id)
-          const optionalChenge = {
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            method: 'PATCH',
-            body: JSON.stringify({ title: inputChenge }),
-          };
-          fetch(`/api/brands/${brand.id}`, optionalChenge)
-            .then(allBrends())
-            .catch(error => console.log(error))
+          let elemLi = document.querySelector(`li[data-id="${brand.id}"]`);
+          let elemLiText = elemLi.textContent;
+          let inputToChenge = document.createElement("input");
+          inputToChenge.value = elemLiText;
+          let buttonTOChengeOk = document.createElement("button");
+          buttonTOChengeOk.innerText = "ок";
+          let buttonTOChengeСancel = document.createElement("button");
+          buttonTOChengeСancel.style.width = "52px";
+          buttonTOChengeСancel.innerText = "отмена";
+          elemLi.textContent = "";
+          elemLi.append(inputToChenge);
+          elemLi.append(buttonTOChengeOk);
+          elemLi.append(buttonTOChengeСancel);
+
+          // при нажатии кнопки ok при изменении
+          buttonTOChengeOk.addEventListener('click', event => {
+            const optionalChenge = {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              method: 'PATCH',
+              body: JSON.stringify({ title: inputToChenge.value }),
+            };
+
+            fetch(`/api/brands/${brand.id}`, optionalChenge)
+              .then(async response => {
+                if (response.ok) {
+                  allBrends()
+                }
+                else {
+                  throw new Error(`query status ${response.status}`)
+                }
+              })
+              .catch(error => console.log(error));
+          });
+          // при нажатии кнопки отмена при изменении
+          buttonTOChengeСancel.addEventListener('click', event => {
+            elemLi.textContent = elemLiText
+            inputToChenge.remove();
+            buttonTOChengeOk.remove();
+            buttonTOChengeСancel.remove();
+          });
         });
 
         // создание строчки с брендом и кнопки удаление и изменения
@@ -166,12 +196,19 @@
             body: new FormData(event.target),
           };
           fetch('/api/brands', optionalAdd)
-            .then(async res => {
-              const result = await res.json();
-              elemList.innerHTML = "";
-              allBrends();
-              elemInput.value = "";
+            .then(async response => {
+              if (response.ok) {
+                const result = await response.json();
+                elemList.innerHTML = "";
+                allBrends();
+                elemInput.value = "";
+              }
+              else {
+                throw new Error(`query status ${response.status}`)
+              }
             })
+            .catch(error => console.log(error));
+
           // отправляет запрос на поиск
         } else if (elemForm.dataset.action === "search") {
           elemList.replaceChildren();
@@ -180,20 +217,26 @@
           event.preventDefault();
 
           fetch('/api/brands')
-            .then(async res => {
-              const result = await res.json();
-              for (let key in result) {
-                if (valueInputSearch === result[key].title) {
-                  let i = {};
-                  i.id = result[key].id;
-                  i.title = result[key].title;
-                  listSearch.push(i)
-                }
-              };
-              elemList.innerHTML = "";
-              listSearch.map(brand => listOutputBrand(brand));
-              elemInput.value = "";
+            .then(async response => {
+              if (response.ok) {
+                const result = await response.json();
+                for (let key in result) {
+                  if (valueInputSearch === result[key].title) {
+                    let i = {};
+                    i.id = result[key].id;
+                    i.title = result[key].title;
+                    listSearch.push(i)
+                  }
+                };
+                elemList.innerHTML = "";
+                listSearch.map(brand => listOutputBrand(brand));
+                elemInput.value = "";
+              }
+              else {
+                throw new Error(`query status ${response.status}`)
+              }
             })
+            .catch(error => console.log(error));
         }
       });
 
