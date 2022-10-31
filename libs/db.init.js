@@ -62,7 +62,7 @@ const data = {
       uid UUID UNIQUE NOT NULL,
       code TEXT UNIQUE NOT NULL,
       article TEXT,
-      article_parse TEXT,
+      eng_article_parse TEXT,
       title TEXT,
       amount REAL DEFAULT 0,
       storage JSON,
@@ -86,8 +86,9 @@ const data = {
       bovid_id INTEGER REFERENCES bovid,
       article TEXT,
       title TEXT,
-      full_title_parse TEXT NOT NULL,
-      amount REAL DEFAULT 0
+      amount REAL DEFAULT 0,
+      eng_article_parse TEXT NOT NULL,
+      rus_article_parse TEXT
     );
   `)
     .then(() => logger.info('create table "positions"'))
@@ -105,8 +106,8 @@ const data = {
     .catch((error) => logger.warn(error.message));
 
   await pool.query(`
-    CREATE INDEX bovid_idx ON bovid (article_parse);
-    CREATE INDEX positions_idx ON positions (full_title_parse, brand_id, provider_id);
+    CREATE INDEX bovid_idx ON bovid (eng_article_parse);
+    CREATE INDEX positions_idx ON positions (eng_article_parse, brand_id, provider_id);
     CREATE INDEX prices_idx ON prices (position_id);
   `)
     .then(() => logger.info('create indexes'))

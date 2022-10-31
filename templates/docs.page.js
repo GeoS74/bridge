@@ -13,7 +13,10 @@ module.exports = (title, body) => `
     <title>Bridge: ${title}</title>
   </head>
   
-  <body>${body}</body>
+  <body>
+  <img src="../favicon_io/android-chrome-192x192.png" width="70px">
+  ${body}
+  </body>
   
   </html>
   `;

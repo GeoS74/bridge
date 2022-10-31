@@ -1,4 +1,4 @@
-const articleParser = require('../libs/article.parser');
+const { parserEng, parserRus } = require('../libs/article.parser');
 const priceHandler = require('../libs/price.handler');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
@@ -10,7 +10,7 @@ module.exports.addBovid = async (ctx) => {
     const data = _makeData(position, ctx.structure, 'isBovid');
 
     try {
-      if (data.articleParse) {
+      if (data.engArticleParse) {
         const pos = data.uid
           ? await _updatePositionBovidByUID(data)
           : await _updatePositionBovidByCode(data);
@@ -24,7 +24,7 @@ module.exports.addBovid = async (ctx) => {
     }
   }
 
-  // logger.info('upload positions complete', (Date.now() - start) / 1000);
+  logger.info('upload positions complete', (Date.now() - start) / 1000);
 
   ctx.status = 200;
   ctx.body = {
@@ -37,7 +37,7 @@ function _updatePositionBovidByUID(data) {
   SET
     updatedat=DEFAULT,
     article=$2,
-    article_parse=$3,
+    eng_article_parse=$3,
     title=$4,
     amount=$5,
     storage=$6,
@@ -51,7 +51,7 @@ function _updatePositionBovidByUID(data) {
   `, [
     data.uid,
     data.article,
-    data.articleParse,
+    data.engArticleParse,
     data.title,
     data.amount,
     data.storage,
@@ -69,7 +69,7 @@ function _updatePositionBovidByCode(data) {
   SET
     updatedat=DEFAULT,
     article=$2,
-    article_parse=$3,
+    eng_article_parse=$3,
     title=$4,
     amount=$5,
     storage=$6,
@@ -83,7 +83,7 @@ function _updatePositionBovidByCode(data) {
   `, [
     data.code,
     data.article,
-    data.articleParse,
+    data.engArticleParse,
     data.title,
     data.amount,
     data.storage,
@@ -102,7 +102,7 @@ function _insertPositionBovid(data) {
       uid, 
       code,
       article, 
-      article_parse, 
+      eng_article_parse, 
       title, 
       amount, 
       storage,
@@ -118,7 +118,7 @@ function _insertPositionBovid(data) {
     data.uid,
     data.code,
     data.article,
-    data.articleParse,
+    data.engArticleParse,
     data.title,
     data.amount,
     data.storage,
@@ -164,8 +164,9 @@ function _makeData(data, structure, isBovid) {
     storage: JSON.stringify(storage),
     price: priceHandler(data[structure.price]),
     amount: isBovid ? _sumAmount(storage) : (data[structure.amount] || null),
-    articleParse: articleParser(data[structure.article]) || null,
-    fullTitleParse: articleParser(fullTitle.trim()) || null,
+    engArticleParse: parserEng(data[structure.article]) || null,
+    engFullTitleParse: parserEng(fullTitle.trim()) || null,
+    rusArticleParse: parserRus(fullTitle.trim()) || null,
   };
 }
 
@@ -185,8 +186,8 @@ module.exports.add = async (ctx) => {
     try {
       let pos = await _updatePosition(data, brandId, providerId);
 
-      if (!pos?.bovid_id && data.articleParse) {
-        data.bovidId = await _getBovidId(data.articleParse);
+      if (!pos?.bovid_id && data.engArticleParse) {
+        data.bovidId = await _getBovidId(data.engArticleParse);
         await _updatePosition(data, brandId, providerId);
       }
 
@@ -200,7 +201,7 @@ module.exports.add = async (ctx) => {
     }
   }
 
-  // logger.info('upload positions complete', (Date.now() - start) / 1000);
+  logger.info('upload positions complete', (Date.now() - start) / 1000);
 
   ctx.status = 200;
   ctx.body = {
@@ -208,10 +209,10 @@ module.exports.add = async (ctx) => {
   };
 };
 
-function _getBovidId(articleParse) {
+function _getBovidId(engArticleParse) {
   return db.query(`SELECT id FROM bovid
-    WHERE article_parse=$1
-  `, [articleParse])
+    WHERE eng_article_parse=$1
+  `, [engArticleParse])
     .then((res) => res.rows[0]?.id);
 }
 
@@ -222,18 +223,19 @@ function _updatePosition(data, brandId, providerId) {
     bovid_id=$1,
     article=$2,
     title=$3,
-    full_title_parse=$4,
-    amount=$5
-  WHERE full_title_parse=$4 AND brand_id=$6 AND provider_id=$7
+    amount=$5,
+    rus_article_parse=$8
+  WHERE eng_article_parse=$4 AND brand_id=$6 AND provider_id=$7
   RETURNING *
   `, [
     data.bovidId,
     data.article,
     data.title,
-    data.fullTitleParse,
+    data.engFullTitleParse,
     data.amount,
     brandId,
     providerId,
+    data.rusArticleParse,
   ])
     .then((res) => res.rows[0]);
 }
@@ -246,10 +248,11 @@ function _insertPosition(data, brandId, providerId) {
       bovid_id, 
       article, 
       title, 
-      full_title_parse,
-      amount
+      eng_article_parse,
+      amount,
+      rus_article_parse
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
     RETURNING *
   `, [
     brandId,
@@ -257,8 +260,9 @@ function _insertPosition(data, brandId, providerId) {
     data.bovidId,
     data.article,
     data.title,
-    data.fullTitleParse,
+    data.engFullTitleParse,
     data.amount,
+    data.rusArticleParse,
   ])
     .then((res) => res.rows[0]);
 }

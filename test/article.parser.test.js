@@ -1,17 +1,17 @@
 const { expect } = require('chai');
 
 const dictionary = require('../dictionary/russian.symbol.json');
-const articleParser = require('../libs/article.parser');
+const {parserEng} = require('../libs/article.parser');
 
 describe('/test/article.parser.test.js', () => {
   it('parsing string', () => {
-    expect(articleParser('4320ЯX-1201010 01')).equal('0100 1201010 4320yax');
-    expect(articleParser(NaN)).equal('');
-    expect(articleParser(null)).equal('');
-    expect(articleParser(undefined)).equal('');
-    expect(articleParser(' ')).equal('');
-    expect(articleParser('')).equal('');
-    expect(articleParser(' 1 ')).equal('1000');
+    expect(parserEng('4320ЯX-1201010 01')).equal('0100 1201010 4320yax');
+    expect(parserEng(NaN)).equal('');
+    expect(parserEng(null)).equal('');
+    expect(parserEng(undefined)).equal('');
+    expect(parserEng(' ')).equal('');
+    expect(parserEng('')).equal('');
+    expect(parserEng(' 1 ')).equal('1000');
   });
   it('check dictionary', () => {
     expect(dictionary['а']).equal('a');

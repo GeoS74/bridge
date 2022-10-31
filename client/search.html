@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="./favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon_io/favicon-16x16.png">
+  <link rel="manifest" href="./favicon_io/site.webmanifest">
+  <title>Bridge: поиск</title>
+</head>
+
+<body>
+  <div>
+    <button onclick="window.location.href = '/'">На главную</button>
+  </div>
+  <div>
+    <h1>Поиск позиций</h1>
+
+    <form id="searchForm">
+      <input type="text" name="title"/>
+      <input type="submit"/>
+    </form>
+    <div id="result"></div>
+    <script>
+      function makeResult(data){
+        let result = '';
+        for(const f of data) {
+          result += `<div>
+            <p>${f.article}<br> 
+            ${f.title}<br>
+              <small>${f.rank}</small></p>  
+          </div>`
+        }
+        return result;
+      }
+
+      document.querySelector('#searchForm')
+      .addEventListener('submit', event => {
+        event.preventDefault();
+        const fd = new FormData(event.target)
+
+        fetch(`/api/search?query=${fd.get('title')}`)
+        .then(async response => {
+          if(response.ok){
+            const result = await response.json()
+            console.log(result)
+            document.querySelector('#result').innerHTML = makeResult(result)
+          } else {
+            throw new Error(`status ${response.status}`)
+          }
+        })
+        .catch(error => console.log(error.message))
+      })
+    </script>
+  </div>
+</body>
+
+</html>
