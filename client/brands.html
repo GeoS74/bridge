@@ -129,6 +129,7 @@
 
         // запрос изменение бренда
         buttonChenge.addEventListener('click', event => {
+          buttonChenge.setAttribute("disabled", "")
           let elemLi = document.querySelector(`li[data-id="${brand.id}"]`);
           let elemLiText = elemLi.textContent;
           let inputToChenge = document.createElement("input");
@@ -145,27 +146,38 @@
 
           // при нажатии кнопки ok при изменении
           buttonTOChengeOk.addEventListener('click', event => {
-            const optionalChenge = {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              method: 'PATCH',
-              body: JSON.stringify({ title: inputToChenge.value }),
-            };
+            if (elemLiText === inputToChenge.value) {
+              buttonChenge.removeAttribute("disabled");
+              elemLi.textContent = elemLiText
+              inputToChenge.remove();
+              buttonTOChengeOk.remove();
+              buttonTOChengeСancel.remove();
+            } else {
+              const optionalChenge = {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                method: 'PATCH',
+                body: JSON.stringify({ title: inputToChenge.value }),
+              };
 
-            fetch(`/api/brands/${brand.id}`, optionalChenge)
-              .then(async response => {
-                if (response.ok) {
-                  allBrends()
-                }
-                else {
-                  throw new Error(`query status ${response.status}`)
-                }
-              })
-              .catch(error => console.log(error));
+              fetch(`/api/brands/${brand.id}`, optionalChenge)
+                .then(async response => {
+                  if (response.ok) {
+                    buttonChenge.removeAttribute("disabled");
+                    allBrends()
+                  }
+                  else {
+                    throw new Error(`query status ${response.status}`)
+                  }
+                })
+                .catch(error => console.log(error));
+            }
+
           });
           // при нажатии кнопки отмена при изменении
           buttonTOChengeСancel.addEventListener('click', event => {
+            buttonChenge.removeAttribute("disabled");
             elemLi.textContent = elemLiText
             inputToChenge.remove();
             buttonTOChengeOk.remove();
@@ -199,7 +211,7 @@
             .then(async response => {
               if (response.ok) {
                 const result = await response.json();
-                elemList.innerHTML = "";
+                elemList.replaceChildren();
                 allBrends();
                 elemInput.value = "";
               }
@@ -214,7 +226,6 @@
           elemList.replaceChildren();
           let valueInputSearch = elemInput.value;
           let listSearch = [];
-          event.preventDefault();
 
           fetch('/api/brands')
             .then(async response => {
