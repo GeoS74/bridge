@@ -72,7 +72,6 @@ const data = {
       length REAL DEFAULT 0,
       manufacturer TEXT
     );
-    CREATE INDEX bovid_idx ON positions (article_parse);
   `)
     .then(() => logger.info('create table "bovid"'))
     .catch((error) => logger.warn(error.message));
@@ -86,12 +85,10 @@ const data = {
       provider_id INTEGER NOT NULL REFERENCES providers ON DELETE CASCADE,
       bovid_id INTEGER REFERENCES bovid,
       article TEXT,
-      article_parse TEXT,
       title TEXT,
-      title_parse TEXT,
+      full_title_parse TEXT NOT NULL,
       amount REAL DEFAULT 0
     );
-    CREATE INDEX positions_idx ON positions (article_parse, title_parse, brand_id, provider_id);
   `)
     .then(() => logger.info('create table "positions"'))
     .catch((error) => logger.warn(error.message));
@@ -103,9 +100,16 @@ const data = {
       position_id INTEGER NOT NULL REFERENCES positions ON DELETE CASCADE,
       price REAL NOT NULL
     );
-    CREATE INDEX prices_idx ON prices (position_id);
   `)
     .then(() => logger.info('create table "prices"'))
+    .catch((error) => logger.warn(error.message));
+
+  await pool.query(`
+    CREATE INDEX bovid_idx ON bovid (article_parse);
+    CREATE INDEX positions_idx ON positions (full_title_parse, brand_id, provider_id);
+    CREATE INDEX prices_idx ON prices (position_id);
+  `)
+    .then(() => logger.info('create indexes'))
     .catch((error) => logger.warn(error.message));
 
   logger.info('database init complete');

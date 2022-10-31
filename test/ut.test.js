@@ -21,8 +21,6 @@ describe('/test/ut.test.js', () => {
   });
 
   after(async () => {
-    await db.query('DELETE FROM prices');
-    await db.query('DELETE FROM positions');
     await db.query('DELETE FROM bovid');
     _server.close();
   });

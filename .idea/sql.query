@@ -38,7 +38,7 @@ where M.createdat = (
 ) 
   and p1.bovid_id is not null 
   and B.amount != 0
-  and p1.brand_id=5 and provider_id=6
+  and p1.brand_id=1 and provider_id=1
 offset 0 limit 10;
 
 -- query count compare positions
