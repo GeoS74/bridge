@@ -1,8 +1,20 @@
-#upload form {
+body form {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0 0 0;
+}
+
+.dropDown {
+    display: flex;
+    margin: 5px 0 50px 0;
+}
+
+.dropDown div {
     display: flex;
     flex-direction: column;
 }
 
-#upload input {
+.dropDown input {
+    margin-right: 10px;
     width: 240px;
 }

@@ -3,7 +3,7 @@
 изначально на форме присутствуют
 3 кнопку :
 добавить бренд (type="submit" id="add" value="добавить бренд" data-toggle-id="form" data-action="add")
-поиск бренда (type="submit" id="search" value="поиск бренда" data-toggle-id="form" data-action="search" onclick="")
+поиск бренда (type="submit" id="search" value="поиск бренда" data-toggle-id="form" data-action="search")
 обновление страницы (type="submit" id="refresh" value="Все бренды" onclick="allBrends()")
 
     форма (id="form" hidden data-action="all") и в ней два input
@@ -83,4 +83,4 @@
         1.1 проверяет у элемента какое значение свойства action.\
             1.1.1 если add то прописывает placeholder = "Добавить бренд" и отправляет в функцию ActionButtun("add")
             1.1.2 если search то прописывает placeholder = "Поиск бренда" и отправляет в функцию ActionButtun("search")
-    2. если значения или свойства нет то игнарирует клик
+    2. если значения или свойства нет то игнорирует клик

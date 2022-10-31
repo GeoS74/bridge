@@ -5,11 +5,55 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/style_upload.css">
     <title>Загрузка прайсов</title>
 </head>
 
 <body>
-
+    <div>
+        <button onclick="window.location.href = '/'">На главную</button>
+    </div>
+    <form>
+        <div class="dropDown">
+            <div>
+                <div class="dropDownBrand">
+                    <label for="brand">Бренды</label>
+                    <input type="text" id="brand">
+                    <button>1</button>
+                </div>
+                <input type="text">
+            </div>
+            <div>
+                <div class="brandSuppliers">
+                    <label for="suppliers">Поставщики</label>
+                    <input type="text" id="suppliers">
+                    <button>2</button>
+                </div>
+                <input type="text">
+            </div>
+        </div>
+        <div class="infoAboutDoc">
+            <div>
+                <input type="text">
+            </div>
+            <div>
+                <input type="text">
+            </div>
+            <div>
+                <input type="text">
+            </div>
+            <div>
+                <input type="text">
+            </div>
+            <div>
+                <input type="text">
+            </div>
+        </div>
+        <div class="buttonForm">
+            <input type="file" id="formFileIn">
+            <input type="submit" id="formFileOut" value="Отправить на сервер">
+        </div>
+    </form>
 </body>
 
 </html>
