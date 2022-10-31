@@ -25,7 +25,7 @@
       </div>
       <div class="search">
         <!-- открывает закрывает форму (Поиск бренд)-->
-        <input type="submit" id="search" value="поиск бренда" data-toggle-id="form" data-action="search" onclick="" />
+        <input type="submit" id="search" value="поиск бренда" data-toggle-id="form" data-action="search" />
       </div>
       <div>
         <!-- кнопка обновления страницы бренды -->
@@ -239,7 +239,6 @@
                     listSearch.push(i)
                   }
                 };
-                elemList.innerHTML = "";
                 listSearch.map(brand => listOutputBrand(brand));
                 elemInput.value = "";
               }
@@ -256,7 +255,6 @@
         // ловим toggleId и по ней определяем кнопку. открывая и закрывая форму
         let id = event.target.dataset.toggleId;
         if (!id) return;
-        let elem = document.getElementById(id);
         // определяем какую форму открыть
         if (event.target.dataset.action === "add") {
           elemInput.placeholder = "Добавить бренд";
