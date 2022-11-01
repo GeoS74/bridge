@@ -5,7 +5,19 @@ const { parserEng, parserRus } = require('../libs/article.parser');
 module.exports.search = async (ctx) => {
   try {
     ctx.status = 200;
-    ctx.body = await _getPositions(ctx.query.query);
+
+    let maxRank = 0;
+    let arr = await _getPositions(ctx.query.query);
+    if (!arr.length) {
+      arr = await _getPositionsStep2(ctx.query.query);
+    }
+    ctx.body = arr.filter((v, i) => {
+      if (i === 0) {
+        maxRank = v.rank * 1000;
+        return true;
+      }
+      return (v.rank * 1000 * 100 / maxRank) > 79.9;
+    });
   } catch (error) {
     logger.error(error.message);
     ctx.throw(404, 'positions not found');
@@ -16,14 +28,58 @@ function normalize(word) {
   return word.replaceAll(' ', ' | ');
 }
 
+function _getPositionsStep2(text) {
+  return db.query(`
+  select 
+    P.article,
+    P.title,
+    ts_rank(to_tsvector(P.eng_article_parse), to_tsquery($1)) as rank,
+    M.price,
+    B.amount as amount_bovid,
+    P.amount as amount,
+    B.code, 
+    R.title as brand
+  from positions P
+  join prices M
+    on P.id=M.position_id
+  left join bovid B
+    on B.id=P.bovid_id
+  join brands R
+    on P.brand_id=R.id
+  where to_tsvector(P.eng_article_parse) @@ to_tsquery($1) AND
+    M.createdat = (
+      select max(createdat) from prices p3
+      where M.position_id=p3.position_id
+    ) 
+  ORDER BY ts_rank(to_tsvector(P.eng_article_parse), to_tsquery($1)) DESC
+  limit 10
+  `, [normalize(parserEng(text))])
+    .then((res) => res.rows);
+}
+
 function _getPositions(text) {
   return db.query(`
   select 
-    article,
-    title,
-    ts_rank(to_tsvector(rus_article_parse), to_tsquery($1)) as rank
-  from positions
-  where to_tsvector(rus_article_parse) @@ to_tsquery($1)
+    P.article,
+    P.title,
+    ts_rank(to_tsvector(rus_article_parse), to_tsquery($1)) as rank,
+    M.price,
+    B.amount as amount_bovid,
+    P.amount as amount,
+    B.code, 
+    R.title as brand
+  from positions P
+  join prices M
+    on P.id=M.position_id
+  left join bovid B
+    on B.id=P.bovid_id
+  join brands R
+    on P.brand_id=R.id
+  where to_tsvector(rus_article_parse) @@ to_tsquery($1) AND
+    M.createdat = (
+      select max(createdat) from prices p3
+      where M.position_id=p3.position_id
+    ) 
   ORDER BY ts_rank(to_tsvector(rus_article_parse), to_tsquery($1)) DESC
   limit 10
   `, [normalize(parserRus(text))])
