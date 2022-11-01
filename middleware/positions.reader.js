@@ -53,14 +53,16 @@ module.exports.file = async (ctx, next) => {
     price: _getColumnNumber(ctx.request.body?.price),
     amount: _getColumnNumber(ctx.request.body?.amount),
   };
-
-  const startRow = ctx.request.body?.startRow;
-  if (startRow) {
-    ctx.positions = ctx.positions.slice(startRow - 1);
-  }
+  ctx.positions = _cutArray(ctx.positions, ctx.request.body?.startRow, ctx.request.body?.endRow);
 
   await next();
 };
+
+function _cutArray(arr, startRow, endRow) {
+  startRow = parseInt(startRow, 10) || 1;
+  endRow = parseInt(endRow, 10) || 0;
+  return endRow ? arr.slice(startRow - 1, endRow) : arr.slice(startRow - 1);
+}
 
 function _getColumnNumber(name) {
   const columnNumber = parseInt(name, 10) || columnNameToNumber(name);

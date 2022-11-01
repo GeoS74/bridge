@@ -1,4 +1,4 @@
-const { parserEng, parserRus } = require('../libs/article.parser');
+const { parserEng, parserRus, parserGlue } = require('../libs/article.parser');
 const priceHandler = require('../libs/price.handler');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
@@ -150,7 +150,7 @@ function _checkStorage(storage) {
 
 function _makeData(data, structure, isBovid) {
   const storage = _checkStorage(data[structure.storage]);
-  const fullTitle = `${data[structure.article]} ${data[structure.title]}`;
+  const fullTitle = `${data[structure.article]} ${data[structure.title]} ${data.brandTitle || ''}`;
   return {
     uid: data[structure.uid] || null,
     code: data[structure.code] || null,
@@ -167,12 +167,14 @@ function _makeData(data, structure, isBovid) {
     engArticleParse: parserEng(data[structure.article]) || null,
     engFullTitleParse: parserEng(fullTitle.trim()) || null,
     rusArticleParse: parserRus(fullTitle.trim()) || null,
+    glueArticleParse: parserGlue(data[structure.article]) || null,
   };
 }
 
 module.exports.add = async (ctx) => {
   const start = Date.now();
   const { brandId, providerId } = ctx.request.body;
+  const brandTitle = await _getBrandTitle(brandId);
 
   let i = 0;
   for (const position of ctx.positions) {
@@ -181,6 +183,7 @@ module.exports.add = async (ctx) => {
       logger.info(`upload ${i} in ${ctx.positions.length}`);
     }
 
+    position.brandTitle = brandTitle;
     const data = _makeData(position, ctx.structure);
 
     try {
@@ -209,6 +212,13 @@ module.exports.add = async (ctx) => {
   };
 };
 
+function _getBrandTitle(brandId) {
+  return db.query(`SELECT title FROM brands
+    WHERE id=$1
+  `, [brandId])
+    .then((res) => res.rows[0]?.title);
+}
+
 function _getBovidId(engArticleParse) {
   return db.query(`SELECT id FROM bovid
     WHERE eng_article_parse=$1
@@ -223,19 +233,19 @@ function _updatePosition(data, brandId, providerId) {
     bovid_id=$1,
     article=$2,
     title=$3,
-    amount=$5,
-    rus_article_parse=$8
-  WHERE eng_article_parse=$4 AND brand_id=$6 AND provider_id=$7
+    amount=$4,
+    rus_article_parse=$5
+  WHERE eng_article_parse=$6 AND brand_id=$7 AND provider_id=$8
   RETURNING *
   `, [
     data.bovidId,
     data.article,
     data.title,
-    data.engFullTitleParse,
     data.amount,
+    data.rusArticleParse,
+    data.engFullTitleParse,
     brandId,
     providerId,
-    data.rusArticleParse,
   ])
     .then((res) => res.rows[0]);
 }
@@ -248,11 +258,12 @@ function _insertPosition(data, brandId, providerId) {
       bovid_id, 
       article, 
       title, 
-      eng_article_parse,
       amount,
-      rus_article_parse
+      rus_article_parse,
+      eng_article_parse,
+      glue_article_parse
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *
   `, [
     brandId,
@@ -260,9 +271,10 @@ function _insertPosition(data, brandId, providerId) {
     data.bovidId,
     data.article,
     data.title,
-    data.engFullTitleParse,
     data.amount,
     data.rusArticleParse,
+    data.engFullTitleParse,
+    data.glueArticleParse,
   ])
     .then((res) => res.rows[0]);
 }
