@@ -37,7 +37,7 @@
             цена: ${f.price}<br>
             остаток БОВИД: ${f.amount_bovid || 'под заказ'}<br>
             остаток СКЛАД: ${f.amount || 'под заказ'}<br>
-              <small>${f.rank}</small></p>  
+              <small>${f.rank || ''}</small></p>  
           </div>`
         }
         return result;

@@ -36,3 +36,11 @@ module.exports.parserRus = (word) => {
 function _parseToArrayRus(word) {
   return word.match(/[a-zа-я\d]+/g) || [];
 }
+
+module.exports.parserGlue = (word) => {
+  if (!word) {
+    return '';
+  }
+  word = _translit(word.toString().toLowerCase().trim());
+  return _parseToArrayEng(word).join('');
+};

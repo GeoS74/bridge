@@ -1,4 +1,4 @@
-const { parserEng, parserRus } = require('../libs/article.parser');
+const { parserEng, parserRus, parserGlue } = require('../libs/article.parser');
 const priceHandler = require('../libs/price.handler');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
@@ -167,6 +167,7 @@ function _makeData(data, structure, isBovid) {
     engArticleParse: parserEng(data[structure.article]) || null,
     engFullTitleParse: parserEng(fullTitle.trim()) || null,
     rusArticleParse: parserRus(fullTitle.trim()) || null,
+    glueArticleParse: parserGlue(data[structure.article]) || null,
   };
 }
 
@@ -259,9 +260,10 @@ function _insertPosition(data, brandId, providerId) {
       title, 
       amount,
       rus_article_parse,
-      eng_article_parse
+      eng_article_parse,
+      glue_article_parse
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     RETURNING *
   `, [
     brandId,
@@ -272,6 +274,7 @@ function _insertPosition(data, brandId, providerId) {
     data.amount,
     data.rusArticleParse,
     data.engFullTitleParse,
+    data.glueArticleParse,
   ])
     .then((res) => res.rows[0]);
 }
