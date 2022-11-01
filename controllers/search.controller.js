@@ -21,10 +21,10 @@ module.exports.search = async (ctx) => {
       });
 
       // step
-      const pr = await Promise.all(makePromise(ctx.query.query))
+      const pr = await Promise.all(makePromise(ctx.query.query));
       let arr_2 = [];
-      for(let i = 0; i < pr.length; i++){
-        if(pr[i].length){
+      for (let i = 0; i < pr.length; i++) {
+        if (pr[i].length) {
           arr_2 = pr[i];
           break;
         }
@@ -32,14 +32,8 @@ module.exports.search = async (ctx) => {
 
       arr = arr_2.concat(arr, arr_1);
     }
-    
-    
+
     ctx.body = arr;
-
-
-    
-
-
   } catch (error) {
     logger.error(error.message);
     ctx.throw(404, 'positions not found');
@@ -48,8 +42,8 @@ module.exports.search = async (ctx) => {
 
 function makePromise(query) {
   const arr = [];
-  for(let i = 0; i < query.length-6; i++){
-    let str = '%'+parserGlue(query.substring(0, query.length-i))+'%';
+  for (let i = 0; i < query.length - 6; i++) {
+    const str = `%${parserGlue(query.substring(0, query.length - i))}%`;
     arr.push(db.query(`
     select
       P.article,
@@ -72,11 +66,10 @@ function makePromise(query) {
         where M.position_id=p3.position_id
       ) 
     limit 5
-    `, [str]).then((res) => res.rows))
+    `, [str]).then((res) => res.rows));
   }
   return arr;
 }
-
 
 function normalize(word) {
   return word.replaceAll(' ', ' | ');
