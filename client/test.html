@@ -14,22 +14,10 @@
         <button onclick="window.location.href = '/'">На главную</button>
     </div>
     <form>
-        <div class="dropDown">
-            <div>
-                <div class="dropDownBrand">
-                    <label for="brand">Бренды</label>
-                    <input type="text" id="brand">
-                    <button>1</button>
-                </div>
-                <input type="text">
+        <div id="dropDown">
+            <div id="dropDownBrand" class="dropDown">
             </div>
-            <div>
-                <div class="brandSuppliers">
-                    <label for="suppliers">Поставщики</label>
-                    <input type="text" id="suppliers">
-                    <button>2</button>
-                </div>
-                <input type="text">
+            <div id="dropDownSuppliers" class="dropDown">
             </div>
         </div>
         <div class="infoAboutDoc">
@@ -54,6 +42,45 @@
             <input type="submit" id="formFileOut" value="Отправить на сервер">
         </div>
     </form>
+
+    <script>
+        'use strict'
+        const dropDownBrand = document.getElementById('dropDownBrand')
+        const dropDownBrand = document.getElementById('dropDownBrand')
+
+
+        // запрашивает бренды и поставщиков
+        function listsBrandAndProviders() {
+            fetch('/api/providers')
+                .then(async response => {
+                    if (response.ok) {
+                        const providers = await response.json();
+                        elemList.innerHTML = "";
+                        providers.map(positin => listOutputBrand(position, provider))
+                    }
+                    else {
+                        throw new Error(`query status ${response.status}`)
+                    }
+                })
+                .catch(error => console.log(error));
+
+            fetch('/api/brands')
+                .then(async response => {
+                    if (response.ok) {
+                        const brands = await response.json();
+                        elemList.innerHTML = "";
+                        brands.map(position => listOutputBrand(position, brand))
+                    }
+                    else {
+                        throw new Error(`query status ${response.status}`)
+                    }
+                })
+                .catch(error => console.log(error));
+        };
+
+        // отрисовка брендов
+
+    </script>
 </body>
 
 </html>

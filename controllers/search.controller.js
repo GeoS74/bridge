@@ -25,7 +25,8 @@ function _getPositions(text) {
   from positions
   where to_tsvector(rus_article_parse) @@ to_tsquery($1)
   ORDER BY ts_rank(to_tsvector(rus_article_parse), to_tsquery($1)) DESC
-  limit 10
+  limit 100
+  offset 20
   `, [normalize(parserRus(text))])
     .then((res) => res.rows);
 }

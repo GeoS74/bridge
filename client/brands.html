@@ -131,9 +131,8 @@
         buttonChenge.addEventListener('click', event => {
           buttonChenge.setAttribute("disabled", "")
           let elemLi = document.querySelector(`li[data-id="${brand.id}"]`);
-          let elemLiText = elemLi.textContent;
           let inputToChenge = document.createElement("input");
-          inputToChenge.value = elemLiText;
+          inputToChenge.value = brand.title;
           let buttonTOChengeOk = document.createElement("button");
           buttonTOChengeOk.innerText = "ок";
           let buttonTOChengeСancel = document.createElement("button");
@@ -146,9 +145,9 @@
 
           // при нажатии кнопки ok при изменении
           buttonTOChengeOk.addEventListener('click', event => {
-            if (elemLiText === inputToChenge.value) {
+            if (brand.title === inputToChenge.value) {
               buttonChenge.removeAttribute("disabled");
-              elemLi.textContent = elemLiText
+              elemLi.textContent = (`${brand.title}: ${brand.id}`)
               inputToChenge.remove();
               buttonTOChengeOk.remove();
               buttonTOChengeСancel.remove();
@@ -175,10 +174,11 @@
             }
 
           });
+
           // при нажатии кнопки отмена при изменении
           buttonTOChengeСancel.addEventListener('click', event => {
             buttonChenge.removeAttribute("disabled");
-            elemLi.textContent = elemLiText
+            elemLi.textContent = (`${brand.title}: ${brand.id}`)
             inputToChenge.remove();
             buttonTOChengeOk.remove();
             buttonTOChengeСancel.remove();
@@ -187,7 +187,7 @@
 
         // создание строчки с брендом и кнопки удаление и изменения
         div.className = `li-${brand.id}`;
-        div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}</li>`);
+        div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}:  ${brand.id}</li>`);
         div.prepend(buttonChenge);
         div.prepend(buttonDel);
         list.append(div);
