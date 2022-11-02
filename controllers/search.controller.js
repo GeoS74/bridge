@@ -4,37 +4,31 @@ const { parserEng, parserRus, parserGlue } = require('../libs/article.parser');
 
 module.exports.search = async (ctx) => {
   try {
+    const start = Date.now();
     ctx.status = 200;
 
     let maxRank = 0;
     let arr = await _getPositions(ctx.query.query);
+    arr = arr.filter((v, i) => {
+      if (i === 0) {
+        maxRank = v.rank * 1000;
+        return true;
+      }
+      return (v.rank * 1000 * 100 / maxRank) > 79.9;
+    });
+
 
     if (!arr.length || arr[0].rank < 0.04) {
-      // step
-      let arr_1 = [];
-      // arr_1 = await _getPositionsStep2(ctx.query.query);
-      // arr_1 = arr_1.filter((v, i) => {
-      //   if (i === 0) {
-      //     maxRank = v.rank * 1000;
-      //     return true;
-      //   }
-      //   return (v.rank * 1000 * 100 / maxRank) > 79.9;
-      // });
+      const pr = await Promise.any(makePromise(ctx.query.query))
+        .catch(_ => []);
+      arr = pr.concat(arr);
 
-      // step
-      const pr = await Promise.all(makePromise(ctx.query.query));
-      let arr_2 = [];
-      for (let i = 0; i < pr.length; i++) {
-        if (pr[i].length) {
-          arr_2 = pr[i];
-          break;
-        }
-      }
-
-      arr = arr_2.concat(arr, arr_1);
     }
-
-    ctx.body = arr;
+    // logger.info('query time: ', (Date.now() - start) / 1000);
+    ctx.body = {
+      positions: arr,
+      time: (Date.now() - start) / 1000,
+    };
   } catch (error) {
     logger.error(error.message);
     ctx.throw(404, 'positions not found');
@@ -45,7 +39,8 @@ function makePromise(query) {
   const arr = [];
   for (let i = 0; i < query.length - 6; i++) {
     const str = `%${parserGlue(query.substring(0, query.length - i))}%`;
-    arr.push(db.query(`
+    arr.push(new Promise((resolve, reject) => {
+      db.query(`
     select
       P.article,
       P.title,
@@ -66,8 +61,15 @@ function makePromise(query) {
         select max(createdat) from prices p3
         where M.position_id=p3.position_id
       ) 
+    order by article desc
     limit 5
-    `, [str]).then((res) => res.rows));
+    `, [str]).then((res) => {
+        if (res.rows.length) {
+          return resolve(res.rows)
+        }
+        reject(new Error())
+      })
+    }));
   }
   return arr;
 }
@@ -129,8 +131,7 @@ function _getPositions(text) {
       where M.position_id=p3.position_id
     ) 
   ORDER BY ts_rank(to_tsvector(rus_article_parse), to_tsquery($1)) DESC
-  limit 100
-  offset 20
+  limit 10
   `, [normalize(parserRus(text))])
     .then((res) => res.rows);
 }

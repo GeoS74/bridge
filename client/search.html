@@ -26,8 +26,8 @@
     <div id="result"></div>
     <script>
       function makeResult(data){
-        let result = '';
-        for(const f of data) {
+        let result = `<p><small>time: ${data.time} sec</small></p>`;
+        for(const f of data.positions) {
           result += `<div>
             <p>
             <b>${f.article}<br> 
