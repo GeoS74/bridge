@@ -55,6 +55,7 @@
             console.log(result)
             document.querySelector('#result').innerHTML = makeResult(result)
           } else {
+            document.querySelector('#result').innerHTML = ''
             throw new Error(`status ${response.status}`)
           }
         })
