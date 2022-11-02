@@ -100,7 +100,8 @@ const data = {
       id BIGSERIAL PRIMARY KEY,
       createdat TIMESTAMP NOT NULL DEFAULT NOW(),
       position_id INTEGER NOT NULL REFERENCES positions ON DELETE CASCADE,
-      price REAL NOT NULL
+      price REAL NOT NULL,
+      profit REAL DEFAULT 0
     );
   `)
     .then(() => logger.info('create table "prices"'))

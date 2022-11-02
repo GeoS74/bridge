@@ -166,7 +166,7 @@ function _makeData(data, structure, isBovid) {
     amount: isBovid ? _sumAmount(storage) : (data[structure.amount] || null),
     engArticleParse: parserEng(data[structure.article]) || null,
     engFullTitleParse: parserEng(fullTitle.trim()) || null,
-    rusArticleParse: parserRus(fullTitle.trim()) || null,
+    rusFullTitleParse: parserRus(fullTitle.trim()) || null,
     glueArticleParse: parserGlue(data[structure.article]) || null,
   };
 }
@@ -242,7 +242,7 @@ function _updatePosition(data, brandId, providerId) {
     data.article,
     data.title,
     data.amount,
-    data.rusArticleParse,
+    data.rusFullTitleParse,
     data.engFullTitleParse,
     brandId,
     providerId,
@@ -272,7 +272,7 @@ function _insertPosition(data, brandId, providerId) {
     data.article,
     data.title,
     data.amount,
-    data.rusArticleParse,
+    data.rusFullTitleParse,
     data.engFullTitleParse,
     data.glueArticleParse,
   ])

@@ -11,14 +11,15 @@ module.exports.search = async (ctx) => {
 
     if (!arr.length || arr[0].rank < 0.04) {
       // step
-      let arr_1 = await _getPositionsStep2(ctx.query.query);
-      arr_1 = arr_1.filter((v, i) => {
-        if (i === 0) {
-          maxRank = v.rank * 1000;
-          return true;
-        }
-        return (v.rank * 1000 * 100 / maxRank) > 79.9;
-      });
+      let arr_1 = [];
+      // arr_1 = await _getPositionsStep2(ctx.query.query);
+      // arr_1 = arr_1.filter((v, i) => {
+      //   if (i === 0) {
+      //     maxRank = v.rank * 1000;
+      //     return true;
+      //   }
+      //   return (v.rank * 1000 * 100 / maxRank) > 79.9;
+      // });
 
       // step
       const pr = await Promise.all(makePromise(ctx.query.query));
