@@ -29,15 +29,9 @@
         let result = '';
         for(const f of data) {
           result += `<div>
-            <p>
-            <b>${f.article}<br> 
-            ${f.title}</b><br>
-            бренд: ${f.brand}<br> 
-            код: ${f.code || ''}<br>
-            цена: ${f.price}<br>
-            остаток БОВИД: ${f.amount_bovid || 'под заказ'}<br>
-            остаток СКЛАД: ${f.amount || 'под заказ'}<br>
-              <small>${f.rank || ''}</small></p>  
+            <p>${f.article}<br> 
+            ${f.title}<br>
+              <small>${f.rank}</small></p>  
           </div>`
         }
         return result;
