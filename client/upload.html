@@ -1,20 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/style_upload.css">
     <title>Загрузка прайсов</title>
-    <link rel="stylesheet" href="css/style_upload.css">
 </head>
+
 <body>
-    <h1>Загрузить прайс</h1>
-    <div id="upload">
-        <form>
-            <input type="file">
-            <input type="submit" value="Отправить на сервер">
-        </form>        
+    <div>
+        <button onclick="window.location.href = '/'">На главную</button>
     </div>
-    
+    <form>
+        <div id="dropDown">
+            <div id="dropDownBrand" class="dropDown">
+                <label for="brandSelect">Бренды</label>
+                <select name="brand" id="brandSelect"></select>
+            </div>
+            <div id="dropDownProvider" class="dropDown">
+                <label for="providerSelect">Поставщики</label>
+                <select name="зrovider" id="providerSelect"></select>
+            </div>
+        </div>
+        <div class="infoAboutDoc">
+            <div>
+                <input type="text">
+                <label for="">Артикул</label>
+            </div>
+            <div>
+                <input type="text">
+                <label for="">Наименование</label>
+            </div>
+            <div>
+                <input type="text">
+                <label for="">Цена</label>
+            </div>
+            <div>
+                <input type="text">
+                <label for="">Начальная строка</label>
+            </div>
+            <div>
+                <input type="text">
+                <label for="">Количество</label>
+            </div>
+        </div>
+        <div class="buttonForm">
+            <input type="file" id="formFileIn">
+            <input type="submit" id="formFileOut" value="Отправить на сервер">
+        </div>
+    </form>
+
+    <script>
+        'use strict'
+        // запрашивает бренды и поставщиков
+        fetch('/api/providers')
+            .then(async response => {
+                if (response.ok) {
+                    const providers = await response.json();
+                    console.log(providers)
+                    providers.map(position => dropDownList(position, "provider"))
+                }
+                else {
+                    throw new Error(`query status ${response.status}`)
+                }
+            })
+            .catch(error => console.log(error));
+
+        fetch('/api/brands')
+            .then(async response => {
+                if (response.ok) {
+                    const brands = await response.json();
+                    console.log(brands)
+                    brands.map(position => dropDownList(position, "brand"))
+                }
+                else {
+                    throw new Error(`query status ${response.status}`)
+                }
+            })
+            .catch(error => console.log(error));
+
+
+        // отрисовка брендов
+        function dropDownList(position, name) {
+            if (name === "brand") {
+                const selectForm = document.getElementById('brandSelect')
+                let option = document.createElement("option")
+                option.value = position.id
+                option.innerText = position.title
+                option.style.fontStyle = "20px"
+                selectForm.append(option)
+            } else if (name === "provider") {
+                const selectForm = document.getElementById('providerSelect')
+                let option = document.createElement("option")
+                option.value = position.id
+                option.innerText = position.title
+                option.style.fontStyle = "20px"
+                selectForm.append(option)
+            }
+        }
+
+
+
+    </script>
 </body>
+
 </html>
