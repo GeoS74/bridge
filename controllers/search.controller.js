@@ -1,6 +1,7 @@
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 const { parserRus, parserGlue } = require('../libs/article.parser');
+const mapper = require('../mappers/position.mapper');
 
 module.exports.search = async (ctx) => {
   try {
@@ -23,7 +24,7 @@ module.exports.search = async (ctx) => {
 
     ctx.status = 200;
     ctx.body = {
-      positions: responseFullText,
+      positions: responseFullText.map((position) => mapper(position)),
       time: (Date.now() - start) / 1000,
     };
   } catch (error) {
@@ -46,9 +47,7 @@ function _filterResponsesByRank(response) {
 function _cleanDublicatePosition(response) {
   const result = [];
   response.forEach((v) => {
-    const dublicate = result.find((elem) => elem.brand_id === v.brand_id
-        && elem.provider_id === v.provider_id
-        && elem.eng_article_parse === v.eng_article_parse);
+    const dublicate = result.find((elem) => elem.id === v.id);
 
     if (!dublicate) {
       result.push(v);
@@ -65,16 +64,25 @@ function _glueTextSearch(text) {
   return new Promise((resolve, reject) => {
     db.query(`
       select
+        P.id,
+        P.createdat,
         P.brand_id,
+        R.title as brand_title,
         P.provider_id,
-        P.eng_article_parse,
+        V.title as provider_title,
         P.article,
         P.title,
         M.price,
         B.amount as amount_bovid,
         P.amount as amount,
-        B.code, 
-        R.title as brand
+        B.code,
+        B.uid,
+        B.manufacturer,
+        B.storage,
+        B.weight,
+        B.width,
+        B.length,
+        B.storage
       from positions P
       join prices M
         on P.id=M.position_id
@@ -82,6 +90,8 @@ function _glueTextSearch(text) {
         on B.id=P.bovid_id
       join brands R
         on P.brand_id=R.id
+      join providers V
+        on P.provider_id=V.id
       where glue_article_parse like $1 AND
         M.createdat = (
           select max(createdat) from prices p3
@@ -121,17 +131,26 @@ function normalize(word) {
 function _fullTextSearch(text) {
   return db.query(`
     select
+      P.id,
+      P.createdat,
       P.brand_id,
+      R.title as brand_title,
       P.provider_id,
-      P.eng_article_parse,
+      V.title as provider_title,
       P.article,
       P.title,
       ts_rank(to_tsvector(rus_article_parse), to_tsquery($1)) as rank,
       M.price,
       B.amount as amount_bovid,
       P.amount as amount,
-      B.code, 
-      R.title as brand
+      B.code,
+      B.uid,
+      B.manufacturer,
+      B.storage,
+      B.weight,
+      B.width,
+      B.length,
+      B.storage
     from positions P
     join prices M
       on P.id=M.position_id
@@ -139,13 +158,15 @@ function _fullTextSearch(text) {
       on B.id=P.bovid_id
     join brands R
       on P.brand_id=R.id
+    join providers V
+      on P.provider_id=V.id
     where to_tsvector(rus_article_parse) @@ to_tsquery($1) AND
       M.createdat = (
         select max(createdat) from prices p3
         where M.position_id=p3.position_id
       ) 
     ORDER BY ts_rank(to_tsvector(rus_article_parse), to_tsquery($1)) DESC
-    limit 10
+    limit 3
   `, [normalize(parserRus(text))])
     .then((res) => res.rows);
 }
