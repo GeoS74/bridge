@@ -26,12 +26,18 @@
     <div id="result"></div>
     <script>
       function makeResult(data){
-        let result = '';
-        for(const f of data) {
+        let result = `<p><small>time: ${data.time} sec</small></p>`;
+        for(const f of data.positions) {
           result += `<div>
-            <p>${f.article}<br> 
-            ${f.title}<br>
-              <small>${f.rank}</small></p>  
+            <p>
+            <b>${f.article}<br> 
+            ${f.title}</b><br>
+            бренд: ${f.brantTitle}<br> 
+            код: ${f.code || ''}<br>
+            цена: ${f.price}<br>
+            остаток БОВИД: ${f.amountBovid || 'под заказ'}<br>
+            остаток СКЛАД: ${f.amount || 'под заказ'}<br>
+              <small>${f.rank || ''}</small></p>  
           </div>`
         }
         return result;
@@ -49,6 +55,7 @@
             console.log(result)
             document.querySelector('#result').innerHTML = makeResult(result)
           } else {
+            document.querySelector('#result').innerHTML = ''
             throw new Error(`status ${response.status}`)
           }
         })

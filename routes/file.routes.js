@@ -24,8 +24,8 @@ router.post(
   '/upload',
   koaBody(optional),
   fileValidator,
-  reader.file,
   positionValidator,
+  reader.file,
   position.add,
 );
 
