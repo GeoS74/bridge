@@ -13,7 +13,7 @@
     <div>
         <button onclick="window.location.href = '/'">На главную</button>
     </div>
-    <form>
+    <form id="form">
         <div id="dropDown">
             <div id="dropDownBrand" class="dropDown">
                 <label for="brandSelect">Бренды</label>
@@ -21,45 +21,46 @@
             </div>
             <div id="dropDownProvider" class="dropDown">
                 <label for="providerSelect">Поставщики</label>
-                <select name="зrovider" id="providerSelect"></select>
+                <select name="provider" id="providerSelect"></select>
             </div>
         </div>
         <div class="infoAboutDoc">
             <div>
-                <input type="text">
+                <input type="text" name="article">
                 <label for="">Артикул</label>
             </div>
             <div>
-                <input type="text">
+                <input type="text" name="title">
                 <label for="">Наименование</label>
             </div>
             <div>
-                <input type="text">
+                <input type="text" name="price">
                 <label for="">Цена</label>
             </div>
             <div>
-                <input type="text">
+                <input type="text" name="startRow">
                 <label for="">Начальная строка</label>
             </div>
             <div>
-                <input type="text">
+                <input type="text" name="quantity">
                 <label for="">Количество</label>
             </div>
         </div>
         <div class="buttonForm">
-            <input type="file" id="formFileIn">
+            <input type="file" id="formFileIn" name="file">
             <input type="submit" id="formFileOut" value="Отправить на сервер">
         </div>
     </form>
 
     <script>
         'use strict'
+        const elemForm = document.getElementById("form");
+
         // запрашивает бренды и поставщиков
         fetch('/api/providers')
             .then(async response => {
                 if (response.ok) {
                     const providers = await response.json();
-                    console.log(providers)
                     providers.map(position => dropDownList(position, "provider"))
                 }
                 else {
@@ -72,7 +73,6 @@
             .then(async response => {
                 if (response.ok) {
                     const brands = await response.json();
-                    console.log(brands)
                     brands.map(position => dropDownList(position, "brand"))
                 }
                 else {
@@ -101,6 +101,24 @@
             }
         }
 
+        elemForm.addEventListener('submit', event => {
+            event.preventDefault();
+            const optionForm = {
+                headers: {},
+                method: 'POST',
+                body: new FormData(form),
+            }
+
+            fetch('api/file/upload', optionForm)
+                .then(async response => {
+                    if (response.ok) {
+                        alert('Данные отпраленны')
+                    } else {
+                        alert('Что то пошло не так')
+                    }
+                })
+                .catch(error => console.log(error));
+        });
 
 
     </script>
