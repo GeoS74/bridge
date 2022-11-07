@@ -17,11 +17,11 @@
         <div id="dropDown">
             <div id="dropDownBrand" class="dropDown">
                 <label for="brandSelect">Бренды</label>
-                <select name="brand" id="brandSelect"></select>
+                <select name="brandId" id="brandSelect"></select>
             </div>
             <div id="dropDownProvider" class="dropDown">
                 <label for="providerSelect">Поставщики</label>
-                <select name="provider" id="providerSelect"></select>
+                <select name="providerId" id="providerSelect"></select>
             </div>
         </div>
         <div class="infoAboutDoc">
@@ -112,7 +112,7 @@
             fetch('api/file/upload', optionForm)
                 .then(async response => {
                     if (response.ok) {
-                        alert('Данные отпраленны')
+                        await alert('Данные отпраленны')
                     } else {
                         alert('Что то пошло не так')
                     }
