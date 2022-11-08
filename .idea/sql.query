@@ -46,3 +46,42 @@ select count(*) from positions where bovid_id is not null;
 
 insert into positions (brand_id, provider_id) values (1, 1), (2, 2);
 insert into prices (position_id, price) values (1, 150), (1, 250), (2, 777);
+
+-- full text query prod
+explain (analyze, buffers) select
+      P.id,
+      P.createdat,
+      P.brand_id,
+      R.title as brand_title,
+      P.provider_id,
+      V.title as provider_title,
+      P.article,
+      P.title,
+      ts_rank(to_tsvector(rus_article_parse), to_tsquery('рессора | камаз')) as rank,
+      M.price,
+      B.amount as amount_bovid,
+      P.amount as amount,
+      B.code,
+      B.uid,
+      B.manufacturer,
+      B.storage,
+      B.weight,
+      B.width,
+      B.length,
+      B.storage
+    from positions P
+    join prices M
+      on P.id=M.position_id
+    left join bovid B
+      on B.id=P.bovid_id
+    join brands R
+      on P.brand_id=R.id
+    join providers V
+      on P.provider_id=V.id
+    where to_tsvector(rus_article_parse) @@ to_tsquery('рессора | камаз') AND
+      M.createdat = (
+        select max(createdat) from prices p3
+        where M.position_id=p3.position_id
+      ) 
+    ORDER BY ts_rank(to_tsvector(rus_article_parse), to_tsquery('рессора | камаз')) DESC
+    OFFSET 0 LIMIT 5;
