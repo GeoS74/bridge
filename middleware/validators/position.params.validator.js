@@ -11,5 +11,7 @@ module.exports = async (ctx, next) => {
   }
   ctx.request.body.providerId = providerId;
 
+  ctx.request.body.profit = parseInt(ctx.request?.body?.profit, 10) || 0;
+
   await next();
 };

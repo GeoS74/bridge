@@ -173,7 +173,7 @@ function _makeData(data, structure, isBovid) {
 
 module.exports.add = async (ctx) => {
   const start = Date.now();
-  const { brandId, providerId } = ctx.request.body;
+  const { brandId, providerId, profit } = ctx.request.body;
   const brandTitle = await _getBrandTitle(brandId);
 
   let i = 0;
@@ -198,7 +198,7 @@ module.exports.add = async (ctx) => {
         pos = await _insertPosition(data, brandId, providerId);
       }
 
-      await _insertPrice(pos.id, data.price);
+      await _insertPrice(pos.id, data.price, profit);
     } catch (error) {
       logger.error(`артикул ${data.article} наименование ${data.title}`, error.message);
     }
@@ -279,9 +279,9 @@ function _insertPosition(data, brandId, providerId) {
     .then((res) => res.rows[0]);
 }
 
-function _insertPrice(positionId, price) {
+function _insertPrice(positionId, price, profit) {
   return db.query(`INSERT INTO prices
-  (position_id, price)
-  VALUES ($1, $2)
-  `, [positionId, price]);
+  (position_id, price, profit)
+  VALUES ($1, $2, $3)
+  `, [positionId, price, profit]);
 }

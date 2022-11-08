@@ -22,6 +22,7 @@ select
   B.amount as ut_amount, 
   p1.amount as pos_amount, 
   M.price,
+  (M.price*(1+M.profit/100)) as settlement_price,
   M.createdat
 from positions p1
 join prices M
