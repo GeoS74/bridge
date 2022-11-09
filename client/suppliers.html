@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="./css/style_brends.css">
-  <title>Бренды</title>
+  <title>Поставщики</title>
 
 </head>
 
@@ -15,21 +15,21 @@
   <div>
     <button onclick="window.location.href = '/'">На главную</button>
   </div>
-  <h1>Бренды</h1>
+  <h1>Поставщики</h1>
 
   <div>
     <div style="display: flex;">
       <div class="add">
-        <!-- открывает закрывает форму (добаввить бренд)-->
-        <input type="submit" id="add" value="добавить бренд" data-toggle-id="form" data-action="add" />
+        <!-- открывает закрывает форму (добаввить поставщика)-->
+        <input type="submit" id="add" value="добавить поставщика" data-toggle-id="form" data-action="add" />
       </div>
       <div class="search">
-        <!-- открывает закрывает форму (Поиск бренд)-->
-        <input type="submit" id="search" value="поиск бренда" data-toggle-id="form" data-action="search" />
+        <!-- открывает закрывает форму (Поиск поставщика)-->
+        <input type="submit" id="search" value="поиск поставщика" data-toggle-id="form" data-action="search" />
       </div>
       <div>
-        <!-- кнопка обновления страницы бренды -->
-        <input type="submit" id="refresh" value="Все бренды" onclick="allBrends()" />
+        <!-- кнопка обновления страницы поставщики -->
+        <input type="submit" id="refresh" value="Все поставщики" onclick="allBrends()" />
       </div>
     </div>
 
@@ -75,9 +75,9 @@
         }
       };
 
-      // запрос на все бренды
+      // запрос на все поставщики
       function allBrends() {
-        fetch('/api/brands')
+        fetch('/api/providers')
           .then(async response => {
             if (response.ok) {
               const brands = await response.json();
@@ -107,10 +107,10 @@
         imgChenge.className = 'imgChenge'
         buttonChenge.append(imgChenge);
 
-        // запрос удаление бренда
+        // запрос удаление поставщика
         buttonDel.addEventListener('click', event => {
-          if (confirm(`вы собираетесь удалить бренд!!! ${brand.title}`) === true) {
-            fetch(`/api/brands/${brand.id}`, {
+          if (confirm(`вы собираетесь удалить поставщика!!! ${brand.title}`) === true) {
+            fetch(`/api/providers/${brand.id}`, {
               headers: {},
               method: 'DELETE',
               body: {},
@@ -127,7 +127,7 @@
           }
         });
 
-        // запрос изменение бренда
+        // запрос изменение поставщика
         buttonChenge.addEventListener('click', event => {
           buttonChenge.setAttribute("disabled", "")
           let elemLi = document.querySelector(`li[data-id="${brand.id}"]`);
@@ -160,7 +160,7 @@
                 body: JSON.stringify({ title: inputToChenge.value }),
               };
 
-              fetch(`/api/brands/${brand.id}`, optionalChenge)
+              fetch(`/api/providers/${brand.id}`, optionalChenge)
                 .then(async response => {
                   if (response.ok) {
                     buttonChenge.removeAttribute("disabled");
@@ -185,7 +185,7 @@
           });
         });
 
-        // создание строчки с брендом и кнопки удаление и изменения
+        // создание строчки с поставщиком и кнопки удаление и изменения
         div.className = `li-${brand.id}`;
         div.insertAdjacentHTML('afterbegin', `<li data-id="${brand.id}">${brand.title}:  ${brand.id}</li>`);
         div.prepend(buttonChenge);
@@ -207,12 +207,11 @@
             method: 'POST',
             body: new FormData(event.target),
           };
-
-          fetch('/api/brands', optionalAdd)
+          fetch('/api/providers', optionalAdd)
             .then(async response => {
               if (response.ok) {
                 const result = await response.json();
-                elemList.replaceChildren();
+                elemList.innerHTML = "";
                 allBrends();
                 elemInput.value = "";
               }
@@ -227,8 +226,9 @@
           elemList.replaceChildren();
           let valueInputSearch = elemInput.value;
           let listSearch = [];
+          event.preventDefault();
 
-          fetch('/api/brands')
+          fetch('/api/providers')
             .then(async response => {
               if (response.ok) {
                 const result = await response.json();
@@ -240,6 +240,7 @@
                     listSearch.push(i)
                   }
                 };
+                elemList.innerHTML = "";
                 listSearch.map(brand => listOutputBrand(brand));
                 elemInput.value = "";
               }
@@ -256,12 +257,13 @@
         // ловим toggleId и по ней определяем кнопку. открывая и закрывая форму
         let id = event.target.dataset.toggleId;
         if (!id) return;
+        let elem = document.getElementById(id);
         // определяем какую форму открыть
         if (event.target.dataset.action === "add") {
-          elemInput.placeholder = "Добавить бренд";
+          elemInput.placeholder = "Добавить поставщика";
           ActionButtun("add");
         } else {
-          elemInput.placeholder = "Поиск бренда";
+          elemInput.placeholder = "Поиск поставщика";
           ActionButtun("search");
         }
       });      

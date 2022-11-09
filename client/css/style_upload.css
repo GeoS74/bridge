@@ -1,0 +1,39 @@
+body form {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0 0 0;
+    font-size: 20px;
+}
+
+#dropDown {
+    display: flex;
+    flex-direction: row;
+    margin: 5px 0 50px 0;
+}
+
+#dropDown div {
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+}
+
+.infoAboutDoc {
+    display: flex;
+    flex-direction: column-reverse;    
+}
+
+.infoAboutDoc div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 300px;
+    margin: 5px;
+    font-size: 20px;
+}
+.infoAboutDoc input {
+    margin-right: 10px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    text-align: center;
+}

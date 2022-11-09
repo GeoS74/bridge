@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="./favicon_io/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="./favicon_io/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="./favicon_io/favicon-16x16.png">
+  <link rel="manifest" href="./favicon_io/site.webmanifest">
+  <title>Bridge: поиск</title>
+</head>
+
+<body>
+  <div>
+    <button onclick="window.location.href = '/'">На главную</button>
+  </div>
+  <div>
+    <h1>Поиск позиций</h1>
+
+    <form id="searchForm" data-action="close">
+      <input type="text" name="title" placeholder="имя детали" id="sendInput" />
+      <button id="sendButton">отправить</button>
+      <div>
+        <button id="backButton" hidden>назад</button>
+        <button id="nextButton" hidden>вперед</button>
+      </div>
+    </form>
+
+    <div id="result"></div>
+    <script>
+      // ловим кнопки форму и инпут
+      const elemFormId = document.getElementById('searchForm');
+      const buttonSend = document.getElementById('sendButton');
+      const inputSend = document.getElementById('sendInput');
+      const buttonNext = document.getElementById('nextButton');
+      const buttonBack = document.getElementById('backButton');
+      let offsetPage = 0;
+
+      // функция отрисовки одной детали
+      function makeResult(data) {
+        let result = `<p><small>time: ${data.time} sec</small></p>`;
+        for (const f of data.positions) {
+          result += `<div>
+            <p>
+            <b>${f.article}<br> 
+            ${f.title}</b><br>
+            бренд: ${f.brantTitle}<br> 
+            код: ${f.code || ''}<br>
+            цена: ${f.price}<br>
+            остаток БОВИД: ${f.amountBovid || 'под заказ'}<br>
+            остаток СКЛАД: ${f.amount || 'под заказ'}<br>
+              <small>${f.rank || ''}</small></p>  
+          </div>`
+        }
+        return result;
+      }
+
+      // функция запроса на сервер
+      function fetchPage(fd, offsetPage = 0) {
+        fetch(`/api/search?query=${fd.get('title')}&offset=${String(offsetPage)}&limit=${fd.get('limit')}`)
+          .then(async response => {
+            if (response.ok) {
+              buttonNext.removeAttribute('hidden');
+              buttonBack.removeAttribute('hidden');
+              const result = await response.json()
+              console.log(result)
+              document.querySelector('#result').innerHTML = makeResult(result)
+            } else {
+              buttonNext.setAttribute('hidden', '');
+              buttonBack.setAttribute('hidden', '');
+              document.querySelector('#result').innerHTML = ''
+              throw new Error(`status ${response.status}`)
+            }
+
+          })
+          .catch(error => console.log(error.message))
+      }
+
+
+      buttonSend.addEventListener('click', event => {
+        event.preventDefault();
+        const fd = new FormData(elemFormId);
+        buttonNext.removeAttribute("disabled");
+        buttonBack.setAttribute("disabled", "");
+        offsetPage = 0;
+        fetchPage(fd);
+      })
+
+      buttonNext.addEventListener('click', event => {
+        event.preventDefault();
+        const fd = new FormData(elemFormId);
+        buttonBack.removeAttribute("disabled");
+        offsetPage += 10;
+        fetchPage(fd, offsetPage);
+      })
+
+      buttonBack.addEventListener('click', event => {
+        event.preventDefault();
+        const fd = new FormData(elemFormId);
+        if (offsetPage < 20) {
+          buttonBack.setAttribute("disabled", "");
+        }
+        offsetPage -= 10;
+        fetchPage(fd, offsetPage);
+      })
+
+      inputSend.addEventListener('input', event => {
+        event.preventDefault();
+        buttonNext.setAttribute("disabled", "");
+        buttonBack.setAttribute("disabled", "");
+      })
+
+    </script>
+  </div>
+</body>
+
+</html>
