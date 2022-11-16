@@ -19,15 +19,29 @@
   <div>
     <h1>Поиск позиций</h1>
 
-    <form id="searchForm">
-      <input type="text" name="title"/>
-      <input type="submit"/>
+    <form id="searchForm" data-action="close">
+      <input type="text" name="title" placeholder="имя детали" id="sendInput" />
+      <button id="sendButton">отправить</button>
+      <div>
+        <button id="backButton" hidden>назад</button>
+        <button id="nextButton" hidden>вперед</button>
+      </div>
     </form>
+
     <div id="result"></div>
     <script>
-      function makeResult(data){
+      // ловим кнопки форму и инпут
+      const elemFormId = document.getElementById('searchForm');
+      const buttonSend = document.getElementById('sendButton');
+      const inputSend = document.getElementById('sendInput');
+      const buttonNext = document.getElementById('nextButton');
+      const buttonBack = document.getElementById('backButton');
+      let offsetPage = 0;
+
+      // функция отрисовки одной детали
+      function makeResult(data) {
         let result = `<p><small>time: ${data.time} sec</small></p>`;
-        for(const f of data.positions) {
+        for (const f of data.positions) {
           result += `<div>
             <p>
             <b>${f.article}<br> 
@@ -43,24 +57,61 @@
         return result;
       }
 
-      document.querySelector('#searchForm')
-      .addEventListener('submit', event => {
-        event.preventDefault();
-        const fd = new FormData(event.target)
+      // функция запроса на сервер
+      function fetchPage(fd, offsetPage = 0) {
+        fetch(`/api/search?query=${fd.get('title')}&offset=${String(offsetPage)}&limit=${fd.get('limit')}`)
+          .then(async response => {
+            if (response.ok) {
+              buttonNext.removeAttribute('hidden');
+              buttonBack.removeAttribute('hidden');
+              const result = await response.json()
+              console.log(result)
+              document.querySelector('#result').innerHTML = makeResult(result)
+            } else {
+              buttonNext.setAttribute('hidden', '');
+              buttonBack.setAttribute('hidden', '');
+              document.querySelector('#result').innerHTML = ''
+              throw new Error(`status ${response.status}`)
+            }
 
-        fetch(`/api/search?query=${fd.get('title')}`)
-        .then(async response => {
-          if(response.ok){
-            const result = await response.json()
-            console.log(result)
-            document.querySelector('#result').innerHTML = makeResult(result)
-          } else {
-            document.querySelector('#result').innerHTML = ''
-            throw new Error(`status ${response.status}`)
-          }
-        })
-        .catch(error => console.log(error.message))
+          })
+          .catch(error => console.log(error.message))
+      }
+
+
+      buttonSend.addEventListener('click', event => {
+        event.preventDefault();
+        const fd = new FormData(elemFormId);
+        buttonNext.removeAttribute("disabled");
+        buttonBack.setAttribute("disabled", "");
+        offsetPage = 0;
+        fetchPage(fd);
       })
+
+      buttonNext.addEventListener('click', event => {
+        event.preventDefault();
+        const fd = new FormData(elemFormId);
+        buttonBack.removeAttribute("disabled");
+        offsetPage += 10;
+        fetchPage(fd, offsetPage);
+      })
+
+      buttonBack.addEventListener('click', event => {
+        event.preventDefault();
+        const fd = new FormData(elemFormId);
+        if (offsetPage < 20) {
+          buttonBack.setAttribute("disabled", "");
+        }
+        offsetPage -= 10;
+        fetchPage(fd, offsetPage);
+      })
+
+      inputSend.addEventListener('input', event => {
+        event.preventDefault();
+        buttonNext.setAttribute("disabled", "");
+        buttonBack.setAttribute("disabled", "");
+      })
+
     </script>
   </div>
 </body>
