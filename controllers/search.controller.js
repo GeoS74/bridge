@@ -12,7 +12,7 @@ module.exports.search = async (ctx) => {
     responseFullText = _filterResponsesByRank(responseFullText, 79.9);
 
     if (!responseFullText.length || responseFullText[0].rank < 0.045) {
-      const glueTextSearch = await Promise.any(_makeRequestPool(query))
+      const glueTextSearch = await Promise.any(_makeRequestPool(query, offset, limit))
         .catch(() => []);
 
       responseFullText = glueTextSearch.concat(responseFullText);
@@ -27,8 +27,8 @@ module.exports.search = async (ctx) => {
     ctx.body = {
       positions: responseFullText.map((position) => mapper(position)),
       time: (Date.now() - start) / 1000,
-      offset: ctx.query.offset,
-      limit: ctx.query.limit,
+      offset,
+      limit,
     };
   } catch (error) {
     logger.error(error.message);
@@ -63,10 +63,10 @@ function _getGlueStringForLike(str) {
   return `%${parserGlue(str)}%`;
 }
 
-function _makeRequestPool(query) {
+function _makeRequestPool(query, offset, limit) {
   const arr = [];
   for (let i = 0; i < query.length - 6; i += 1) {
-    arr.push(_glueTextSearch(query.substring(0, query.length - i)));
+    arr.push(_glueTextSearch(query.substring(0, query.length - i), offset, limit));
   }
   return arr;
 }
