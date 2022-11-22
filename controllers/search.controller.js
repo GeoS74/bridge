@@ -18,7 +18,7 @@ module.exports.search = async (ctx) => {
       responseFullText = glueTextSearch.concat(responseFullText);
     }
 
-    responseFullText = _cleanDublicatePosition(responseFullText);
+    responseFullText = _cleanDublicatePositionById(responseFullText);
     if (!responseFullText.length) {
       throw new Error(`positions "${query}" not found`);
     }
@@ -47,7 +47,7 @@ function _filterResponsesByRank(response, ratio) {
   });
 }
 
-function _cleanDublicatePosition(response) {
+function _cleanDublicatePositionById(response) {
   const result = [];
   response.forEach((v) => {
     const dublicate = result.find((elem) => elem.id === v.id);

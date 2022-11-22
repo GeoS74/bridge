@@ -38,7 +38,7 @@
       const buttonBack = document.getElementById('backButton');
       let offsetPage = 0;
 
-      // функция отрисовки одной детали
+      // функция отрисовки одного элемента
       function makeResult(data) {
         let result = `<p><small>time: ${data.time} sec</small></p>`;
         for (const f of data.positions) {
@@ -58,8 +58,8 @@
       }
 
       // функция запроса на сервер
-      function fetchPage(fd, offsetPage = 0) {
-        fetch(`/api/search?query=${fd.get('title')}&offset=${String(offsetPage)}&limit=${fd.get('limit')}`)
+      function fetchPage(fd, offsetPage, limit) {
+        fetch(`/api/search?query=${fd.get('title')}&offset=${offsetPage}&limit=${limit}`)
           .then(async response => {
             if (response.ok) {
               buttonNext.removeAttribute('hidden');
