@@ -58,8 +58,9 @@ explain (analyze, buffers) select
       V.title as provider_title,
       P.article,
       P.title,
-      ts_rank(to_tsvector(rus_article_parse), to_tsquery('рессора | камаз')) as rank,
+      ts_rank(rus_article_parse, to_tsquery('4320 | 1201010 | глушитель')) as rank,
       M.price,
+      (M.price*(1+M.profit/100)) as settlement_price,
       B.amount as amount_bovid,
       P.amount as amount,
       B.code,
@@ -79,10 +80,10 @@ explain (analyze, buffers) select
       on P.brand_id=R.id
     join providers V
       on P.provider_id=V.id
-    where to_tsvector(rus_article_parse) @@ to_tsquery('рессора | камаз') AND
+    where rus_article_parse @@ to_tsquery('4320 | 1201010 | глушитель') AND
       M.createdat = (
         select max(createdat) from prices p3
         where M.position_id=p3.position_id
       ) 
-    ORDER BY ts_rank(to_tsvector(rus_article_parse), to_tsquery('рессора | камаз')) DESC
-    OFFSET 0 LIMIT 5;
+    ORDER BY ts_rank(rus_article_parse, to_tsquery('4320 | 1201010 | глушитель')) DESC
+    OFFSET 0 LIMIT 10;

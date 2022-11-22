@@ -3,7 +3,12 @@ const priceHandler = require('../libs/price.handler');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 
-module.exports.addBovid = async (ctx) => {
+module.exports = {
+  addBovid,
+  add,
+};
+
+async function addBovid(ctx) {
   const start = Date.now();
 
   for (const position of ctx.positions) {
@@ -30,7 +35,7 @@ module.exports.addBovid = async (ctx) => {
   ctx.body = {
     message: `upload positions complete in ${(Date.now() - start) / 1000}`,
   };
-};
+}
 
 function _updatePositionBovidByUID(data) {
   return db.query(`UPDATE bovid
@@ -171,7 +176,7 @@ function _makeData(data, structure, isBovid) {
   };
 }
 
-module.exports.add = async (ctx) => {
+async function add(ctx) {
   const start = Date.now();
   const { brandId, providerId, profit } = ctx.request.body;
   const brandTitle = await _getBrandTitle(brandId);
@@ -210,7 +215,7 @@ module.exports.add = async (ctx) => {
   ctx.body = {
     message: `upload ${ctx.positions.length} positions complete in ${(Date.now() - start) / 1000}`,
   };
-};
+}
 
 function _getBrandTitle(brandId) {
   return db.query(`SELECT title FROM brands
@@ -234,7 +239,7 @@ function _updatePosition(data, brandId, providerId) {
     article=$2,
     title=$3,
     amount=$4,
-    rus_article_parse=$5
+    rus_article_parse=to_tsvector('pg_catalog.russian', coalesce($5, ''))
   WHERE eng_article_parse=$6 AND brand_id=$7 AND provider_id=$8
   RETURNING *
   `, [
@@ -263,7 +268,7 @@ function _insertPosition(data, brandId, providerId) {
       eng_article_parse,
       glue_article_parse
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+    VALUES ($1, $2, $3, $4, $5, $6, to_tsvector('pg_catalog.russian', coalesce($7, '')), $8, $9)
     RETURNING *
   `, [
     brandId,

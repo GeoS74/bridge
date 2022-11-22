@@ -37,7 +37,7 @@ const data = {
       id SERIAL PRIMARY KEY,
       createdat TIMESTAMP NOT NULL DEFAULT NOW(),
       updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
-      title TEXT
+      title TEXT NOT NULL
     );
   `)
     .then(() => logger.info('create table "brands"'))
@@ -48,7 +48,7 @@ const data = {
       id SERIAL PRIMARY KEY,
       createdat TIMESTAMP NOT NULL DEFAULT NOW(),
       updatedat TIMESTAMP NOT NULL DEFAULT NOW(),
-      title TEXT
+      title TEXT NOT NULL
     );
   `)
     .then(() => logger.info('create table "providers"'))
@@ -88,7 +88,7 @@ const data = {
       title TEXT,
       amount REAL DEFAULT 0,
       eng_article_parse TEXT NOT NULL,
-      rus_article_parse TEXT,
+      rus_article_parse TSVECTOR,
       glue_article_parse TEXT
     );
   `)
@@ -111,6 +111,7 @@ const data = {
     CREATE INDEX bovid_idx ON bovid (eng_article_parse);
     CREATE INDEX positions_idx ON positions (eng_article_parse, brand_id, provider_id);
     CREATE INDEX positions_glue_idx ON positions (glue_article_parse);
+    CREATE INDEX textsearch_idx ON positions USING GIN (rus_article_parse);
     CREATE INDEX prices_idx ON prices (position_id);
   `)
     .then(() => logger.info('create indexes'))

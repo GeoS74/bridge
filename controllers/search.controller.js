@@ -12,13 +12,13 @@ module.exports.search = async (ctx) => {
     responseFullText = _filterResponsesByRank(responseFullText, 79.9);
 
     if (!responseFullText.length || responseFullText[0].rank < 0.045) {
-      const glueTextSearch = await Promise.any(_makeRequestPool(query))
+      const glueTextSearch = await Promise.any(_makeRequestPool(query, offset, limit))
         .catch(() => []);
 
       responseFullText = glueTextSearch.concat(responseFullText);
     }
 
-    responseFullText = _cleanDublicatePosition(responseFullText);
+    responseFullText = _cleanDublicatePositionById(responseFullText);
     if (!responseFullText.length) {
       throw new Error(`positions "${query}" not found`);
     }
@@ -27,8 +27,8 @@ module.exports.search = async (ctx) => {
     ctx.body = {
       positions: responseFullText.map((position) => mapper(position)),
       time: (Date.now() - start) / 1000,
-      offset: ctx.query.offset,
-      limit: ctx.query.limit,
+      offset,
+      limit,
     };
   } catch (error) {
     logger.error(error.message);
@@ -47,7 +47,7 @@ function _filterResponsesByRank(response, ratio) {
   });
 }
 
-function _cleanDublicatePosition(response) {
+function _cleanDublicatePositionById(response) {
   const result = [];
   response.forEach((v) => {
     const dublicate = result.find((elem) => elem.id === v.id);
@@ -63,10 +63,10 @@ function _getGlueStringForLike(str) {
   return `%${parserGlue(str)}%`;
 }
 
-function _makeRequestPool(query) {
+function _makeRequestPool(query, offset, limit) {
   const arr = [];
   for (let i = 0; i < query.length - 6; i += 1) {
-    arr.push(_glueTextSearch(query.substring(0, query.length - i)));
+    arr.push(_glueTextSearch(query.substring(0, query.length - i), offset, limit));
   }
   return arr;
 }
@@ -86,7 +86,7 @@ function _fullTextSearch(query, offset, limit) {
       V.title as provider_title,
       P.article,
       P.title,
-      ts_rank(to_tsvector(rus_article_parse), to_tsquery($1)) as rank,
+      ts_rank(rus_article_parse, to_tsquery($1)) as rank,
       M.price,
       (M.price*(1+M.profit/100)) as settlement_price,
       B.amount as amount_bovid,
@@ -108,12 +108,12 @@ function _fullTextSearch(query, offset, limit) {
       on P.brand_id=R.id
     join providers V
       on P.provider_id=V.id
-    where to_tsvector(rus_article_parse) @@ to_tsquery($1) AND
+    where rus_article_parse @@ to_tsquery($1) AND
       M.createdat = (
         select max(createdat) from prices p3
         where M.position_id=p3.position_id
       ) 
-    ORDER BY ts_rank(to_tsvector(rus_article_parse), to_tsquery($1)) DESC
+    ORDER BY ts_rank(rus_article_parse, to_tsquery($1)) DESC
     OFFSET $2 LIMIT $3
   `, [normalize(parserRus(query)), offset, limit])
     .then((res) => res.rows);
@@ -168,7 +168,7 @@ function _glueTextSearch(query, offset, limit) {
         reject();
       })
       .catch((error) => {
-        // ошибка проброшенная от сюда с помощью throw ломает приложение
+        // ошибка проброшенная отсюда с помощью throw ломает приложение,
         // чтобы не потерять ошибки запросов к БД они логируются здесь
         logger.error(error.message);
         reject();
