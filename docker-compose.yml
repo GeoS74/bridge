@@ -1,0 +1,18 @@
+version: '1.0'
+services:
+  db:
+      image: "postgres"
+      volumes:
+        - /home/geos/nodejs/bridge/libs:/docker-entrypoint-initdb.d
+      environment:
+        - POSTGRES_PASSWORD=admin
+        - POSTGRES_USER=bridge
+        - POSTGRES_DB=bridge
+  bridge_app:
+    build: .
+    ports:
+      - "3500:3500"
+    environment:
+      - SERVER_PORT=3500
+      - DB_USER=bridge
+      - DB_HOST=db
