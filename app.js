@@ -1,6 +1,7 @@
 const Koa = require('koa');
 const { readdir, mkdir } = require('node:fs/promises');
 const serve = require('koa-static');
+const cors = require('@koa/cors');
 
 const errorCatcher = require('./middleware/error.catcher');
 const docsRoutes = require('./routes/docs.routes');
@@ -22,6 +23,7 @@ const searchRoutes = require('./routes/search.routes');
 const app = new Koa();
 
 app.use(errorCatcher);
+app.use(cors());
 app.use(serve('client'));
 app.use(serve('docs'));
 app.use(docsRoutes);
