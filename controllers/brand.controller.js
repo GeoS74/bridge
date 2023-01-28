@@ -11,7 +11,9 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const brands = await _getAllBrands();
+  const brands = ctx.query?.title ? 
+    await _getSearchBrands(ctx.query?.title) : 
+    await _getAllBrands();
   ctx.status = 200;
   ctx.body = brands.map((brand) => mapper(brand));
 };
@@ -47,6 +49,11 @@ async function _getBrand(id) {
 
 async function _getAllBrands() {
   return db.query('SELECT * FROM brands')
+    .then((res) => res.rows);
+}
+
+async function _getSearchBrands(title) {
+  return db.query("SELECT * FROM brands WHERE LOWER(title) LIKE '%' || $1 || '%'", [title.toLowerCase()])
     .then((res) => res.rows);
 }
 
