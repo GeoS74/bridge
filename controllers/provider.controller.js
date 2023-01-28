@@ -11,7 +11,9 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const providers = await _getAllProviders();
+  const providers = ctx.query?.title ? 
+    await _getSearchProviders(ctx.query?.title) : 
+    await _getAllProviders();
   ctx.status = 200;
   ctx.body = providers.map((provider) => mapper(provider));
 };
@@ -47,6 +49,11 @@ async function _getProvider(id) {
 
 async function _getAllProviders() {
   return db.query('SELECT * FROM providers')
+    .then((res) => res.rows);
+}
+
+async function _getSearchProviders(title) {
+  return db.query("SELECT * FROM providers WHERE LOWER(title) LIKE '%' || $1 || '%'", [title.toLowerCase()])
     .then((res) => res.rows);
 }
 
