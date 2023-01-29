@@ -1,6 +1,11 @@
 module.exports = async (ctx, next) => {
-  const query = ctx.query.query
-    .toString()
+  let query = ctx.query?.query;
+
+  if(!query){
+    ctx.throw(400, 'params "query" is empty');
+  }
+
+  query = query.toString()
     .toLowerCase()
     .trim()
     .match(/[a-zа-я\d]+/g) || [];
