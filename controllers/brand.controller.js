@@ -11,9 +11,9 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const brands = ctx.query?.title ? 
-    await _getSearchBrands(ctx.query?.title) : 
-    await _getAllBrands();
+  const brands = ctx.query?.title
+    ? await _getSearchBrands(ctx.query?.title)
+    : await _getAllBrands();
   ctx.status = 200;
   ctx.body = brands.map((brand) => mapper(brand));
 };

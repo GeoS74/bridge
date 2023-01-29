@@ -173,7 +173,7 @@ describe('/test/position.upload.test.js', () => {
 
       let response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
         .then(_getData);
-      expect(response.status, 'сервер возвращает статус 400').to.be.equal(404);
+      expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
 
       // empty providerId
@@ -184,7 +184,7 @@ describe('/test/position.upload.test.js', () => {
 
       response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
         .then(_getData);
-      expect(response.status, 'сервер возвращает статус 400').to.be.equal(404);
+      expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
 
       // empty brandId
@@ -195,7 +195,7 @@ describe('/test/position.upload.test.js', () => {
 
       response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
         .then(_getData);
-      expect(response.status, 'сервер возвращает статус 400').to.be.equal(404);
+      expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
     });
   });

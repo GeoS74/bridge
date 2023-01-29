@@ -11,9 +11,9 @@ module.exports.get = async (ctx) => {
 };
 
 module.exports.getAll = async (ctx) => {
-  const providers = ctx.query?.title ? 
-    await _getSearchProviders(ctx.query?.title) : 
-    await _getAllProviders();
+  const providers = ctx.query?.title
+    ? await _getSearchProviders(ctx.query?.title)
+    : await _getAllProviders();
   ctx.status = 200;
   ctx.body = providers.map((provider) => mapper(provider));
 };
