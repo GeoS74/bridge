@@ -1,7 +1,7 @@
 module.exports = async (ctx, next) => {
   let query = ctx.query?.query;
 
-  if(!query){
+  if (!query) {
     ctx.throw(400, 'params "query" is empty');
   }
 

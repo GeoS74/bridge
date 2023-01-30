@@ -8,7 +8,7 @@ const app = require('../app');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 
-if (process.env.NODE_ENV !== 'develop') {
+if (config.node.env !== 'dev') {
   logger.warn('Error: нельзя запускать тесты в производственной среде, это может привести к потере данных');
   process.exit();
 }

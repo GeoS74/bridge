@@ -29,12 +29,18 @@ router.post(
   position.add,
 );
 
-router.post(
-  '/upload/ut',
-  koaBody(optional),
-  fileValidator,
-  reader.file,
-  position.addBovid,
-);
+/*
+* роут для загузки позиций компании из Excel
+* этот подход не должен применяться,
+* т.к. выгрузка торговых позиций компании должна осуществляться через роут ut.routes
+* в формате json
+*/
+// router.post(
+//   '/upload/ut',
+//   koaBody(optional),
+//   fileValidator,
+//   reader.file,
+//   position.addBovid,
+// );
 
 module.exports = router.routes();

@@ -1,6 +1,6 @@
 {
   "name": "bridge",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "intermediate service for controlling prices and trading positions between 1C and the site",
   "main": "index.js",
   "scripts": {
