@@ -5,7 +5,7 @@ const validator = require('../middleware/validators/ut.params.validator');
 const reader = require('../middleware/positions.reader');
 const position = require('../controllers/position.controller');
 
-const router = new Router({ prefix: '/api/ut' });
+const router = new Router({ prefix: '/api/bridge/ut' });
 
 router.post(
   '/upload',

@@ -57,7 +57,7 @@
         const elemForm = document.getElementById("form");
 
         // запрашивает бренды и поставщиков
-        fetch('/api/providers')
+        fetch('/api/bridge/providers')
             .then(async response => {
                 if (response.ok) {
                     const providers = await response.json();
@@ -69,7 +69,7 @@
             })
             .catch(error => console.log(error));
 
-        fetch('/api/brands')
+        fetch('/api/bridge/brands')
             .then(async response => {
                 if (response.ok) {
                     const brands = await response.json();
@@ -109,7 +109,7 @@
                 body: new FormData(form),
             }
 
-            fetch('api/file/upload', optionForm)
+            fetch('api/bridge/file/upload', optionForm)
                 .then(async response => {
                     if (response.ok) {
                         await alert('Данные отпраленны')

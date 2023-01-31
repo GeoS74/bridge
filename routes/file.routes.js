@@ -18,7 +18,7 @@ const optional = {
   multipart: true,
 };
 
-const router = new Router({ prefix: '/api/file' });
+const router = new Router({ prefix: '/api/bridge/file' });
 
 router.post(
   '/upload',

@@ -4,7 +4,7 @@ const koaBody = require('koa-body');
 const controller = require('../controllers/brand.controller');
 const validator = require('../middleware/validators/brand.params.validator');
 
-const router = new Router({ prefix: '/api/brands' });
+const router = new Router({ prefix: '/api/bridge/brands' });
 
 router.get('/:id', validator.id, controller.get);
 router.get('/', controller.getAll);

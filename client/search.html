@@ -71,7 +71,7 @@
 
       function fetcher(fd) {
         disabledButtons(true)
-        return fetch(`/api/search?query=${fd.get('title')}&offset=${fd.get('offset')}&limit=${fd.get('limit')}`)
+        return fetch(`/api/bridge/search?query=${fd.get('title')}&offset=${fd.get('offset')}&limit=${fd.get('limit')}`)
           .then(async response => { //response processing
             if (response.ok) {
               const res = await response.json();

@@ -55,7 +55,7 @@ CRUD API для работы со списком брендов позволяе
 
 Маршрут:
 ```
-POST /api/brands
+POST /api/bridge/brands
 ```
 
 Сервер ожидает получить название бренда, доступное по ключу `title`.
@@ -72,7 +72,7 @@ POST /api/brands
 
 Маршрут:
 ```
-GET /api/brands
+GET /api/bridge/brands
 ```
 
 Сервер возвращает статус **200** и массив объектов с данными о брендах в формате json.
@@ -95,7 +95,7 @@ GET /api/brands
 
 Маршрут:
 ```
-GET /api/brands/:id
+GET /api/bridge/brands/:id
 ```
 где `:id` - идентификатор бренда
 
@@ -114,7 +114,7 @@ GET /api/brands/:id
 
 Маршрут:
 ```
-PATCH /api/brands/:id
+PATCH /api/bridge/brands/:id
 ```
 где `:id` - идентификатор бренда
 
@@ -134,7 +134,7 @@ PATCH /api/brands/:id
 
 Маршрут:
 ```
-DELETE /api/brands/:id
+DELETE /api/bridge/brands/:id
 ```
 где `:id` - идентификатор бренда
 
@@ -159,7 +159,7 @@ CRUD API для работы со списком поставщиков позв
 
 Маршрут:
 ```
-POST /api/providers
+POST /api/bridge/providers
 ```
 
 Сервер ожидает получить название поставщика, доступное по ключу `title`.
@@ -176,7 +176,7 @@ POST /api/providers
 
 Маршрут:
 ```
-GET /api/providers
+GET /api/bridge/providers
 ```
 
 Сервер возвращает статус **200** и массив объектов с данными о поставщиках в формате json.
@@ -199,7 +199,7 @@ GET /api/providers
 
 Маршрут:
 ```
-GET /api/providers/:id
+GET /api/bridge/providers/:id
 ```
 где `:id` - идентификатор поставщика
 
@@ -218,7 +218,7 @@ GET /api/providers/:id
 
 Маршрут:
 ```
-PATCH /api/providers/:id
+PATCH /api/bridge/providers/:id
 ```
 где `:id` - идентификатор поставщика
 
@@ -238,7 +238,7 @@ PATCH /api/providers/:id
 
 Маршрут:
 ```
-DELETE /api/providers/:id
+DELETE /api/bridge/providers/:id
 ```
 где `:id` - идентификатор поставщика
 
@@ -258,7 +258,7 @@ DELETE /api/providers/:id
 
 Маршрут:
 ```
-POST /api/file/upload
+POST /api/bridge/file/upload
 ```
 
 ### Описание полей данных
@@ -296,7 +296,7 @@ __Поля отмеченные * являются обязательными.__
 
 Маршрут:
 ```
-GET /api/search?query='text'&offset='offset'&limit='limit'
+GET /api/bridge/search?query='text'&offset='offset'&limit='limit'
 ```
 Параментры запроса:
 - **query** - <span style="color:red">(обязательный параметр)</span> искомая строка
