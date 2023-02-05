@@ -8,3 +8,4 @@ Makefile
 .dockerignore
 .git
 .gitignore
+secret.env
