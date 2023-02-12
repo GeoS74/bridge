@@ -10,7 +10,7 @@ const clientRoutes = require('./routes/client.routes');
 const fileRoutes = require('./routes/file.routes');
 const brandRoutes = require('./routes/brand.routes');
 const providerRoutes = require('./routes/provider.routes');
-const utRoutes = require('./routes/ut.routes');
+// const utRoutes = require('./routes/ut.routes');
 const searchRoutes = require('./routes/search.routes');
 
 (async () => {
@@ -34,7 +34,7 @@ app.use(clientRoutes);
 app.use(brandRoutes);
 app.use(providerRoutes);
 app.use(fileRoutes);
-app.use(utRoutes);
+// app.use(utRoutes);
 app.use(searchRoutes);
 
 module.exports = app;

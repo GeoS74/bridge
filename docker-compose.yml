@@ -14,8 +14,10 @@ services:
       - "3100:3500"
     environment:
       - SERVER_PORT=3500
+      - NODE_ENV=dev
       - DB_USER=bridge
       - DB_HOST=db
       - DB_NAME=bridge
       - DB_PASS=admin
-      - NODE_ENV=dev
+      - JWT_CHECK=true
+      - JWT_SECRET_KEY=any secret phrase

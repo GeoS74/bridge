@@ -5,6 +5,7 @@ const fileValidator = require('../middleware/validators/file.params.validator');
 const positionValidator = require('../middleware/validators/position.params.validator');
 const reader = require('../middleware/positions.reader');
 const position = require('../controllers/position.controller');
+const accessCheck = require('../middleware/access.check');
 
 const optional = {
   formidable: {
@@ -20,6 +21,7 @@ const optional = {
 
 const router = new Router({ prefix: '/api/bridge/file' });
 
+router.all('/', accessCheck);
 router.post(
   '/upload',
   koaBody(optional),
