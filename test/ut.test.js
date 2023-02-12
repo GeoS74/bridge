@@ -49,7 +49,7 @@ describe('/test/ut.test.js', () => {
       };
 
       // use function _insertPositionBovid
-      let response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
 
@@ -60,7 +60,7 @@ describe('/test/ut.test.js', () => {
       optional.body = JSON.stringify(positions);
 
       // use function _updatePositionBovidByUID
-      response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
 
@@ -73,7 +73,7 @@ describe('/test/ut.test.js', () => {
       optional.body = JSON.stringify(positions);
 
       // use function _updatePositionBovidByCode
-      response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
 
@@ -88,7 +88,7 @@ describe('/test/ut.test.js', () => {
         body: null,
       };
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -96,7 +96,7 @@ describe('/test/ut.test.js', () => {
       let positions = { json_data: null };
       optional.body = JSON.stringify(positions);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -104,7 +104,7 @@ describe('/test/ut.test.js', () => {
       positions = { json_data: {} };
       optional.body = JSON.stringify(positions);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -112,7 +112,7 @@ describe('/test/ut.test.js', () => {
       positions = { json_data: JSON.stringify({}) };
       optional.body = JSON.stringify(positions);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -124,7 +124,7 @@ describe('/test/ut.test.js', () => {
       positions = { json_data: JSON.stringify([position]) };
       optional.body = JSON.stringify(positions);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/ut/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/ut/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
 

@@ -39,14 +39,14 @@ describe('/test/brands.test.js', () => {
         body: JSON.stringify(brand),
       };
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/brands`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 201').to.be.equal(201);
       _expectFieldState.call(this, response.data);
       expect(response.data.title, 'сервер возвращает новый title').to.be.equal(brand.title);
 
       optional.body = JSON.stringify({});
-      response = await fetch(`http://localhost:${config.server.port}/api/brands`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -58,25 +58,25 @@ describe('/test/brands.test.js', () => {
         method: 'GET',
       };
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/brands`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
       expect(response.data, 'сервер возвращает массив').that.is.an('array');
       _expectFieldState.call(this, response.data[0]);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/${response.data[0].id}`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands/${response.data[0].id}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
       _expectFieldState.call(this, response.data);
 
       const nextId = await _getNextId();
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/${nextId}`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands/${nextId}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/any`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands/any`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
@@ -96,7 +96,7 @@ describe('/test/brands.test.js', () => {
 
       const currBrand = await _getBrand();
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/brands/${currBrand.id}`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands/${currBrand.id}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
       _expectFieldState.call(this, response.data);
@@ -104,12 +104,12 @@ describe('/test/brands.test.js', () => {
 
       const nextId = await _getNextId();
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/${nextId}`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands/${nextId}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/any`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands/any`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
@@ -123,13 +123,13 @@ describe('/test/brands.test.js', () => {
 
       const currBrand = await _getBrand();
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/brands/${currBrand.id}`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands/${currBrand.id}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
       _expectFieldState.call(this, response.data);
       expect(response.data.title, 'сервер возвращает удалённый title').to.be.equal(currBrand.title);
 
-      response = await fetch(`http://localhost:${config.server.port}/api/brands/${currBrand.id}`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands/${currBrand.id}`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);

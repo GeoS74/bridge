@@ -72,7 +72,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('startRow', 2);
       optional.body = fd;
 
-      const response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      const response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
 
@@ -103,7 +103,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('startRow', 2);
       optional.body = fd;
 
-      const response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      const response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
 
@@ -127,7 +127,7 @@ describe('/test/position.upload.test.js', () => {
       let fd = new FormData();
       optional.body = fd;
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -138,7 +138,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('file1', fs.createReadStream(path.join(__dirname, '../files/test1.xlsx')));
       optional.body = fd;
 
-      response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -148,7 +148,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('myFile', fs.createReadStream(path.join(__dirname, '../files/test1.xlsx')));
       optional.body = fd;
 
-      response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -159,7 +159,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('file', fs.createReadStream(path.join(__dirname, '../files/test1.xlsx')));
       optional.body = fd;
 
-      response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -171,7 +171,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('file', fs.createReadStream(path.join(__dirname, '../files/test1.xlsx')));
       optional.body = fd;
 
-      let response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -182,7 +182,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('brandId', brandId);
       optional.body = fd;
 
-      response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -193,7 +193,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('providerId', providerId);
       optional.body = fd;
 
-      response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
@@ -212,7 +212,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('file', fs.createReadStream(path.join(__dirname, '../files/test3.txt')));
       optional.body = fd;
 
-      const response = await fetch(`http://localhost:${config.server.port}/api/file/upload`, optional)
+      const response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 400').to.be.equal(400);
       _expectErrorFieldState.call(this, response.data);
