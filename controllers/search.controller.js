@@ -3,15 +3,23 @@ const logger = require('../libs/logger');
 const { parserRus, parserGlue } = require('../libs/article.parser');
 const mapper = require('../mappers/position.mapper');
 
+// минимальный порог релевантности для фильтрации полнотекстового поиска
+const minRankFullTextSearch = 79.9;
+// минимальный порог релевантности для включения липкого поиска
+const minRankForStartGlueSearch = 0.065;
+// минимальная длина поискового запроса (равна значение + 1)
+// при значении 3, минимальная длина строки запроса = 4
+const minLengthGleuSearchQuery = 2;
+
 module.exports.search = async (ctx) => {
   try {
     const start = Date.now();
     const { query, offset, limit } = ctx.query;
 
     let responseFullText = await _fullTextSearch(query, offset, limit);
-    responseFullText = _filterResponsesByRank(responseFullText, 79.9);
+    responseFullText = _filterResponsesByRank(responseFullText, minRankFullTextSearch);
 
-    if (!responseFullText.length || responseFullText[0].rank < 0.045) {
+    if (!responseFullText.length || responseFullText[0].rank < minRankForStartGlueSearch) {
       const glueTextSearch = await Promise.any(_makeRequestPool(query, offset, limit))
         .catch(() => []);
 
@@ -65,7 +73,7 @@ function _getGlueStringForLike(str) {
 
 function _makeRequestPool(query, offset, limit) {
   const arr = [];
-  for (let i = 0; i < query.length - 6; i += 1) {
+  for (let i = 0; i < query.length - minLengthGleuSearchQuery; i += 1) {
     arr.push(_glueTextSearch(query.substring(0, query.length - i), offset, limit));
   }
   return arr;

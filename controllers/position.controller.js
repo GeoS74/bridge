@@ -172,7 +172,7 @@ function _makeData(data, structure, isBovid) {
     engArticleParse: parserEng(data[structure.article]) || null,
     engFullTitleParse: parserEng(fullTitle.trim()) || null,
     rusFullTitleParse: parserRus(fullTitle.trim()) || null,
-    glueArticleParse: parserGlue(data[structure.article]) || null,
+    glueArticleParse: parserGlue(fullTitle.trim()) || null,
   };
 }
 

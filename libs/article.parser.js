@@ -8,7 +8,7 @@ module.exports.parserEng = (word) => {
   word = _translitToEng(word.toString().toLowerCase().trim());
   return _parseToArrayEng(word)
     .sort()
-    .map((e) => (e.length < 4 ? e + new Array(4 - e.length).fill('0').join('') : e))
+    // .map((e) => (e.length < 4 ? e + new Array(4 - e.length).fill('0').join('') : e))
     .join(' ');
 };
 
@@ -31,7 +31,7 @@ module.exports.parserRus = (word) => {
   word = _translitToRus(word.toString().toLowerCase().trim());
   return _parseToArrayRus(word)
     .sort()
-    .map((e) => (e.length < 4 ? e + new Array(4 - e.length).fill('0').join('') : e))
+    // .map((e) => (e.length < 4 ? e + new Array(4 - e.length).fill('0').join('') : e))
     .join(' ');
 };
 
