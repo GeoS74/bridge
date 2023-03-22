@@ -21,9 +21,9 @@ const optional = {
 
 const router = new Router({ prefix: '/api/bridge/file' });
 
-router.all('/', accessCheck);
 router.post(
   '/upload',
+  accessCheck,
   koaBody(optional),
   fileValidator,
   positionValidator,
