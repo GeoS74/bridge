@@ -37,7 +37,7 @@ describe('/test/check.access.test.js', () => {
       expect(response.status, 'сервер возвращает статус 401').to.be.equal(401);
     });
     it('access denied upload file', async () => {
-      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/file`)
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, {method: 'POST'})
         .then(_getData);
       expect(response.status, 'сервер возвращает статус 401').to.be.equal(401);
     });
