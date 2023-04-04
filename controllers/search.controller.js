@@ -14,16 +14,18 @@ const minLengthGleuSearchQuery = 2;
 module.exports.search = async (ctx) => {
   try {
     const start = Date.now();
-    const { query, offset, limit } = ctx.query;
+    const {
+      query, offset, limit, liastId,
+    } = ctx.query;
 
-    let responseFullText = await _fullTextSearch(query, offset, limit);
+    let responseFullText = await _fullTextSearch(query, offset, limit, liastId);
     responseFullText = _filterResponsesByRank(responseFullText, minRankFullTextSearch);
 
     if (!responseFullText.length || responseFullText[0].rank < minRankForStartGlueSearch) {
-      const glueTextSearch = await Promise.any(_makeRequestPool(query, offset, limit))
+      const glueTextSearch = await Promise.any(_makeRequestPool(query, offset, limit, liastId))
         .catch(() => []);
 
-      responseFullText = glueTextSearch.concat(responseFullText);
+      responseFullText = responseFullText.concat(glueTextSearch);
     }
 
     responseFullText = _cleanDublicatePositionById(responseFullText);
@@ -71,10 +73,10 @@ function _getGlueStringForLike(str) {
   return `%${parserGlue(str)}%`;
 }
 
-function _makeRequestPool(query, offset, limit) {
+function _makeRequestPool(query, offset, limit, liastId) {
   const arr = [];
   for (let i = 0; i < query.length - minLengthGleuSearchQuery; i += 1) {
-    arr.push(_glueTextSearch(query.substring(0, query.length - i), offset, limit));
+    arr.push(_glueTextSearch(query.substring(0, query.length - i), offset, limit, liastId));
   }
   return arr;
 }
@@ -83,7 +85,7 @@ function normalize(word) {
   return word.replaceAll(' ', ' | ');
 }
 
-function _fullTextSearch(query, offset, limit) {
+function _fullTextSearch(query, offset, limit, liastId) {
   return db.query(`
     select
       P.id,
@@ -121,13 +123,14 @@ function _fullTextSearch(query, offset, limit) {
         select max(createdat) from prices p3
         where M.position_id=p3.position_id
       ) 
-    ORDER BY ts_rank(rus_article_parse, to_tsquery($1)) DESC
+      AND P.id > $4
+    ORDER BY ts_rank(rus_article_parse, to_tsquery($1)) DESC, id
     OFFSET $2 LIMIT $3
-  `, [normalize(parserRus(query)), offset, limit])
+  `, [normalize(parserRus(query)), offset, limit, +liastId])
     .then((res) => res.rows);
 }
 
-function _glueTextSearch(query, offset, limit) {
+function _glueTextSearch(query, offset, limit, liastId) {
   return new Promise((resolve, reject) => {
     db.query(`
       select
@@ -165,9 +168,10 @@ function _glueTextSearch(query, offset, limit) {
           select max(createdat) from prices p3
           where M.position_id=p3.position_id
         ) 
-      order by article desc
+        AND P.id > $4
+      order by article DESC, id
       OFFSET $2 LIMIT $3
-  `, [_getGlueStringForLike(query), offset, limit])
+  `, [_getGlueStringForLike(query), offset, limit, +liastId])
       .then((res) => {
         if (res.rows.length) {
           resolve(res.rows);

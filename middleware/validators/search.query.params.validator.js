@@ -15,10 +15,11 @@ module.exports = async (ctx, next) => {
   }
 
   ctx.query.limit = parseInt(ctx.query?.limit, 10) || 10;
-  if (ctx.query.limit > 10) {
-    ctx.query.limit = 10;
+  if (ctx.query.limit > 50) {
+    ctx.query.limit = 50;
   }
   ctx.query.offset = parseInt(ctx.query?.offset, 10) || 0;
+  ctx.query.liastId = parseInt(ctx.query?.last, 10) || 0;
 
   await next();
 };

@@ -1,4 +1,5 @@
 module.exports = (data) => ({
+  id: data.id,
   createdAt: data.createdat,
   brandId: data.brand_id,
   brantTitle: data.brand_title,
