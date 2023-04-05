@@ -21,12 +21,12 @@ module.exports = {
   },
   search: {
     // минимальный порог релевантности для фильтрации полнотекстового поиска
-    minRankFullTextSearch: 79.9,
+    minRankFullTextSearch: process.env.minRankFullTextSearch || 0.0799,
     // минимальный порог релевантности для включения липкого поиска
-    minRankForStartGlueSearch: 0.065,
+    minRankForStartGlueSearch: process.env.minRankForStartGlueSearch || 0.065,
     // минимальная длина поискового запроса (равна значение + 1)
     // при значении 3, минимальная длина строки запроса = 4
-    minLengthGleuSearchQuery: 2,
+    minLengthGlueSearchQuery: process.env.minLengthGlueSearchQuery || 2,
   },
   log: {
     file: 'app.log',

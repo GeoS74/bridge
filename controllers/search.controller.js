@@ -12,7 +12,7 @@ module.exports.search = async (ctx) => {
     } = ctx.query;
 
     let responseFullText = await _fullTextSearch(query, offset, limit, liastId);
-    responseFullText = _filterResponsesByRank(responseFullText, config.minRankFullTextSearch);
+    responseFullText = _filterResponsesByRank(responseFullText);
 
     if (!responseFullText.length || responseFullText[0].rank < config.minRankForStartGlueSearch) {
       const glueTextSearch = await Promise.any(_makeRequestPool(query, offset, limit, liastId))
@@ -39,14 +39,14 @@ module.exports.search = async (ctx) => {
   }
 };
 
-function _filterResponsesByRank(response, ratio) {
+function _filterResponsesByRank(response) {
   let maxRank = 0;
   return response.filter((e, i) => {
     if (i === 0) {
-      maxRank = e.rank * 1000;
+      maxRank = e.rank;
       return true;
     }
-    return ((e.rank * 1000 * 100) / maxRank) > ratio;
+    return ((e.rank * 100) / maxRank) > config.minRankFullTextSearch;
   });
 }
 
@@ -68,7 +68,7 @@ function _getGlueStringForLike(str) {
 
 function _makeRequestPool(query, offset, limit, liastId) {
   const arr = [];
-  for (let i = 0; i < query.length - config.minLengthGleuSearchQuery; i += 1) {
+  for (let i = 0; i < query.length - config.minLengthGlueSearchQuery; i += 1) {
     arr.push(_glueTextSearch(query.substring(0, query.length - i), offset, limit, liastId));
   }
   return arr;
