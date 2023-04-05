@@ -19,6 +19,15 @@ module.exports = {
     check: process.env.JWT_CHECK === 'true',
     secretKey: process.env.JWT_SECRET_KEY || 'any_secret',
   },
+  search: {
+    // минимальный порог релевантности для фильтрации полнотекстового поиска
+    minRankFullTextSearch: 79.9,
+    // минимальный порог релевантности для включения липкого поиска
+    minRankForStartGlueSearch: 0.065,
+    // минимальная длина поискового запроса (равна значение + 1)
+    // при значении 3, минимальная длина строки запроса = 4
+    minLengthGleuSearchQuery: 2,
+  },
   log: {
     file: 'app.log',
   },
