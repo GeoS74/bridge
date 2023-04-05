@@ -8,14 +8,21 @@ module.exports.search = async (ctx) => {
   try {
     const start = Date.now();
     const {
-      query, offset, limit, liastId,
+      query, /* offset, */ limit, liastId,
     } = ctx.query;
 
-    let responseFullText = await _fullTextSearch(query, offset, limit, liastId);
+    let responseFullText = await _fullTextSearch(query, limit, liastId);
     responseFullText = _filterResponsesByRank(responseFullText);
 
-    if (!responseFullText.length || responseFullText[0].rank < config.minRankForStartGlueSearch) {
-      const glueTextSearch = await Promise.any(_makeRequestPool(query, offset, limit, liastId))
+    if (!responseFullText.length
+      || responseFullText[0].rank < config.search.minRankForStartGlueSearch
+    ) {
+      const glueTextSearch = await Promise.any(_makeRequestPool(
+        query,
+        /* offset, */
+        limit,
+        liastId,
+      ))
         .catch(() => []);
 
       responseFullText = responseFullText.concat(glueTextSearch);
@@ -30,7 +37,7 @@ module.exports.search = async (ctx) => {
     ctx.body = {
       positions: responseFullText.map((position) => mapper(position)),
       time: (Date.now() - start) / 1000,
-      offset,
+      /* offset, */
       limit,
     };
   } catch (error) {
@@ -46,7 +53,7 @@ function _filterResponsesByRank(response) {
       maxRank = e.rank;
       return true;
     }
-    return ((e.rank * 100) / maxRank) > config.minRankFullTextSearch;
+    return ((e.rank * 100) / maxRank) > config.search.minRankFullTextSearch;
   });
 }
 
@@ -66,10 +73,10 @@ function _getGlueStringForLike(str) {
   return `%${parserGlue(str)}%`;
 }
 
-function _makeRequestPool(query, offset, limit, liastId) {
+function _makeRequestPool(query, /* offset, */ limit, liastId) {
   const arr = [];
-  for (let i = 0; i < query.length - config.minLengthGlueSearchQuery; i += 1) {
-    arr.push(_glueTextSearch(query.substring(0, query.length - i), offset, limit, liastId));
+  for (let i = 0; i < query.length - config.search.minLengthGlueSearchQuery; i += 1) {
+    arr.push(_glueTextSearch(query.substring(0, query.length - i), /* offset, */ limit, liastId));
   }
   return arr;
 }
@@ -78,7 +85,7 @@ function normalize(word) {
   return word.replaceAll(' ', ' | ');
 }
 
-function _fullTextSearch(query, offset, limit, liastId) {
+function _fullTextSearch(query, /* offset, */ limit, liastId) {
   return db.query(`
     select
       P.id,
@@ -116,14 +123,14 @@ function _fullTextSearch(query, offset, limit, liastId) {
         select max(createdat) from prices p3
         where M.position_id=p3.position_id
       ) 
-      AND P.id > $4
+      AND P.id > $3
     ORDER BY ts_rank(rus_article_parse, to_tsquery($1)) DESC, id
-    OFFSET $2 LIMIT $3
-  `, [normalize(parserRus(query)), offset, limit, +liastId])
+    LIMIT $2
+  `, [normalize(parserRus(query)), limit, +liastId])
     .then((res) => res.rows);
 }
 
-function _glueTextSearch(query, offset, limit, liastId) {
+function _glueTextSearch(query, /* offset, */ limit, liastId) {
   return new Promise((resolve, reject) => {
     db.query(`
       select
@@ -161,10 +168,10 @@ function _glueTextSearch(query, offset, limit, liastId) {
           select max(createdat) from prices p3
           where M.position_id=p3.position_id
         ) 
-        AND P.id > $4
+        AND P.id > $3
       order by article DESC, id
-      OFFSET $2 LIMIT $3
-  `, [_getGlueStringForLike(query), offset, limit, +liastId])
+      LIMIT $2
+  `, [_getGlueStringForLike(query), limit, +liastId])
       .then((res) => {
         if (res.rows.length) {
           resolve(res.rows);

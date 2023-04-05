@@ -26,7 +26,7 @@ module.exports = {
     minRankForStartGlueSearch: process.env.minRankForStartGlueSearch || 0.065,
     // минимальная длина поискового запроса (равна значение + 1)
     // при значении 3, минимальная длина строки запроса = 4
-    minLengthGlueSearchQuery: process.env.minLengthGlueSearchQuery || 2,
+    minLengthGlueSearchQuery: process.env.minLengthGlueSearchQuery || 4,
   },
   log: {
     file: 'app.log',
