@@ -36,7 +36,7 @@ module.exports.json = async (ctx, next) => {
 };
 
 module.exports.file = async (ctx, next) => {
-  ctx.positions = _readExceltoArray(ctx.request.files.file.filepath);
+  ctx.positions = _readExceltoArray(ctx.request.files.file.filepath, 0);
   _delFile(ctx.request.files.file.filepath);
 
   ctx.structure = {
@@ -69,9 +69,9 @@ function _getColumnNumber(name) {
   return columnNumber ? columnNumber - 1 : null;
 }
 
-function _readExceltoArray(filePath) {
+function _readExceltoArray(filePath, numSheet) {
   const workbook = XLSX.readFile(filePath);
-  const sheetName = workbook.SheetNames[0];
+  const sheetName = workbook.SheetNames[numSheet || 0];
   const worksheet = workbook.Sheets[sheetName];
   const opts = {
     header: 1,
@@ -110,7 +110,7 @@ module.exports.structure = async (ctx, next) => {
 
 module.exports.readPriceOpt = async (ctx, next) => {
   const positions = [];
-  let res = _readExceltoArrayRedialTrade(ctx.request.files.file.filepath, 0);
+  let res = _readExceltoArray(ctx.request.files.file.filepath, 0);
   res = _cutArray(res, 7);
 
   res.forEach((e) => {
@@ -147,9 +147,6 @@ module.exports.readPriceOpt = async (ctx, next) => {
     ]);
   });
 
-  // ctx.positions = _readExceltoArrayRedialTrade(ctx.request.files.file.filepath, 0);
-  // ctx.positions = _cutArray(ctx.positions, 7, 21);
-
   ctx.positions = positions.filter((e) => e[0] !== '');
 
   await next();
@@ -157,7 +154,7 @@ module.exports.readPriceOpt = async (ctx, next) => {
 
 module.exports.readPriceImp = async (ctx, next) => {
   const positions = [];
-  let res = _readExceltoArrayRedialTrade(ctx.request.files.file.filepath, 1);
+  let res = _readExceltoArray(ctx.request.files.file.filepath, 1);
   res = _cutArray(res, 3);
 
   res.forEach((e) => {
@@ -170,9 +167,6 @@ module.exports.readPriceImp = async (ctx, next) => {
     ]);
   });
 
-  // ctx.positions = _readExceltoArrayRedialTrade(ctx.request.files.file.filepath, 0);
-  // ctx.positions = _cutArray(ctx.positions, 7, 21);
-
   const pos = positions.filter((e) => {
     if (!e[1] && !e[2] && !e[3] && !e[4]) return false;
     return true;
@@ -184,7 +178,7 @@ module.exports.readPriceImp = async (ctx, next) => {
 
 module.exports.readStopKol = async (ctx, next) => {
   const positions = [];
-  let res = _readExceltoArrayRedialTrade(ctx.request.files.file.filepath, 2);
+  let res = _readExceltoArray(ctx.request.files.file.filepath, 2);
   res = _cutArray(res, 7);
 
   res.forEach((e) => {
@@ -210,14 +204,3 @@ module.exports.readStopKol = async (ctx, next) => {
 
   await next();
 };
-
-function _readExceltoArrayRedialTrade(filePath, numSheet) {
-  const workbook = XLSX.readFile(filePath);
-  const sheetName = workbook.SheetNames[numSheet];
-  const worksheet = workbook.Sheets[sheetName];
-  const opts = {
-    header: 1,
-    defval: '',
-  };
-  return XLSX.utils.sheet_to_json(worksheet, opts);
-}

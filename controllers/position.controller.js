@@ -155,7 +155,7 @@ function _checkStorage(storage) {
 
 function _makeData(data, structure, isBovid) {
   const storage = _checkStorage(data[structure.storage]);
-  const fullTitle = `${data[structure.article]} ${data[structure.title]} ${data.brandTitle || ''}`;
+  const fullTitle = `${data[structure.article]?.trim()} ${data[structure.title]?.trim()} ${data.brandTitle || ''} ${data[structure.manufacturer]?.trim() || ''}`;
   return {
     uid: data[structure.uid] || null,
     code: data[structure.code] || null,
