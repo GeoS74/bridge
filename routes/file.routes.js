@@ -42,7 +42,8 @@ router.post(
   positionValidator,
   reader.readPriceOpt,
   reader.readPriceImp,
-  reader.readStopKol,
+  reader.readPriceStopRing,
+  reader.readPriceTools,
   reader.structure,
   position.add,
 );

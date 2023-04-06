@@ -176,7 +176,7 @@ module.exports.readPriceImp = async (ctx, next) => {
   await next();
 };
 
-module.exports.readStopKol = async (ctx, next) => {
+module.exports.readPriceStopRing = async (ctx, next) => {
   const positions = [];
   let res = _readExceltoArray(ctx.request.files.file.filepath, 2);
   res = _cutArray(res, 7);
@@ -201,6 +201,26 @@ module.exports.readStopKol = async (ctx, next) => {
 
   const pos = positions.filter((e) => e[0] !== '');
   ctx.positions = ctx.positions.concat(pos);
+
+  await next();
+};
+
+module.exports.readPriceTools = async (ctx, next) => {
+  const positions = [];
+  let res = _readExceltoArray(ctx.request.files.file.filepath, 3);
+  res = _cutArray(res, 4);
+
+  res.forEach((e) => {
+    positions.push([
+      `Размер: ${e[2]}`, // article
+      e[1], // title
+      e[4], // manufacturer
+      e[5], // amount
+      e[6], // price
+    ]);
+  });
+
+  ctx.positions = ctx.positions.concat(positions);
 
   await next();
 };
