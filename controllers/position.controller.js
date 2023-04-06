@@ -264,11 +264,12 @@ function _insertPosition(data, brandId, providerId) {
       article, 
       title, 
       amount,
+      manufacturer,
       rus_article_parse,
       eng_article_parse,
       glue_article_parse
     )
-    VALUES ($1, $2, $3, $4, $5, $6, to_tsvector('pg_catalog.russian', coalesce($7, '')), $8, $9)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, to_tsvector('pg_catalog.russian', coalesce($8, '')), $9, $10)
     RETURNING *
   `, [
     brandId,
@@ -277,6 +278,7 @@ function _insertPosition(data, brandId, providerId) {
     data.article,
     data.title,
     data.amount,
+    data.manufacturer,
     data.rusFullTitleParse,
     data.engFullTitleParse,
     data.glueArticleParse,

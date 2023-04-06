@@ -32,6 +32,22 @@ router.post(
 );
 
 /*
+* роут загрузки прайса redial-trade
+*/
+router.post(
+  '/upload/redial-trade',
+  accessCheck,
+  koaBody(optional),
+  fileValidator,
+  positionValidator,
+  reader.readPriceOpt,
+  reader.readPriceImp,
+  reader.readStopKol,
+  reader.structure,
+  position.add,
+);
+
+/*
 * роут для загузки позиций компании из Excel
 * этот подход не должен применяться,
 * т.к. выгрузка торговых позиций компании должна осуществляться через роут ut.routes

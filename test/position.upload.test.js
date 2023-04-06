@@ -20,8 +20,8 @@ describe('/test/position.upload.test.js', () => {
   let _server;
   let brandId;
   let providerId;
-  const pos1 = ['8608014*01 5557', 'Бак масляный без фильтра (самосвальная установка)', '777', '10'];
-  const pos2 = ['4320X-1201010-01', 'Агрегат насосный в сборе ШААЗ', '1500', '15'];
+  const pos1 = ['8608014*01 5557', 'Бак масляный без фильтра (самосвальная установка)', '777', '10', 'УРАЛ'];
+  const pos2 = ['4320X-1201010-01', 'Агрегат насосный в сборе ШААЗ', '1500', '15', 'КАМАЗ'];
 
   before(async () => {
     _server = app.listen(config.server.port);
@@ -30,14 +30,14 @@ describe('/test/position.upload.test.js', () => {
     await _createTestFileXLSX(
       'test1',
       [
-        ['article', 'title', 'price', 'amount'],
+        ['article', 'title', 'price', 'amount', 'manufacturer'],
         pos1,
       ],
     );
     await _createTestFileXLS(
       'test2',
       [
-        ['article', 'title', 'price', 'amount'],
+        ['article', 'title', 'price', 'amount', 'manufacturer'],
         pos2,
       ],
     );
@@ -69,6 +69,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('title', 2);
       fd.append('price', 3);
       fd.append('amount', 4);
+      fd.append('manufacturer', 5);
       fd.append('startRow', 2);
       optional.body = fd;
 
@@ -81,6 +82,7 @@ describe('/test/position.upload.test.js', () => {
       expect(pos1[1]).equal(newPos.title);
       expect(+pos1[2]).equal(newPos.price);
       expect(+pos1[3]).equal(newPos.amount);
+      expect(pos1[4]).equal(newPos.manufacturer);
     });
   });
 
@@ -100,6 +102,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('title', 2);
       fd.append('price', 3);
       fd.append('amount', 4);
+      fd.append('manufacturer', 5);
       fd.append('startRow', 2);
       optional.body = fd;
 
@@ -112,6 +115,7 @@ describe('/test/position.upload.test.js', () => {
       expect(pos2[1]).equal(newPos.title);
       expect(+pos2[2]).equal(newPos.price);
       expect(+pos2[3]).equal(newPos.amount);
+      expect(pos2[4]).equal(newPos.manufacturer);
     });
   });
 

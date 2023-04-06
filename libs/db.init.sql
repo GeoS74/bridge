@@ -36,6 +36,7 @@ CREATE TABLE positions (
       bovid_id INTEGER REFERENCES bovid,
       article TEXT,
       title TEXT,
+      manufacturer TEXT,
       amount REAL DEFAULT 0,
       eng_article_parse TEXT NOT NULL,
       rus_article_parse TSVECTOR,
