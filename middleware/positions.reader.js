@@ -101,12 +101,16 @@ module.exports.structure = async (ctx, next) => {
     length: null,
     manufacturer: _getColumnNumber(3),
     storage: null,
-    price: _getColumnNumber(4),
-    amount: _getColumnNumber(5),
+    price: _getColumnNumber(5),
+    amount: _getColumnNumber(4),
   };
 
   await next();
 };
+
+function _makeBearingTitle(one, two) {
+  return one ? `${one}-${two}` : two;
+}
 
 module.exports.readPriceOpt = async (ctx, next) => {
   const positions = [];
@@ -115,16 +119,16 @@ module.exports.readPriceOpt = async (ctx, next) => {
 
   res.forEach((e) => {
     positions.push([
-      e[0] ? `${e[0]}-${e[1]}` : e[1],
-      'Подшипник',
-      e[2],
-      e[3],
-      e[4],
+      e[0] ? `${e[0]}-${e[1]}` : e[1], // article
+      `Подшипник ${_makeBearingTitle(e[0], e[1])}`, // title
+      e[2], // manufactured
+      e[3], // amount
+      e[4], // price
     ]);
 
     positions.push([
       e[6] ? `${e[6]}-${e[7]}` : e[7],
-      'Подшипник',
+      `Подшипник ${_makeBearingTitle(e[6], e[7])}`, // title
       e[8],
       e[9],
       e[10],
@@ -132,7 +136,7 @@ module.exports.readPriceOpt = async (ctx, next) => {
 
     positions.push([
       e[12] ? `${e[12]}-${e[13]}` : e[13],
-      'Подшипник',
+      `Подшипник ${_makeBearingTitle(e[12], e[13])}`, // title
       e[14],
       e[15],
       e[16],
@@ -140,7 +144,7 @@ module.exports.readPriceOpt = async (ctx, next) => {
 
     positions.push([
       e[18] ? `${e[18]}-${e[19]}` : e[19], // article
-      'Подшипник', // title
+      `Подшипник ${_makeBearingTitle(e[18], e[19])}`, // title
       e[20], // manufactured
       e[21], // amount
       e[22], // price

@@ -168,7 +168,7 @@ function _makeData(data, structure, isBovid) {
     manufacturer: data[structure.manufacturer] || null,
     storage: JSON.stringify(storage),
     price: priceHandler(data[structure.price]),
-    amount: isBovid ? _sumAmount(storage) : (data[structure.amount] || 0),
+    amount: isBovid ? _sumAmount(storage) : priceHandler(data[structure.amount]),
     engArticleParse: parserEng(data[structure.article]) || null,
     engFullTitleParse: parserEng(fullTitle.trim()) || null,
     rusFullTitleParse: parserRus(fullTitle.trim()) || null,
