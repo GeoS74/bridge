@@ -21,12 +21,14 @@ module.exports = {
   },
   search: {
     // минимальный порог релевантности для фильтрации полнотекстового поиска
-    minRankFullTextSearch: process.env.minRankFullTextSearch || 0.0799,
+    minRankFullTextSearch: process.env.MIN_RANK_FULL_SEARCH || 0.0799,
     // минимальный порог релевантности для включения липкого поиска
-    minRankForStartGlueSearch: process.env.minRankForStartGlueSearch || 0.065,
+    minRankForStartGlueSearch: process.env.MIN_RANK_FOR_START_GLUE_SEARCH || 0.065,
     // минимальная длина поискового запроса (равна значение + 1)
     // при значении 3, минимальная длина строки запроса = 4
-    minLengthGlueSearchQuery: process.env.minLengthGlueSearchQuery || 4,
+    minLengthGlueSearchQuery: process.env.MIN_LENGTH_GLUE_SEARCH_QUERY || 4,
+    // время актуальности цены и количества
+    ttl: process.env.ACTUAL_TTL || '7 day',
   },
   log: {
     file: 'app.log',

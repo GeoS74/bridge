@@ -49,7 +49,7 @@ router.post(
 );
 
 /*
-* роут для загузки позиций компании из Excel
+* роут для загрузки позиций компании из Excel
 * этот подход не должен применяться,
 * т.к. выгрузка торговых позиций компании должна осуществляться через роут ut.routes
 * в формате json
@@ -61,5 +61,11 @@ router.post(
 //   reader.file,
 //   position.addBovid,
 // );
+
+router.get(
+  '/download',
+  koaBody(optional),
+  position.download,
+);
 
 module.exports = router.routes();

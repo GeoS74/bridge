@@ -1,11 +1,14 @@
+const XLSX = require('xlsx');
 const { parserEng, parserRus, parserGlue } = require('../libs/article.parser');
 const priceHandler = require('../libs/price.handler');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
+const config = require('../config');
 
 module.exports = {
   addBovid,
   add,
+  download,
 };
 
 async function addBovid(ctx) {
@@ -216,7 +219,7 @@ async function add(ctx) {
     }
   }
 
-  logger.info('upload positions complete', (Date.now() - start) / 1000);
+  logger.info('upload positions complete in', (Date.now() - start) / 1000);
 
   ctx.status = 200;
   ctx.body = {
@@ -298,4 +301,83 @@ function _insertPrice(positionId, price, profit) {
   (position_id, price, profit)
   VALUES ($1, $2, $3)
   `, [positionId, price, profit]);
+}
+
+async function download(ctx) {
+  const start = Date.now();
+
+  const price = await _getPrice();
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(price);
+  XLSX.utils.book_append_sheet(wb, ws);
+
+  const result = await XLSX.write(wb, {
+    type: 'buffer',
+    bookType: 'xlsx',
+  });
+
+  logger.info('download positions complete in', (Date.now() - start) / 1000);
+
+  ctx.set('Content-Disposition', 'attachment; filename="SheetJSNode.xlsx"');
+  ctx.set('Content-Type', 'application/vnd.ms-excel');
+  ctx.status = 200;
+  ctx.body = result;
+}
+
+async function _getPrice() {
+  const price = [['№ п/п', 'Артикл', 'Наименование', 'Цена с НДС', 'Кол-во', 'Направление', 'Производитель', 'Склад']];
+  const positions = await _selectAllPosition();
+
+  positions.forEach((pos, i) => {
+    price.push([
+      i + 1,
+      pos.article,
+      pos.title,
+      pos.settlement_price,
+      pos.amount,
+      pos.brand_title,
+      pos.manufacturer,
+      pos.stock,
+    ]);
+  });
+  return price;
+}
+
+function _selectAllPosition() {
+  return db.query(`
+    select
+      P.id,
+      P.createdat,
+      P.brand_id,
+      R.title as brand_title,
+      P.provider_id,
+      CONCAT('Склад № ', P.provider_id) as stock,
+      P.article,
+      P.title,
+      case 
+        when M.createdat < NOW() - interval '${config.search.ttl}' then 0
+        else (M.price*(1+M.profit/100)) end
+        as settlement_price,
+      case 
+        when M.createdat < NOW() - interval '${config.search.ttl}' then 0
+        else P.amount end
+        as amount,
+      P.manufacturer
+    from positions P
+    join prices M
+      on P.id=M.position_id
+    left join bovid B
+      on B.id=P.bovid_id
+    join brands R
+      on P.brand_id=R.id
+    join providers V
+      on P.provider_id=V.id
+    where M.createdat = (
+        select max(createdat) from prices p3
+        where M.position_id=p3.position_id
+      ) 
+    ORDER BY id DESC
+  `)
+    .then((res) => res.rows);
 }

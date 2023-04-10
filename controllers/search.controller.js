@@ -41,7 +41,7 @@ module.exports.search = async (ctx) => {
       limit,
     };
   } catch (error) {
-    logger.warn(error.message);
+    logger.info(error.message);
     ctx.throw(404, 'positions not found');
   }
 };
@@ -98,11 +98,14 @@ function _fullTextSearch(query, /* offset, */ limit, liastId) {
       P.title,
       ts_rank(rus_article_parse, to_tsquery($1)) as rank,
       case 
-        when M.createdat < NOW() - interval '1 second' then 0
+        when M.createdat < NOW() - interval '${config.search.ttl}' then 0
         else (M.price*(1+M.profit/100)) end
         as settlement_price,
       B.amount as amount_bovid,
-      P.amount as amount,
+      case 
+        when M.createdat < NOW() - interval '${config.search.ttl}' then 0
+        else P.amount end
+        as amount,
       B.code,
       B.uid,
       P.manufacturer,
@@ -145,11 +148,14 @@ function _glueTextSearch(query, /* offset, */ limit, liastId) {
         P.article,
         P.title,
         case 
-          when M.createdat < NOW() - interval '1 second' then 0
+          when M.createdat < NOW() - interval '${config.search.ttl}' then 0
           else (M.price*(1+M.profit/100)) end
           as settlement_price,
         B.amount as amount_bovid,
-        P.amount as amount,
+        case 
+          when M.createdat < NOW() - interval '${config.search.ttl}' then 0
+          else P.amount end
+          as amount,
         B.code,
         B.uid,
         P.manufacturer,
