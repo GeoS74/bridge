@@ -41,7 +41,7 @@ module.exports.search = async (ctx) => {
       limit,
     };
   } catch (error) {
-    logger.error(error.message);
+    logger.warn(error.message);
     ctx.throw(404, 'positions not found');
   }
 };
@@ -93,12 +93,14 @@ function _fullTextSearch(query, /* offset, */ limit, liastId) {
       P.brand_id,
       R.title as brand_title,
       P.provider_id,
-      V.title as provider_title,
+      CONCAT('Склад № ', P.provider_id) as stock,
       P.article,
       P.title,
       ts_rank(rus_article_parse, to_tsquery($1)) as rank,
-      M.price,
-      (M.price*(1+M.profit/100)) as settlement_price,
+      case 
+        when M.createdat < NOW() - interval '1 second' then 0
+        else (M.price*(1+M.profit/100)) end
+        as settlement_price,
       B.amount as amount_bovid,
       P.amount as amount,
       B.code,
@@ -139,11 +141,13 @@ function _glueTextSearch(query, /* offset, */ limit, liastId) {
         P.brand_id,
         R.title as brand_title,
         P.provider_id,
-        V.title as provider_title,
+        CONCAT('Склад № ', P.provider_id) as stock,
         P.article,
         P.title,
-        M.price,
-        (M.price*(1+M.profit/100)) as settlement_price,
+        case 
+          when M.createdat < NOW() - interval '1 second' then 0
+          else (M.price*(1+M.profit/100)) end
+          as settlement_price,
         B.amount as amount_bovid,
         P.amount as amount,
         B.code,

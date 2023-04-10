@@ -153,9 +153,16 @@ function _checkStorage(storage) {
   return [];
 }
 
+function _makeString(str) {
+  if (!str) {
+    return '';
+  }
+  return str.toString().trim() || '';
+}
+
 function _makeData(data, structure, isBovid) {
   const storage = _checkStorage(data[structure.storage]);
-  const fullTitle = `${data[structure.article]?.toString().trim()} ${data[structure.title]?.toString().trim()} ${data.brandTitle || ''} ${data[structure.manufacturer]?.toString().trim()}`;
+  const fullTitle = `${_makeString(data[structure.article])} ${_makeString(data[structure.title])} ${_makeString(data.brandTitle)} ${_makeString(data[structure.manufacturer])}`;
   return {
     uid: data[structure.uid] || null,
     code: data[structure.code] || null,
@@ -196,7 +203,7 @@ async function add(ctx) {
 
       if (!pos?.bovid_id && data.engArticleParse) {
         data.bovidId = await _getBovidId(data.engArticleParse);
-        await _updatePosition(data, brandId, providerId);
+        pos = await _updatePosition(data, brandId, providerId);
       }
 
       if (!pos) {
