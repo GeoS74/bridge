@@ -1,6 +1,6 @@
 const XLSX = require('xlsx');
 const { parserEng, parserRus, parserGlue } = require('../libs/article.parser');
-const priceHandler = require('../libs/price.handler');
+const { convStringToReal, convRealToString } = require('../libs/price.handler');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 const config = require('../config');
@@ -177,8 +177,8 @@ function _makeData(data, structure, isBovid) {
     length: data[structure.length] || 0,
     manufacturer: data[structure.manufacturer] || null,
     storage: JSON.stringify(storage),
-    price: priceHandler(data[structure.price]),
-    amount: isBovid ? _sumAmount(storage) : priceHandler(data[structure.amount]),
+    price: convStringToReal(data[structure.price]),
+    amount: isBovid ? _sumAmount(storage) : convStringToReal(data[structure.amount]),
     engArticleParse: parserEng(data[structure.article]) || null,
     engFullTitleParse: parserEng(fullTitle.trim()) || null,
     rusFullTitleParse: parserRus(fullTitle.trim()) || null,
@@ -334,8 +334,8 @@ async function _getPrice() {
       i + 1,
       pos.article,
       pos.title,
-      pos.settlement_price,
-      pos.amount,
+      convRealToString(pos.settlement_price),
+      convRealToString(pos.amount),
       pos.brand_title,
       pos.manufacturer,
       pos.stock,
