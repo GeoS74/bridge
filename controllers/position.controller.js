@@ -332,7 +332,7 @@ async function download(ctx) {
 }
 
 async function _getPrice() {
-  const price = [['№ п/п', 'Артикл', 'Наименование', 'Цена с НДС', 'Кол-во', 'Направление', 'Производитель', 'Склад']];
+  const price = [['№ п/п', 'Артикл', 'Наименование', 'Цена с НДС', 'Кол-во', 'Производитель', 'Склад']];
   const positions = await _selectAllPosition();
 
   positions.forEach((pos, i) => {
@@ -340,9 +340,8 @@ async function _getPrice() {
       i + 1,
       pos.article,
       pos.title,
-      convRealToString(pos.settlement_price),
-      convRealToString(pos.amount),
-      pos.brand_title,
+      Math.round(pos.settlement_price*100)/100,
+      Math.round(pos.amount*100)/100,
       pos.manufacturer,
       pos.stock,
     ]);
