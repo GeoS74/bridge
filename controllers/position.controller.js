@@ -204,10 +204,15 @@ async function add(ctx) {
     try {
       let pos = await _updatePosition(data, brandId, providerId);
 
-      if (!pos?.bovid_id && data.engArticleParse) {
-        data.bovidId = await _getBovidId(data.engArticleParse);
-        pos = await _updatePosition(data, brandId, providerId);
+      if (!data.article && !data.title) {
+        throw new Error('позиция без артикула и наименования');
       }
+
+      // используй это если есть интеграция с 1С
+      // if (!pos?.bovid_id && data.engArticleParse) {
+      //   data.bovidId = await _getBovidId(data.engArticleParse);
+      //   pos = await _updatePosition(data, brandId, providerId);
+      // }
 
       if (!pos) {
         pos = await _insertPosition(data, brandId, providerId);
@@ -234,12 +239,13 @@ function _getBrandTitle(brandId) {
     .then((res) => res.rows[0]?.title);
 }
 
-function _getBovidId(engArticleParse) {
-  return db.query(`SELECT id FROM bovid
-    WHERE eng_article_parse=$1
-  `, [engArticleParse])
-    .then((res) => res.rows[0]?.id);
-}
+// используй это если есть интеграция с 1С
+// function _getBovidId(engArticleParse) {
+//   return db.query(`SELECT id FROM bovid
+//     WHERE eng_article_parse=$1
+//   `, [engArticleParse])
+//     .then((res) => res.rows[0]?.id);
+// }
 
 function _updatePosition(data, brandId, providerId) {
   return db.query(`UPDATE positions

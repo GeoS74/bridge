@@ -18,8 +18,8 @@ describe('/test/price.handler.test.js', () => {
     expect(convRealToString('10,5')).equal('NaN');
     expect(convRealToString('10.5')).equal('10,50');
     expect(convRealToString('10.50123')).equal('10,50');
-    expect(convRealToString(null)).equal(0);
-    expect(convRealToString(undefined)).equal(0);
-    expect(convRealToString(NaN)).equal(0);
+    expect(convRealToString(null)).equal('0');
+    expect(convRealToString(undefined)).equal('0');
+    expect(convRealToString(NaN)).equal('0');
   });
 });
