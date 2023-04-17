@@ -1,6 +1,6 @@
 const XLSX = require('xlsx');
 const { parserEng, parserRus, parserGlue } = require('../libs/article.parser');
-const { convStringToReal, convRealToString } = require('../libs/price.handler');
+const { convStringToReal } = require('../libs/price.handler');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 const config = require('../config');
@@ -340,8 +340,8 @@ async function _getPrice() {
       i + 1,
       pos.article,
       pos.title,
-      Math.round(pos.settlement_price*100)/100,
-      Math.round(pos.amount*100)/100,
+      Math.round(pos.settlement_price * 100) / 100,
+      Math.round(pos.amount * 100) / 100,
       pos.manufacturer,
       pos.stock,
     ]);

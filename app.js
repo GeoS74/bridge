@@ -12,6 +12,7 @@ const brandRoutes = require('./routes/brand.routes');
 const providerRoutes = require('./routes/provider.routes');
 const utRoutes = require('./routes/ut.routes');
 const searchRoutes = require('./routes/search.routes');
+const cardRoutes = require('./routes/card.routes');
 
 (async () => {
   try {
@@ -36,5 +37,6 @@ app.use(providerRoutes);
 app.use(fileRoutes);
 app.use(utRoutes);
 app.use(searchRoutes);
+app.use(cardRoutes);
 
 module.exports = app;
