@@ -33,4 +33,10 @@ module.exports = {
   log: {
     file: 'app.log',
   },
+  api: {
+    voshod: {
+      key: process.env.VOSHOD_API_KEY || null,
+      uri: 'https://api.v-avto.ru/v1/items',
+    },
+  },
 };
