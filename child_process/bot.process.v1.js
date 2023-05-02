@@ -220,10 +220,7 @@ class BotOld {
   }
 
   _makeString(str) {
-    if (!str) {
-      return '';
-    }
-    return str.toString().trim() || '';
+   return str?.toString()?.trim() || '';
   }
 
   // _parentSay(message) {

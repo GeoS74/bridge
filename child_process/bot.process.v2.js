@@ -234,10 +234,7 @@ class Bot {
   }
 
   static _makeString(str) {
-    if (!str) {
-      return '';
-    }
-    return str.toString().trim() || '';
+    return str?.toString()?.trim() || '';
   }
 }
 
