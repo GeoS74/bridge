@@ -8,7 +8,8 @@ const router = new Router({ prefix: '/api/bridge/external' });
 router.get(
   '/voshod',
   position.countPages,
-  position.reader,
+  // position.reader,
+  position.readerNew,
 );
 
 module.exports = router.routes();
