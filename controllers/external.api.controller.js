@@ -37,11 +37,11 @@ async function countPages(ctx, next) {
  */
 
 async function readerV1(ctx) {
-  const providerId = 83;
-  const brandId = 78;
+  const providerId = 1;
+  const brandId = 1;
   const brandTitle = 'Ваз, Газ, Иномарки';
   const profit = 20;
-  const countBots = 8;
+  const countBots = 3;
 
   for (let i = 0, step = Math.ceil(ctx.countPages / countBots); i < ctx.countPages; i += step) {
     const start = i + 1;
@@ -118,6 +118,6 @@ function _createProcessV2(id, providerId, brandId, brandTitle, profit, maxPages)
 
 function delay(time) {
   return new Promise((res) => {
-    setTimeout(() => res(1), time);
+    setTimeout(() => res(), time);
   });
 }
