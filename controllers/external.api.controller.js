@@ -37,11 +37,11 @@ async function countPages(ctx, next) {
  */
 
 async function readerV1(ctx) {
-  const providerId = 1;
-  const brandId = 1;
+  const providerId = 83;
+  const brandId = 78;
   const brandTitle = 'Ваз, Газ, Иномарки';
   const profit = 20;
-  const countBots = 3;
+  const countBots = 8;
 
   for (let i = 0, step = Math.ceil(ctx.countPages / countBots); i < ctx.countPages; i += step) {
     const start = i + 1;

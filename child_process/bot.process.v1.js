@@ -170,10 +170,9 @@ class Bot {
 
         throw new Error(response.status);
       })
-      .catch((error) => {
+      .catch(() => {
         this._numberOfPages.push(numPage);
-        logger.error(`status: ${error.message} Bad url = ${config.api.voshod.uri}/?a=1&page=${numPage}`);
-        return {};
+        return false;
       });
   }
 
