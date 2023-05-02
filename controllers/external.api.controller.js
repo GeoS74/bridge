@@ -6,8 +6,8 @@ const logger = require('../libs/logger');
 
 module.exports = {
   countPages,
-  reader,
-  readerNew,
+  readerV1,
+  readerV2,
 };
 
 async function countPages(ctx, next) {
@@ -32,7 +32,11 @@ async function countPages(ctx, next) {
   await next();
 }
 
-async function reader(ctx) {
+/**
+ * v1
+ */
+
+async function readerV1(ctx) {
   const providerId = 83;
   const brandId = 78;
   const brandTitle = 'Ваз, Газ, Иномарки';
@@ -51,7 +55,7 @@ async function reader(ctx) {
 }
 
 function _createBot(start, end, providerId, brandId, brandTitle, profit) {
-  const bot = childProcess.fork('./child_process/bot.process', [], {
+  const bot = childProcess.fork('./child_process/bot.process.v1', [], {
     env: {
       start, end, providerId, brandId, brandTitle, profit,
     },
@@ -64,34 +68,38 @@ function _createBot(start, end, providerId, brandId, brandTitle, profit) {
   return bot;
 }
 
+/**
+* v2
+*/
+
 let numPage = 1;
 
-async function readerNew(ctx) {
+async function readerV2(ctx) {
   const providerId = 83;
   const brandId = 78;
   const brandTitle = 'Ваз, Газ, Иномарки';
   const profit = 20;
   const countBots = 15;
-  numPage = 1;
+  numPage = 0;
 
-  for (let i = 1; i <= countBots; i++) {
+  for (let i = 1; i <= countBots; i += 1) {
     await delay(1000);
     logger.info(`bot ${i} started`);
-    _createBotNew(i, providerId, brandId, brandTitle, profit, ctx.countPages);
+    _createProcessV2(i, providerId, brandId, brandTitle, profit, ctx.countPages);
   }
 
   ctx.status = 200;
   ctx.body = 'all bots started';
 }
 
-function _createBotNew(id, providerId, brandId, brandTitle, profit, maxPages) {
-  const bot = childProcess.fork('./child_process/bot.process', [], {
+function _createProcessV2(id, providerId, brandId, brandTitle, profit, maxPages) {
+  numPage += 1;
+
+  const bot = childProcess.fork('./child_process/bot.process.v2', [], {
     env: {
       id, numPage, providerId, brandId, brandTitle, profit,
     },
   });
-
-  numPage += 1;
 
   bot.on('message', (message) => {
     const mess = JSON.parse(message);
@@ -103,7 +111,7 @@ function _createBotNew(id, providerId, brandId, brandTitle, profit, maxPages) {
     logger.info(`bot ${mess.id} processed page: ${mess.numPage} at ${mess.time} sec`);
 
     if (numPage <= maxPages) {
-      _createBotNew(id, providerId, brandId, brandTitle, profit, maxPages);
+      _createProcessV2(id, providerId, brandId, brandTitle, profit, maxPages);
     }
   });
 }
