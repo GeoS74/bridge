@@ -17,7 +17,7 @@ const db = require('../libs/db');
 const config = require('../config');
 
 class Bot {
-    numberOfPages = this.makeNumberOfPages();
+  numberOfPages = this.makeNumberOfPages();
 
   constructor() {
     // process.on('message', message => {
@@ -27,10 +27,10 @@ class Bot {
     this._start();
   }
 
-  makeNumberOfPages(){
+  makeNumberOfPages() {
     const result = [];
     for (let i = +process.env.start; i <= +process.env.end; i += 1) {
-        result.push(i);
+      result.push(i);
     }
     return result;
   }
@@ -103,6 +103,10 @@ class Bot {
     }
   }
 
+  _checkUtinCode(code) {
+    return code === 796;
+  }
+
   _readPositions(items) {
     if (!items) {
       return [];
@@ -113,13 +117,15 @@ class Bot {
     for (const position of items) {
       if (position.count_chel) {
         if (this._checkDepartment(position.department)) {
-          result.push({
-            article: position.oem_num,
-            title: position.name,
-            amount: position.count_chel,
-            manufacturer: position.oem_brand,
-            price: position.price,
-          });
+          if (this._checkUtinCode(position.unit_code)) {
+            result.push({
+              article: position.oem_num,
+              title: position.name,
+              amount: position.count_chel,
+              manufacturer: position.oem_brand,
+              price: position.price,
+            });
+          }
         }
       }
     }
@@ -139,15 +145,15 @@ class Bot {
         throw new Error(response.status);
       })
       .catch((error) => {
-        this.numberOfPages.push(numPage)
+        this.numberOfPages.push(numPage);
         logger.error(`status: ${error.message} Bad url = ${config.api.voshod.uri}/?a=1&page=${numPage}`);
         return {};
       });
   }
 
   /**
-         * методы без изменения реализации
-         */
+           * методы без изменения реализации
+           */
   async _updatePosition(data, brandId, providerId) {
     return db.query(`UPDATE positions
         SET
