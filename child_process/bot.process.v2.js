@@ -108,11 +108,25 @@ class Bot {
           pos = await Bot._insertPosition(data, this._brandId, this._providerId);
         }
 
-        await Bot._insertPrice(pos.id, data.price, this._profit);
+        // await Bot._insertPrice(pos.id, data.price, this._profit);
+        await Bot._insertPrice(pos.id, data.price, Bot._progressiveProfit(data.price));
       } catch (error) {
         // ошибочные ситуации не логируются в дочернем процессе
       }
     }
+  }
+
+  static _progressiveProfit(price) {
+    if (price < 100) {
+      return 100;
+    }
+    if (price < 500) {
+      return 50;
+    }
+    if (price < 1000) {
+      return 30;
+    }
+    return 20;
   }
 
   static _checkDepartment(department) {

@@ -112,6 +112,8 @@ function _createProcessV2(id, providerId, brandId, brandTitle, profit, maxPages)
 
     if (numPage <= maxPages) {
       _createProcessV2(id, providerId, brandId, brandTitle, profit, maxPages);
+    } else {
+      logger.info(`bot ${mess.id} finished`);
     }
   });
 }
