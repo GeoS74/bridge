@@ -3,6 +3,7 @@ const fetch = require('node-fetch');
 
 const config = require('../config');
 const logger = require('../libs/logger');
+const { delay } = require('../libs/myfunc');
 
 module.exports = {
   countPages,
@@ -82,6 +83,8 @@ async function readerV2(ctx) {
   const countBots = 15;
   numPage = 0;
 
+  logger.info('request to API Voshod started');
+
   for (let i = 1; i <= countBots; i += 1) {
     await delay(1000);
     logger.info(`bot ${i} started`);
@@ -106,20 +109,14 @@ function _createProcessV2(id, providerId, brandId, brandTitle, profit, maxPages)
 
     if (mess.error) {
       logger.error(`bot ${mess.id} error page: ${mess.numPage}`);
+    } else {
+      logger.info(`bot ${mess.id} processed page: ${mess.numPage} at ${mess.time} sec`);
     }
-
-    logger.info(`bot ${mess.id} processed page: ${mess.numPage} at ${mess.time} sec`);
 
     if (numPage <= maxPages) {
       _createProcessV2(id, providerId, brandId, brandTitle, profit, maxPages);
     } else {
       logger.info(`bot ${mess.id} finished`);
     }
-  });
-}
-
-function delay(time) {
-  return new Promise((res) => {
-    setTimeout(() => res(), time);
   });
 }

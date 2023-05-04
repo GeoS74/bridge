@@ -28,7 +28,7 @@ module.exports = {
     // при значении 3, минимальная длина строки запроса = 4
     minLengthGlueSearchQuery: process.env.MIN_LENGTH_GLUE_SEARCH_QUERY || 4,
     // время актуальности цены и количества
-    ttl: process.env.ACTUAL_TTL || '6 hours',
+    ttl: process.env.ACTUAL_TTL || '2 hours',
   },
   log: {
     file: 'app.log',
