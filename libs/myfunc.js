@@ -1,23 +1,17 @@
-module.exports.timer = async function timer(times, cb) {
-  await new Promise((res) => {
-    setTimeout(() => {
-      const h = (`0${new Date().getHours()}`).slice(-2);
-      const m = (`0${new Date().getMinutes()}`).slice(-2);
-      const s = (`0${new Date().getSeconds()}`).slice(-2);
+module.exports.timer = async (times, cb) => {
+  await this.delay(1000);
 
-      if (times.indexOf(`${h}:${m}:${s}`) !== -1) {
-        cb();
-      }
+  const h = (`0${new Date().getHours()}`).slice(-2);
+  const m = (`0${new Date().getMinutes()}`).slice(-2);
+  const s = (`0${new Date().getSeconds()}`).slice(-2);
 
-      res();
-    }, 1000);
-  });
+  if (times.indexOf(`${h}:${m}:${s}`) !== -1) {
+    cb();
+  }
 
-  timer(times, cb);
+  this.timer(times, cb);
 };
 
-module.exports.delay = function delay(time) {
-  return new Promise((res) => {
-    setTimeout(() => res(), time);
-  });
-};
+module.exports.delay = (time) => new Promise((res) => {
+  setTimeout(() => res(), time);
+});
