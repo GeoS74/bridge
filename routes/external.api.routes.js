@@ -19,7 +19,12 @@ router.get(
 
 module.exports = router.routes();
 
-timer(['18:44:00', '10:00:00', '13:00:00', '16:00:00'], () => {
+timer([
+  '07:00:00', 
+  '10:00:00', 
+  '13:00:00', 
+  '16:00:00',
+], () => {
   const token = jwt.sign('say hi', config.jwt.secretKey);
   // этот fetch упадёт если к роуту '/voshod' подключить accessCheck и не передать токен
   fetch(`http://${config.server.host}:${config.server.port}/api/bridge/external/voshod`, {

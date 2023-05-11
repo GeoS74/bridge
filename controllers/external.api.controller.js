@@ -98,7 +98,7 @@ async function readerV2(ctx) {
   const brandId = 78;
   const brandTitle = 'Ваз, Газ, Иномарки';
   const profit = 20;
-  const countBots = 15;
+  const countBots = 14;
   numPage = 0;
 
   logger.info('request to API Voshod started');

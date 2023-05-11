@@ -129,7 +129,7 @@ class Bot {
     if (price < 1000) {
       return 30;
     }
-    return 10;
+    return 12;
   }
 
   static _checkDepartment(department) {
