@@ -50,6 +50,7 @@ describe('/test/card.test.js', () => {
     fd.append('amount', 4);
     fd.append('manufacturer', 5);
     fd.append('startRow', 2);
+    fd.append('addNewPositionMode', 1);
 
     const optional = {
       headers: {},

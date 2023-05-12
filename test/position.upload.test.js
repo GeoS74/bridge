@@ -71,6 +71,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('amount', 4);
       fd.append('manufacturer', 5);
       fd.append('startRow', 2);
+      fd.append('addNewPositionMode', 1);
       optional.body = fd;
 
       const response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
@@ -104,6 +105,7 @@ describe('/test/position.upload.test.js', () => {
       fd.append('amount', 4);
       fd.append('manufacturer', 5);
       fd.append('startRow', 2);
+      fd.append('addNewPositionMode', 1);
       optional.body = fd;
 
       const response = await fetch(`http://localhost:${config.server.port}/api/bridge/file/upload`, optional)
