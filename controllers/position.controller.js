@@ -188,7 +188,9 @@ function _makeData(data, structure, isBovid) {
 
 async function add(ctx) {
   const start = Date.now();
-  const { brandId, providerId, profit } = ctx.request.body;
+  const {
+    brandId, providerId, profit, addNewPositionMode,
+  } = ctx.request.body;
   const brandTitle = await _getBrandTitle(brandId);
 
   let i = 0;
@@ -214,11 +216,15 @@ async function add(ctx) {
       //   pos = await _updatePosition(data, brandId, providerId);
       // }
 
-      if (!pos) {
+      if (!pos && addNewPositionMode) {
         pos = await _insertPosition(data, brandId, providerId);
       }
 
-      await _insertPrice(pos.id, data.price, profit);
+      // если включен режим добавления новых позиций addNewPositionMode
+      // pos.id может не существовать
+      if (pos?.id) {
+        await _insertPrice(pos.id, data.price, profit);
+      }
     } catch (error) {
       logger.error(`артикул ${data.article} наименование ${data.title}`, error.message);
     }

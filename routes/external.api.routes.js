@@ -20,9 +20,9 @@ router.get(
 module.exports = router.routes();
 
 timer([
-  '07:00:00', 
-  '10:00:00', 
-  '13:00:00', 
+  '07:00:00',
+  '10:00:00',
+  '13:00:00',
   '16:00:00',
 ], () => {
   const token = jwt.sign('say hi', config.jwt.secretKey);

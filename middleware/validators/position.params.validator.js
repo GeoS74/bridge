@@ -19,6 +19,8 @@ module.exports = async (ctx, next) => {
 
   ctx.request.body.profit = parseInt(ctx.request?.body?.profit, 10) || 0;
 
+  ctx.request.body.addNewPositionMode = !!ctx.request?.body?.addNewPositionMode;
+
   await next();
 };
 
