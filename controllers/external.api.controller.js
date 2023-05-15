@@ -4,15 +4,18 @@ const fetch = require('node-fetch');
 const config = require('../config');
 const logger = require('../libs/logger');
 const { delay } = require('../libs/myfunc');
+const db = require('../libs/db');
 
 module.exports = {
   countPages,
   readerV1,
   readerV2,
+  getPositions,
+  readerV3,
 };
 
 async function countPages(ctx, next) {
-  ctx.countPages = await fetch(`${config.api.voshod.uri}/?a=1`, {
+  ctx.countPages = await fetch(`${config.api.voshod.uri}/items/?a=1`, {
     headers: {
       'X-Voshod-API-KEY': config.api.voshod.key,
     },
@@ -42,6 +45,8 @@ async function countPages(ctx, next) {
  * при этом если при запросе страницы сервер возвращает ошибку,
  * бот ставит эту страницу в конец очереди и
  * после завершения опроса бот возвращается к проблемной странице
+ *
+ * работает медленнее чем readerV2
  */
 
 async function readerV1(ctx) {
@@ -133,6 +138,87 @@ function _createProcessV2(id, providerId, brandId, brandTitle, profit, maxPages)
 
     if (numPage <= maxPages) {
       _createProcessV2(id, providerId, brandId, brandTitle, profit, maxPages);
+    } else {
+      logger.info(`bot ${mess.id} finished`);
+    }
+  });
+}
+
+/**
+ * v3
+ *
+ * используется глобальная переменная
+ *
+ * перед запуском reader-a выполняется запрос к БД для получения всех позиций для обновления
+ *
+ * бот получает только одну позиция за вызов
+ * по артикулу делает запрос и из полученного массива
+ * (одному артикулу может соответствовать несколько позиций)
+ * ищет позиция с точно таким же ариткулом и заводом
+ *
+ * работает медленнее чем readerV2
+ *
+ */
+let currentIndexPosition = 0;
+let positions = [];
+
+async function getPositions(ctx, next) {
+  const providerId = 83;
+  const brandId = 78;
+
+  positions = await db.query(`select id, article, manufacturer 
+    from positions 
+      where brand_id=${brandId} and 
+      provider_id=${providerId} 
+      order by id desc
+    `)
+    .then((res) => res.rows);
+
+  await next();
+}
+
+async function readerV3(ctx) {
+  const countBots = 25;
+  currentIndexPosition = 77900;
+
+  logger.info('request to API Voshod started');
+
+  for (let i = 1; i <= countBots; i += 1) {
+    await delay(300);
+    logger.info(`bot ${i} started`);
+    _createProcessV3(i);
+  }
+
+  ctx.status = 200;
+  ctx.body = 'all bots started';
+}
+
+function _createProcessV3(id) {
+  const pos = positions[currentIndexPosition];
+  const currIndex = currentIndexPosition;
+  currentIndexPosition += 1;
+
+  const bot = childProcess.fork('./child_process/bot.process.v3', [], {
+    env: {
+      id,
+      posId: pos.id,
+      article: pos.article,
+      manufacturer: pos.manufacturer,
+    },
+  });
+
+  bot.on('message', (message) => {
+    const mess = JSON.parse(message);
+
+    if (mess.error) {
+      logger.error(`bot ${mess.id} error page: ${mess.article} index: ${currIndex}`);
+      positions.push(pos);
+    } else {
+      logger.info(`bot ${mess.id} processed page index: ${currIndex} in ${positions.length} at ${mess.time} sec`);
+    }
+
+    if (currentIndexPosition < positions.length) {
+      _createProcessV3(id);
     } else {
       logger.info(`bot ${mess.id} finished`);
     }

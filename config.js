@@ -36,7 +36,7 @@ module.exports = {
   api: {
     voshod: {
       key: process.env.VOSHOD_API_KEY || null,
-      uri: 'https://api.v-avto.ru/v1/items',
+      uri: 'https://api.v-avto.ru/v1',
     },
   },
 };

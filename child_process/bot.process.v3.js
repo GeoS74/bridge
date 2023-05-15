@@ -19,39 +19,33 @@ const config = require('../config');
 class Bot {
   _id;
 
-  _numPage;
+  _posId;
 
-  _providerId;
+  _article;
 
-  _brandId;
-
-  _brandTitle;
-
-  _profit;
+  _manufacturer;
 
   constructor({
-    id, numPage, providerId, brandId, brandTitle, profit,
+    id, posId, article, manufacturer,
   }) {
     this._id = id;
-    this._numPage = numPage;
-    this._providerId = providerId;
-    this._brandId = brandId;
-    this._brandTitle = brandTitle;
-    this._profit = profit;
+    this._posId = posId;
+    this._article = article;
+    this._manufacturer = manufacturer;
     this._start();
   }
 
   async _start() {
     const start = Date.now();
 
-    const page = await Bot._readPage(this._numPage);
+    const page = await Bot._readPage(this._article);
 
-    if (!page) {
+    if (!page?.response?.items) {
       const answer = {
         error: 'bad page',
         id: this._id,
         time: (Date.now() - start) / 1000,
-        numPage: this._numPage,
+        article: this._article,
       };
 
       process.send(JSON.stringify(answer));
@@ -64,7 +58,6 @@ class Bot {
     const answer = {
       id: this._id,
       time: (Date.now() - start) / 1000,
-      numPage: this._numPage,
     };
 
     process.send(JSON.stringify(answer));
@@ -98,18 +91,20 @@ class Bot {
       const data = this._makeData(position);
 
       try {
-        let pos = await Bot._updatePosition(data, this._brandId, this._providerId);
-
         if (!data.article && !data.title) {
           throw new Error('позиция без артикула и наименования');
         }
-
-        if (!pos) {
-          pos = await Bot._insertPosition(data, this._brandId, this._providerId);
+        if (data.article !== this._article) {
+          throw new Error('не совпадает артикул');
+        }
+        if (data.manufacturer !== this._manufacturer) {
+          throw new Error('позиция другого производителя');
         }
 
-        // await Bot._insertPrice(pos.id, data.price, this._profit);
+        const pos = await Bot._updatePosition(data, this._posId);
+
         await Bot._insertPrice(pos.id, data.price, Bot._progressiveProfit(data.price));
+        break;
       } catch (error) {
         // ошибочные ситуации не логируются в дочернем процессе
       }
@@ -132,15 +127,6 @@ class Bot {
     return 12;
   }
 
-  static _checkDepartment(department) {
-    switch (department.toString().toLowerCase()) {
-      case 'иномарки':
-      case 'ваз':
-      case 'газ': return true;
-      default: return false;
-    }
-  }
-
   static _checkUnitCode(code) {
     return code === 796;
   }
@@ -154,24 +140,22 @@ class Bot {
 
     for (const position of items) {
       if (position.count_chel) {
-        if (Bot._checkDepartment(position.department)) {
-          if (Bot._checkUnitCode(position.unit_code)) {
-            result.push({
-              article: position.oem_num,
-              title: position.name,
-              amount: position.count_chel,
-              manufacturer: position.oem_brand,
-              price: position.price,
-            });
-          }
+        if (Bot._checkUnitCode(position.unit_code)) {
+          result.push({
+            article: position.oem_num,
+            title: position.name,
+            amount: position.count_chel,
+            manufacturer: position.oem_brand,
+            price: position.price,
+          });
         }
       }
     }
     return result;
   }
 
-  static async _readPage(numPage) {
-    return fetch(`${config.api.voshod.uri}/items/?a=1&page=${numPage}`, {
+  static async _readPage(article) {
+    return fetch(`${config.api.voshod.uri}/search/name/?q=${article}`, {
       headers: { 'X-Voshod-API-KEY': config.api.voshod.key },
     })
       .then(async (response) => {
@@ -185,60 +169,16 @@ class Bot {
       .catch(() => false);
   }
 
-  /**
-  * методы без изменения реализации
-  */
-  static async _updatePosition(data, brandId, providerId) {
+  static async _updatePosition(data, posId) {
     return db.query(`UPDATE positions
           SET
             updatedat=DEFAULT,
-            bovid_id=$1,
-            article=$2,
-            title=$3,
-            amount=$4,
-            rus_article_parse=to_tsvector('pg_catalog.russian', coalesce($5, ''))
-          WHERE eng_article_parse=$6 AND brand_id=$7 AND provider_id=$8
+            amount=$1
+          WHERE id=$2
           RETURNING *
           `, [
-      data.bovidId,
-      data.article,
-      data.title,
       data.amount,
-      data.rusFullTitleParse,
-      data.engFullTitleParse,
-      brandId,
-      providerId,
-    ])
-      .then((res) => res.rows[0]);
-  }
-
-  static async _insertPosition(data, brandId, providerId) {
-    return db.query(`INSERT INTO positions
-            (
-              brand_id, 
-              provider_id, 
-              bovid_id, 
-              article, 
-              title, 
-              amount,
-              manufacturer,
-              rus_article_parse,
-              eng_article_parse,
-              glue_article_parse
-            )
-            VALUES ($1, $2, $3, $4, $5, $6, $7, to_tsvector('pg_catalog.russian', coalesce($8, '')), $9, $10)
-            RETURNING *
-          `, [
-      brandId,
-      providerId,
-      data.bovidId,
-      data.article,
-      data.title,
-      data.amount,
-      data.manufacturer,
-      data.rusFullTitleParse,
-      data.engFullTitleParse,
-      data.glueArticleParse,
+      posId,
     ])
       .then((res) => res.rows[0]);
   }

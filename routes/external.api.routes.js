@@ -17,17 +17,26 @@ router.get(
   position.readerV2,
 );
 
+router.get(
+  '/voshod/update',
+  // accessCheck,
+  position.getPositions,
+  position.readerV3,
+);
+
 module.exports = router.routes();
 
 timer([
-  '07:00:00',
-  '10:00:00',
+  '05:00:00',
+  // '07:00:00',
+  '09:00:00',
+  // '10:00:00',
   '13:00:00',
-  '16:00:00',
+  // '16:00:00',
 ], () => {
   const token = jwt.sign('say hi', config.jwt.secretKey);
   // этот fetch упадёт если к роуту '/voshod' подключить accessCheck и не передать токен
-  fetch(`http://${config.server.host}:${config.server.port}/api/bridge/external/voshod`, {
+  fetch(`http://${config.server.host}:${config.server.port}/api/bridge/external/voshod/update`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
