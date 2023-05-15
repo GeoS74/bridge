@@ -179,7 +179,7 @@ async function getPositions(ctx, next) {
 
 async function readerV3(ctx) {
   const countBots = 25;
-  currentIndexPosition = 77900;
+  currentIndexPosition = 0;
 
   logger.info('request to API Voshod started');
 
