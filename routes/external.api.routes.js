@@ -19,7 +19,7 @@ router.get(
 
 router.get(
   '/voshod/update',
-  // accessCheck,
+  accessCheck,
   position.getPositions,
   position.readerV3,
 );
@@ -27,11 +27,11 @@ router.get(
 module.exports = router.routes();
 
 timer([
-  '05:00:00',
+  // '05:00:00',
   // '07:00:00',
-  '09:00:00',
+  // '09:00:00',
   // '10:00:00',
-  '13:00:00',
+  // '13:00:00',
   // '16:00:00',
 ], () => {
   const token = jwt.sign('say hi', config.jwt.secretKey);
