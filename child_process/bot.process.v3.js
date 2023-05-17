@@ -23,14 +23,17 @@ class Bot {
 
   _article;
 
+  _title;
+
   _manufacturer;
 
   constructor({
-    id, posId, article, manufacturer,
+    id, posId, article, title, manufacturer,
   }) {
     this._id = id;
     this._posId = posId;
     this._article = article;
+    this._title = title;
     this._manufacturer = manufacturer;
     this._start();
   }
@@ -38,11 +41,23 @@ class Bot {
   async _start() {
     const start = Date.now();
 
-    const page = await Bot._readPage(this._article);
+    const page = await Bot._readPage(this._article, this._title);
+
+    if (page === 'The user aborted a request.') {
+      const answer = {
+        error: 'aborting',
+        id: this._id,
+        time: (Date.now() - start) / 1000,
+        article: this._article,
+      };
+
+      process.send(JSON.stringify(answer));
+      process.exit();
+    }
 
     if (!page?.response?.items) {
       const answer = {
-        error: 'bad page',
+        error: `status ${page}`,
         id: this._id,
         time: (Date.now() - start) / 1000,
         article: this._article,
@@ -95,6 +110,9 @@ class Bot {
           throw new Error('позиция без артикула и наименования');
         }
         if (data.article !== this._article) {
+          throw new Error('не совпадает артикул');
+        }
+        if (data.title !== this._title) {
           throw new Error('не совпадает артикул');
         }
         if (data.manufacturer !== this._manufacturer) {
@@ -154,9 +172,21 @@ class Bot {
     return result;
   }
 
-  static async _readPage(article) {
-    return fetch(`${config.api.voshod.uri}/search/name/?q=${article}`, {
+  static makeUrl(article, title) {
+    const url = new URL(`${config.api.voshod.uri}/search/name`);
+    url.searchParams.set('a', '1');
+    url.searchParams.set('q', `${article} ${title}`);
+    return url;
+  }
+
+  static async _readPage(article, title) {
+    const controller = new AbortController();
+
+    setTimeout(() => controller.abort(), 2000);
+
+    return fetch(Bot.makeUrl(article, title), {
       headers: { 'X-Voshod-API-KEY': config.api.voshod.key },
+      signal: controller.signal,
     })
       .then(async (response) => {
         if (response.ok) {
@@ -166,7 +196,7 @@ class Bot {
 
         throw new Error(response.status);
       })
-      .catch(() => false);
+      .catch((error) => error.message);
   }
 
   static async _updatePosition(data, posId) {

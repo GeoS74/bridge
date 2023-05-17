@@ -18,8 +18,8 @@ router.get(
 );
 
 router.get(
-  '/voshod/update',
-  accessCheck,
+  '/voshod/v3',
+  // accessCheck,
   position.getPositions,
   position.readerV3,
 );

@@ -166,11 +166,12 @@ async function getPositions(ctx, next) {
   const providerId = 83;
   const brandId = 78;
 
-  positions = await db.query(`select id, article, manufacturer 
+  positions = await db.query(`select 
+    id, article, title, manufacturer 
     from positions 
       where brand_id=${brandId} and 
       provider_id=${providerId} 
-      order by id desc
+      order by id
     `)
     .then((res) => res.rows);
 
@@ -178,7 +179,7 @@ async function getPositions(ctx, next) {
 }
 
 async function readerV3(ctx) {
-  const countBots = 25;
+  const countBots = 20;
   currentIndexPosition = 0;
 
   logger.info('request to API Voshod started');
@@ -203,18 +204,23 @@ function _createProcessV3(id) {
       id,
       posId: pos.id,
       article: pos.article,
+      title: pos.title,
       manufacturer: pos.manufacturer,
     },
   });
 
-  bot.on('message', (message) => {
+  bot.on('message', async (message) => {
     const mess = JSON.parse(message);
 
     if (mess.error) {
-      logger.error(`bot ${mess.id} error page: ${mess.article} index: ${currIndex}`);
-      positions.push(pos);
+      logger.error(`index: ${currIndex} bot ${mess.id} ${mess.error}`);
+
+      if (mess.error !== 'aborting') {
+        positions.push(pos);
+        await delay(1000);
+      }
     } else {
-      logger.info(`bot ${mess.id} processed page index: ${currIndex} in ${positions.length} at ${mess.time} sec`);
+      logger.info(`index: ${currIndex} bot ${mess.id} processed page in ${positions.length} at ${mess.time} sec`);
     }
 
     if (currentIndexPosition < positions.length) {
