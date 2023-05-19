@@ -33,6 +33,11 @@ async function countPages(ctx, next) {
       return 0;
     });
 
+    if(!ctx.countPages) {
+      ctx.throw(400, 'нет позиций')
+      return;
+    }
+
   await next();
 }
 

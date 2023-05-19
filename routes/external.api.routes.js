@@ -11,7 +11,7 @@ const router = new Router({ prefix: '/api/bridge/external' });
 
 router.get(
   '/voshod',
-  accessCheck,
+  // accessCheck,
   position.countPages,
   // position.readerV1,
   position.readerV2,
