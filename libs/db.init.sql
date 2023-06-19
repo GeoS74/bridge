@@ -37,6 +37,8 @@ CREATE TABLE positions (
       article TEXT,
       title TEXT,
       manufacturer TEXT,
+      photo JSON,
+      alias TEXT,
       amount REAL DEFAULT 0,
       eng_article_parse TEXT NOT NULL,
       rus_article_parse TSVECTOR,

@@ -96,6 +96,8 @@ function _fullTextSearch(query, /* offset, */ limit, liastId) {
       CONCAT('Склад № ', P.provider_id) as stock,
       P.article,
       P.title,
+      P.photo,
+      P.alias,
       ts_rank(rus_article_parse, to_tsquery($1)) as rank,
       case 
         when M.createdat < NOW() - interval '${config.search.ttl}' then 0
@@ -147,6 +149,8 @@ function _glueTextSearch(query, /* offset, */ limit, liastId) {
         CONCAT('Склад № ', P.provider_id) as stock,
         P.article,
         P.title,
+        P.photo,
+        P.alias,
         case 
           when M.createdat < NOW() - interval '${config.search.ttl}' then 0
           else (M.price*(1+M.profit/100)) end

@@ -18,12 +18,14 @@
     "jsonwebtoken": "^9.0.0",
     "koa": "^2.13.4",
     "koa-body": "^5.0.0",
+    "koa-mount": "^4.0.0",
     "koa-router": "^12.0.0",
     "koa-static": "^5.0.0",
     "log4js": "^6.7.0",
     "md-conv": "^0.0.30",
     "node-fetch": "^2.6.7",
     "pg": "^8.8.0",
+    "sharp": "^0.32.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

@@ -88,6 +88,8 @@ const data = {
       title TEXT,
       amount REAL DEFAULT 0,
       manufacturer TEXT,
+      photo JSON,
+      alias TEXT,
       eng_article_parse TEXT NOT NULL,
       rus_article_parse TSVECTOR,
       glue_article_parse TEXT

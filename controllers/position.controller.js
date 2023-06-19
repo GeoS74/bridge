@@ -1,6 +1,7 @@
 const XLSX = require('xlsx');
 const { parserEng, parserRus, parserGlue } = require('../libs/article.parser');
 const { convStringToReal } = require('../libs/price.handler');
+const aliaser = require('../libs/aliaser');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 const config = require('../config');
@@ -183,6 +184,7 @@ function _makeData(data, structure, isBovid) {
     engFullTitleParse: parserEng(fullTitle.trim()) || null,
     rusFullTitleParse: parserRus(fullTitle.trim()) || null,
     glueArticleParse: parserGlue(fullTitle.trim()) || null,
+    alias: aliaser(fullTitle),
   };
 }
 
@@ -289,9 +291,10 @@ function _insertPosition(data, brandId, providerId) {
       manufacturer,
       rus_article_parse,
       eng_article_parse,
-      glue_article_parse
+      glue_article_parse,
+      alias
     )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, to_tsvector('pg_catalog.russian', coalesce($8, '')), $9, $10)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, to_tsvector('pg_catalog.russian', coalesce($8, '')), $9, $10, $11)
     RETURNING *
   `, [
     brandId,
@@ -304,6 +307,7 @@ function _insertPosition(data, brandId, providerId) {
     data.rusFullTitleParse,
     data.engFullTitleParse,
     data.glueArticleParse,
+    data.alias,
   ])
     .then((res) => res.rows[0]);
 }

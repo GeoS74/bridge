@@ -33,10 +33,10 @@ async function countPages(ctx, next) {
       return 0;
     });
 
-    if(!ctx.countPages) {
-      ctx.throw(400, 'нет позиций')
-      return;
-    }
+  if (!ctx.countPages) {
+    ctx.throw(400, 'нет позиций');
+    return;
+  }
 
   await next();
 }
@@ -108,7 +108,7 @@ async function readerV2(ctx) {
   const brandId = 78;
   const brandTitle = 'Ваз, Газ, Иномарки';
   const profit = 20;
-  const countBots = 14;
+  const countBots = 10;
   numPage = 0;
 
   logger.info('request to API Voshod started');

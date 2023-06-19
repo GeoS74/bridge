@@ -119,6 +119,22 @@ describe('/test/card.test.js', () => {
       expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
       _expectErrorFieldState.call(this, response.data);
     });
+
+    it('get card by alias', async () => {
+      let response = await fetch(`http://localhost:${config.server.port}/api/bridge/card/?limit=1`)
+        .then(_getData);
+      const { alias } = response.data[0];
+
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/card/product/${alias}`)
+        .then(_getData);
+      expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
+      _expectFieldState.call(this, response.data);
+
+      response = await fetch(`http://localhost:${config.server.port}/api/bridge/card/product/100500`)
+        .then(_getData);
+      expect(response.status, 'сервер возвращает статус 404').to.be.equal(404);
+      _expectErrorFieldState.call(this, response.data);
+    });
   });
 });
 
@@ -174,6 +190,7 @@ function _expectFieldState(data) {
       'code',
       'article',
       'title',
+      'photo',
       'price',
       'amount',
       'storage',
@@ -182,5 +199,6 @@ function _expectFieldState(data) {
       'height',
       'length',
       'manufacturer',
+      'alias',
     ]);
 }

@@ -10,8 +10,8 @@ const config = require('../config');
 const router = new Router({ prefix: '/api/bridge/external' });
 
 router.get(
-  '/voshod',
-  // accessCheck,
+  '/voshod/v2',
+  accessCheck,
   position.countPages,
   // position.readerV1,
   position.readerV2,
@@ -19,7 +19,7 @@ router.get(
 
 router.get(
   '/voshod/v3',
-  // accessCheck,
+  accessCheck,
   position.getPositions,
   position.readerV3,
 );

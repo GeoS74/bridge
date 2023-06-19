@@ -38,7 +38,8 @@ app.use(providerRoutes);
 app.use(fileRoutes);
 app.use(utRoutes);
 app.use(searchRoutes);
-app.use(cardRoutes);
+app.use(cardRoutes.routes);
+app.use(cardRoutes.static);
 app.use(externalAPIRoutes);
 
 module.exports = app;

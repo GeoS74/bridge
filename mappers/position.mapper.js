@@ -10,6 +10,8 @@ module.exports = (data) => ({
   code: data.code,
   article: data.article,
   title: data.title,
+  photo: data.photo,
+  alias: data.alias,
   // price: (data.price || 0).toFixed(2),
   price: (data.settlement_price || 0).toFixed(2),
   amount: data.amount || 0,

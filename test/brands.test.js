@@ -41,6 +41,7 @@ describe('/test/brands.test.js', () => {
 
       let response = await fetch(`http://localhost:${config.server.port}/api/bridge/brands`, optional)
         .then(_getData);
+
       expect(response.status, 'сервер возвращает статус 201').to.be.equal(201);
       _expectFieldState.call(this, response.data);
       expect(response.data.title, 'сервер возвращает новый title').to.be.equal(brand.title);
