@@ -54,5 +54,6 @@ CREATE TABLE prices (
 CREATE INDEX bovid_idx ON bovid (eng_article_parse);
 CREATE INDEX positions_idx ON positions (eng_article_parse, brand_id, provider_id);
 CREATE INDEX positions_glue_idx ON positions (glue_article_parse);
+CREATE INDEX positions_alias_idx ON positions (alias);
 CREATE INDEX textsearch_idx ON positions USING GIN (rus_article_parse);
 CREATE INDEX prices_idx ON prices (position_id);

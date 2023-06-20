@@ -40,6 +40,7 @@ router.get(
 
 router.get(
   '/product/:alias',
+  validator.alias,
   controller.getByAlias,
 );
 

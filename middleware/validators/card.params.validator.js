@@ -11,6 +11,15 @@ module.exports.id = async (ctx, next) => {
   await next();
 };
 
+module.exports.alias = async (ctx, next) => {
+  const alias = ctx.params.alias.toString().trim();
+  if (!alias) {
+    ctx.throw(404, 'card not found');
+  }
+  ctx.params.alias = alias;
+  await next();
+};
+
 module.exports.param = async (ctx, next) => {
   ctx.query.limit = parseInt(ctx.query?.limit, 10) || 10;
   if (ctx.query.limit > 150) {
