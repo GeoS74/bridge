@@ -45,6 +45,7 @@ router.post(
   reader.readPriceStopRing,
   reader.readPriceTools,
   reader.structure,
+  reader.renameUploadPrice,
   position.add,
 );
 
@@ -64,8 +65,14 @@ router.post(
 
 router.get(
   '/download',
-  koaBody(optional),
   position.download,
+);
+/*
+* роут скачивания прайса redial-trade
+*/
+router.get(
+  '/download/redial-trade',
+  position.downloadRedialTradePrice,
 );
 
 module.exports = router.routes();

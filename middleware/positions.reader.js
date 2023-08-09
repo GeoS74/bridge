@@ -1,5 +1,6 @@
 const XLSX = require('xlsx');
 const fs = require('fs');
+const path = require('path');
 
 const logger = require('../libs/logger');
 const columnNameToNumber = require('../libs/column.name.converter');
@@ -228,3 +229,16 @@ module.exports.readPriceTools = async (ctx, next) => {
 
   await next();
 };
+
+module.exports.renameUploadPrice = async (ctx, next) => {
+  const priceName = 'redial-trade-price.xls';
+  const newPath = path.join(__dirname, '../files', priceName);
+  _renameUploadPriceFile(ctx.request.files.file.filepath, newPath);
+  await next();
+};
+
+function _renameUploadPriceFile(oldPath, newPath) {
+  fs.rename(oldPath, newPath, (err) => {
+    if (err) logger.error(err);
+  });
+}

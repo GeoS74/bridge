@@ -1,4 +1,6 @@
 const XLSX = require('xlsx');
+const path = require('path');
+const fs = require('fs');
 const { parserEng, parserRus, parserGlue } = require('../libs/article.parser');
 const { convStringToReal } = require('../libs/price.handler');
 const aliaser = require('../libs/aliaser');
@@ -10,6 +12,7 @@ module.exports = {
   addBovid,
   add,
   download,
+  downloadRedialTradePrice,
 };
 
 async function addBovid(ctx) {
@@ -335,8 +338,8 @@ async function download(ctx) {
 
   logger.info('download positions complete in', (Date.now() - start) / 1000);
 
-  ctx.set('Content-Disposition', 'attachment; filename="SheetJSNode.xlsx"');
-  ctx.set('Content-Type', 'application/vnd.ms-excel');
+  ctx.set('Content-Disposition', 'attachment; filename="price.xlsx"');
+  ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   ctx.status = 200;
   ctx.body = result;
 }
@@ -395,4 +398,13 @@ function _selectAllPosition() {
     ORDER BY id DESC
   `)
     .then((res) => res.rows);
+}
+
+// скачивание прайса redial-trade
+async function downloadRedialTradePrice(ctx) {
+  const fname = 'redial-trade-price.xls';
+  ctx.set('Content-Disposition', `attachment; filename="${fname}"`);
+  ctx.set('Content-Type', 'application/vnd.ms-excel');
+  ctx.status = 200;
+  ctx.body = fs.createReadStream(path.join(__dirname, `../files/${fname}`));
 }
