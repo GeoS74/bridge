@@ -8,7 +8,7 @@ const pool = new Pool({
   database: config.postgres.database,
   password: config.postgres.password,
   port: config.postgres.port,
-  idleTimeoutMillis: 600000,
+  idleTimeoutMillis: 0,
   connectionTimeoutMillis: 0,
   max: 100,
 });
