@@ -340,6 +340,7 @@ async function download(ctx) {
   await XLSX.writeFile(wb, fpath, {
     type: 'file',
     bookType: 'xlsx',
+    compression: true,
   });
 
   logger.info('download positions complete in', (Date.now() - start) / 1000);
