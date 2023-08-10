@@ -331,8 +331,14 @@ async function download(ctx) {
   const ws = XLSX.utils.aoa_to_sheet(price);
   XLSX.utils.book_append_sheet(wb, ws);
 
-  const result = await XLSX.write(wb, {
-    type: 'buffer',
+  // const result = await XLSX.write(wb, {
+  //   type: 'buffer',
+  //   bookType: 'xlsx',
+  // });
+  const fname = 'price.xlsx';
+  const fpath = path.join(__dirname, `../files/${fname}`);
+  await XLSX.writeFile(wb, fpath, {
+    type: 'file',
     bookType: 'xlsx',
   });
 
@@ -341,7 +347,8 @@ async function download(ctx) {
   ctx.set('Content-Disposition', 'attachment; filename="price.xlsx"');
   ctx.set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   ctx.status = 200;
-  ctx.body = result;
+  // ctx.body = result;
+  ctx.body = fs.createReadStream(fpath);
 }
 
 async function _getPrice() {
