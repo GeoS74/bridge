@@ -282,7 +282,7 @@ async function _updatePosition(data, brandId, providerId) {
   ])
     .then((res) => res.rows[0]);
 
-  client.release()
+  client.release();
   return result;
 }
 
@@ -319,7 +319,7 @@ async function _insertPosition(data, brandId, providerId) {
   ])
     .then((res) => res.rows[0]);
 
-  client.release()
+  client.release();
   return result;
 }
 
@@ -330,7 +330,7 @@ async function _insertPrice(positionId, price, profit) {
   VALUES ($1, $2, $3)
   `, [positionId, price, profit]);
 
-  client.release()
+  client.release();
   return result;
 }
 
