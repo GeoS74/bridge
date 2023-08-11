@@ -258,8 +258,10 @@ function _getBrandTitle(brandId) {
 //     .then((res) => res.rows[0]?.id);
 // }
 
-function _updatePosition(data, brandId, providerId) {
-  return db.query(`UPDATE positions
+async function _updatePosition(data, brandId, providerId) {
+  const client = await db.pool.connect();
+
+  const result = await client.query(`UPDATE positions
   SET
     updatedat=DEFAULT,
     bovid_id=$1,
@@ -280,10 +282,16 @@ function _updatePosition(data, brandId, providerId) {
     providerId,
   ])
     .then((res) => res.rows[0]);
+
+  client.release();
+  logger.info(`waitingCount _updatePosition = ${db.pool.waitingCount}`)
+  return result;
 }
 
-function _insertPosition(data, brandId, providerId) {
-  return db.query(`INSERT INTO positions
+async function _insertPosition(data, brandId, providerId) {
+  const client = await db.pool.connect();
+
+  const result = await client.query(`INSERT INTO positions
     (
       brand_id, 
       provider_id, 
@@ -313,13 +321,23 @@ function _insertPosition(data, brandId, providerId) {
     data.alias,
   ])
     .then((res) => res.rows[0]);
+
+  client.release();
+  logger.info(`waitingCount _insertPosition = ${db.pool.waitingCount}`)
+  return result;
 }
 
-function _insertPrice(positionId, price, profit) {
-  return db.query(`INSERT INTO prices
+async function _insertPrice(positionId, price, profit) {
+  const client = await db.pool.connect();
+
+  const result = await client.query(`INSERT INTO prices
   (position_id, price, profit)
   VALUES ($1, $2, $3)
   `, [positionId, price, profit]);
+
+  client.release();
+  logger.info(`_insertPrice _insertPosition = ${db.pool.waitingCount}`)
+  return result;
 }
 
 async function download(ctx) {
