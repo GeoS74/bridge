@@ -7,7 +7,6 @@ const aliaser = require('../libs/aliaser');
 const db = require('../libs/db');
 const logger = require('../libs/logger');
 const config = require('../config');
-const { delay } = require('../libs/myfunc');
 
 module.exports = {
   addBovid,
@@ -204,7 +203,6 @@ async function add(ctx) {
     i += 1;
     if (!(i % 500)) {
       logger.info(`upload ${i} in ${ctx.positions.length}`);
-      await delay(1000);
     }
 
     position.brandTitle = brandTitle;
