@@ -258,24 +258,8 @@ function _getBrandTitle(brandId) {
 //     .then((res) => res.rows[0]?.id);
 // }
 
-const { Pool } = require('pg');
-const pool = new Pool({
-  user: config.postgres.user,
-  host: config.postgres.host,
-  database: config.postgres.database,
-  password: config.postgres.password,
-  port: config.postgres.port,
-  idleTimeoutMillis: 10000,
-  connectionTimeoutMillis: 10000,
-  max: 50,
-});
-
 async function _updatePosition(data, brandId, providerId) {
-  console.log(db);
-  console.log('~~~~~~~~~~~~~~~~~');
-  console.log(db.pool);
-
-  const client = await pool.connect();
+  const client = await db.pool.connect();
   const result = await client.query(`UPDATE positions
   SET
     updatedat=DEFAULT,
@@ -303,7 +287,7 @@ async function _updatePosition(data, brandId, providerId) {
 }
 
 async function _insertPosition(data, brandId, providerId) {
-  const client = await pool.connect();
+  const client = await db.pool.connect();
   const result = await client.query(`INSERT INTO positions
     (
       brand_id, 
@@ -340,7 +324,7 @@ async function _insertPosition(data, brandId, providerId) {
 }
 
 async function _insertPrice(positionId, price, profit) {
-  const client = await pool.connect();
+  const client = await db.pool.connect();
   const result = await client.query(`INSERT INTO prices
   (position_id, price, profit)
   VALUES ($1, $2, $3)
