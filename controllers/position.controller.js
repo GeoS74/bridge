@@ -277,7 +277,8 @@ async function _updatePosition(data, brandId, providerId) {
   console.log('~~~~~~~~~~~~~~~~~');
   console.log(pool);
 
-  return db.query(`UPDATE positions
+  const client = await pool.connect();
+  const result = await client.query(`UPDATE positions
   SET
     updatedat=DEFAULT,
     bovid_id=$1,
@@ -298,10 +299,14 @@ async function _updatePosition(data, brandId, providerId) {
     providerId,
   ])
     .then((res) => res.rows[0]);
+
+  client.release()
+  return result;
 }
 
 async function _insertPosition(data, brandId, providerId) {
-  return db.query(`INSERT INTO positions
+  const client = await pool.connect();
+  const result = await client.query(`INSERT INTO positions
     (
       brand_id, 
       provider_id, 
@@ -331,13 +336,20 @@ async function _insertPosition(data, brandId, providerId) {
     data.alias,
   ])
     .then((res) => res.rows[0]);
+
+  client.release()
+  return result;
 }
 
 async function _insertPrice(positionId, price, profit) {
-  return db.query(`INSERT INTO prices
+  const client = await pool.connect();
+  const result = await client.query(`INSERT INTO prices
   (position_id, price, profit)
   VALUES ($1, $2, $3)
   `, [positionId, price, profit]);
+
+  client.release()
+  return result;
 }
 
 async function download(ctx) {
