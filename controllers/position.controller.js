@@ -270,14 +270,12 @@ const pool = new Pool({
   max: 50,
 });
 
-const dbs = require('../libs/dbs');
-
 async function _updatePosition(data, brandId, providerId) {
-  console.log(dbs);
+  console.log(db);
   console.log('~~~~~~~~~~~~~~~~~');
+  console.log(db.pool);
 
-
-  const client = await dbs.connect();
+  const client = await pool.connect();
   const result = await client.query(`UPDATE positions
   SET
     updatedat=DEFAULT,
