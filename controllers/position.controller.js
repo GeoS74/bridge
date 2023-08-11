@@ -258,10 +258,24 @@ function _getBrandTitle(brandId) {
 //     .then((res) => res.rows[0]?.id);
 // }
 
+const { Pool } = require('pg');
+const pool = new Pool({
+  user: config.postgres.user,
+  host: config.postgres.host,
+  database: config.postgres.database,
+  password: config.postgres.password,
+  port: config.postgres.port,
+  idleTimeoutMillis: 10000,
+  connectionTimeoutMillis: 10000,
+  max: 50,
+});
+
 async function _updatePosition(data, brandId, providerId) {
   console.log(db);
   console.log('~~~~~~~~~~~~~~~~~');
   console.log(db.pool);
+  console.log('~~~~~~~~~~~~~~~~~');
+  console.log(pool);
 
   return db.query(`UPDATE positions
   SET
