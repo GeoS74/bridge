@@ -262,6 +262,8 @@ async function _updatePosition(data, brandId, providerId) {
   console.log(db);
   console.log('~~~~~~~~~~~~~~~~~');
   console.log(db.p);
+  console.log('~~~~~~~~~~~~~~~~~');
+  console.log(db.p());
   return db.query(`UPDATE positions
   SET
     updatedat=DEFAULT,
