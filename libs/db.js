@@ -28,4 +28,4 @@ const pool = new Pool({
 });
 
 module.exports.query = (text, params) => pool.query(text, params);
-module.exports.pool = pool;
+module.exports.p = pool;
