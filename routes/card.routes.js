@@ -54,6 +54,11 @@ router.patch(
 );
 
 router.get(
+  '/all/count',
+  controller.getCountCards,
+);
+
+router.get(
   '/',
   validator.param,
   controller.getCards,

@@ -78,6 +78,15 @@ describe('/test/card.test.js', () => {
       _expectFieldState.call(this, response.data[0]);
     });
 
+    it('get count all cards', async () => {
+      const response = await fetch(`http://localhost:${config.server.port}/api/bridge/card/all/count`)
+        .then(_getData);
+      expect(response.status, 'сервер возвращает статус 200').to.be.equal(200);
+      expect(response.data, 'сервер возвращает объект').that.is.an('object');
+      expect(response.data, 'сервер возвращает ключ \'count\'').to.have.key('count');
+      expect(response.data.count, 'сервер возвращает количество 2').to.be.equal(2);
+    });
+
     it('test limit', async () => {
       const response = await fetch(`http://localhost:${config.server.port}/api/bridge/card/?limit=1`)
         .then(_getData);

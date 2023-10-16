@@ -225,3 +225,15 @@ async function _getAllCards(limit, offset) {
   `, [limit, offset])
     .then((res) => res.rows);
 }
+
+module.exports.getCountCards = async (ctx) => {
+  const count = await _getCountCards();
+  ctx.status = 200;
+  ctx.body = {count: +count};
+};
+
+async function _getCountCards() {
+  return db.query(`
+    select count(*) as count from positions`)
+    .then((res) => res.rows[0].count);
+}
