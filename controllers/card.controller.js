@@ -229,7 +229,7 @@ async function _getAllCards(limit, offset) {
 module.exports.getCountCards = async (ctx) => {
   const count = await _getCountCards();
   ctx.status = 200;
-  ctx.body = {count: +count};
+  ctx.body = { count: +count };
 };
 
 async function _getCountCards() {
