@@ -30,6 +30,7 @@ const pool = new Pool({
 // использование простой функции обращения к БД завершается с ошибкой
 // в случае если клиент использует несколько параллельных запросов
 // module.exports.query = (text, params) => pool.query(text, params);
+//
 module.exports.query = async (text, params) => {
   const client = await this.pool.connect();
   const result = await client.query(text, params);
