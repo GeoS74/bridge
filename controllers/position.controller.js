@@ -339,20 +339,20 @@ async function download(ctx) {
 
   const price = await _getPrice();
 
-  let wb = XLSX.utils.book_new();
-  let ws = XLSX.utils.aoa_to_sheet(price);
-  XLSX.utils.book_append_sheet(wb, ws);
+  let workbook = XLSX.utils.book_new();
+  let worksheet = XLSX.utils.aoa_to_sheet(price);
+  XLSX.utils.book_append_sheet(workbook, worksheet);
 
-  const result = XLSX.write(wb, {
+  const result = XLSX.write(workbook, {
     type: 'buffer',
     bookType: 'xlsx',
   });
 
-  ws = null;
-  wb = null;
+  worksheet = null;
+  workbook = null;
   // const fname = 'price.xlsx';
   // const fpath = path.join(__dirname, `../files/${fname}`);
-  // await XLSX.writeFile(wb, fpath, {
+  // await XLSX.writeFile(workbook, fpath, {
   //   type: 'file',
   //   bookType: 'xlsx',
   //   compression: true,
