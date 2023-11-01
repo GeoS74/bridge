@@ -64,10 +64,11 @@ function _readExceltoArray(filePath, numSheet) {
     header: 1,
     defval: '',
   };
-  const result = [...XLSX.utils.sheet_to_json(worksheet, opts)]; // отвязать контекст
-  workbook = null;
-  worksheet = null;
-  return result;
+  return XLSX.utils.sheet_to_json(worksheet, opts);
+  // const result = [...XLSX.utils.sheet_to_json(worksheet, opts)]; // отвязать контекст
+  // workbook = null;
+  // worksheet = null;
+  // return result;
 }
 
 function _delFile(filepath) {
