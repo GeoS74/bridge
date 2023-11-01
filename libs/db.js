@@ -28,8 +28,8 @@ const pool = new Pool({
   max: 50,
 });
 
-pool.on('error', error => {
-  logger.error(`pool db error: ${error.message}`)
+pool.on('error', (error) => {
+  logger.error(`pool db error: ${error.message}`);
 });
 
 // module.exports.query = (text, params) => pool.query(text, params);

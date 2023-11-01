@@ -65,7 +65,8 @@ function _readExceltoArray(filePath, numSheet) {
     defval: '',
   };
 
-  const result = [...XLSX.utils.sheet_to_json(worksheet, opts)]; // отвязать контекст, это высвобождет примерно 30-35 Мб сразу
+  // отвязать контекст, это высвобождет примерно 30-35 Мб сразу
+  const result = [...XLSX.utils.sheet_to_json(worksheet, opts)];
   workbook = null;
   worksheet = null;
   return result;
