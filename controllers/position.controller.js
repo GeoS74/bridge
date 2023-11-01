@@ -343,10 +343,13 @@ async function download(ctx) {
   const ws = XLSX.utils.aoa_to_sheet(price);
   XLSX.utils.book_append_sheet(wb, ws);
 
-  const result = await XLSX.write(wb, {
+  const result = XLSX.write(wb, {
     type: 'buffer',
     bookType: 'xlsx',
   });
+
+  ws = null;
+  wb = null;
   // const fname = 'price.xlsx';
   // const fpath = path.join(__dirname, `../files/${fname}`);
   // await XLSX.writeFile(wb, fpath, {
