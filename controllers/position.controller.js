@@ -386,11 +386,7 @@ async function _getPrice() {
 }
 
 async function _selectAllPosition() {
-  const client = await db.pool.connect();
-  client.on('error', error => {
-    logger.error(`client db error: ${error.message}`)
-  });
-  const result = await client.query(`
+  return db.query(`
     select
       P.id,
       P.createdat,
@@ -425,9 +421,6 @@ async function _selectAllPosition() {
     ORDER BY id DESC
   `)
     .then((res) => res.rows);
-  
-  client.release();
-  return result;
 }
 
 // скачивание прайса redial-trade

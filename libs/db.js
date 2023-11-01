@@ -35,6 +35,9 @@ pool.on('error', error => {
 // module.exports.query = (text, params) => pool.query(text, params);
 module.exports.query = async (text, params) => {
   const client = await this.pool.connect();
+  client.on('error', error => {
+    logger.error(`client db error: ${error.message}`)
+  });
   const result = await client.query(text, params);
   client.release();
   return result;
