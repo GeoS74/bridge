@@ -382,8 +382,9 @@ async function _getPrice() {
   return price;
 }
 
-function _selectAllPosition() {
-  return db.query(`
+async function _selectAllPosition() {
+  const client = await db.pool.connect();
+  const result = await client.query(`
     select
       P.id,
       P.createdat,
@@ -418,6 +419,9 @@ function _selectAllPosition() {
     ORDER BY id DESC
   `)
     .then((res) => res.rows);
+  
+  client.release();
+  return result;
 }
 
 // скачивание прайса redial-trade
