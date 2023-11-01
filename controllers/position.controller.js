@@ -339,8 +339,8 @@ async function download(ctx) {
 
   const price = await _getPrice();
 
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.aoa_to_sheet(price);
+  let wb = XLSX.utils.book_new();
+  let ws = XLSX.utils.aoa_to_sheet(price);
   XLSX.utils.book_append_sheet(wb, ws);
 
   const result = XLSX.write(wb, {
