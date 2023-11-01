@@ -388,7 +388,7 @@ async function _getPrice() {
 async function _selectAllPosition() {
   const client = await db.pool.connect();
   client.on('error', error => {
-    logger.error(`pool db error: ${error.message}`)
+    logger.error(`client db error: ${error.message}`)
   });
   const result = await client.query(`
     select
