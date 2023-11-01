@@ -259,8 +259,7 @@ function _getBrandTitle(brandId) {
 // }
 
 async function _updatePosition(data, brandId, providerId) {
-  const client = await db.pool.connect();
-  const result = await client.query(`UPDATE positions
+  return db.query(`UPDATE positions
   SET
     updatedat=DEFAULT,
     bovid_id=$1,
@@ -281,14 +280,10 @@ async function _updatePosition(data, brandId, providerId) {
     providerId,
   ])
     .then((res) => res.rows[0]);
-
-  client.release();
-  return result;
 }
 
 async function _insertPosition(data, brandId, providerId) {
-  const client = await db.pool.connect();
-  const result = await client.query(`INSERT INTO positions
+  return db.query(`INSERT INTO positions
     (
       brand_id, 
       provider_id, 
@@ -318,20 +313,13 @@ async function _insertPosition(data, brandId, providerId) {
     data.alias,
   ])
     .then((res) => res.rows[0]);
-
-  client.release();
-  return result;
 }
 
 async function _insertPrice(positionId, price, profit) {
-  const client = await db.pool.connect();
-  const result = await client.query(`INSERT INTO prices
+  return db.query(`INSERT INTO prices
   (position_id, price, profit)
   VALUES ($1, $2, $3)
   `, [positionId, price, profit]);
-
-  client.release();
-  return result;
 }
 
 async function download(ctx) {
