@@ -34,12 +34,13 @@ pool.on('error', error => {
 
 // module.exports.query = (text, params) => pool.query(text, params);
 module.exports.query = async (text, params) => {
+  logger.info(1)
   const client = await this.pool.connect();
-  // client.on('error', error => {
-  //   logger.error(`client db error: ${error.message}`)
-  // });
+  logger.info(2)
   const result = await client.query(text, params);
+  logger.info(3)
   client.release();
+  logger.info(4)
   return result;
 };
 module.exports.pool = pool;
