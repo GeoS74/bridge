@@ -40,20 +40,6 @@ module.exports.file = async (ctx, next) => {
   ctx.positions = _readExceltoArray(ctx.request.files.file.filepath, 0);
   _delFile(ctx.request.files.file.filepath);
 
-  ctx.structure = {
-    uid: null,
-    code: _getColumnNumber(ctx.request.body?.code),
-    article: _getColumnNumber(ctx.request.body?.article),
-    title: _getColumnNumber(ctx.request.body?.title),
-    weight: _getColumnNumber(ctx.request.body?.weight),
-    width: _getColumnNumber(ctx.request.body?.width),
-    height: _getColumnNumber(ctx.request.body?.height),
-    length: _getColumnNumber(ctx.request.body?.length),
-    manufacturer: _getColumnNumber(ctx.request.body?.manufacturer),
-    storage: null,
-    price: _getColumnNumber(ctx.request.body?.price),
-    amount: _getColumnNumber(ctx.request.body?.amount),
-  };
   ctx.positions = _cutArray(ctx.positions, ctx.request.body?.startRow, ctx.request.body?.endRow);
 
   await next();
@@ -71,14 +57,17 @@ function _getColumnNumber(name) {
 }
 
 function _readExceltoArray(filePath, numSheet) {
-  const workbook = XLSX.readFile(filePath);
+  let workbook = XLSX.readFile(filePath);
   const sheetName = workbook.SheetNames[numSheet || 0];
-  const worksheet = workbook.Sheets[sheetName];
+  let worksheet = workbook.Sheets[sheetName];
   const opts = {
     header: 1,
     defval: '',
   };
-  return XLSX.utils.sheet_to_json(worksheet, opts);
+  const result = [...XLSX.utils.sheet_to_json(worksheet, opts)]; // отвязать контекст
+  workbook = null;
+  worksheet = null;
+  return result;
 }
 
 function _delFile(filepath) {
@@ -90,7 +79,7 @@ function _delFile(filepath) {
 /*
 * функции чтения прайса redial-trade
 */
-module.exports.structure = async (ctx, next) => {
+module.exports.structureRT = async (ctx, next) => {
   ctx.structure = {
     uid: null,
     code: null,

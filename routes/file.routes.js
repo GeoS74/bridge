@@ -3,6 +3,7 @@ const koaBody = require('koa-body');
 
 const fileValidator = require('../middleware/validators/file.params.validator');
 const positionValidator = require('../middleware/validators/position.params.validator');
+const structureValidator = require('../middleware/validators/file.structure.validator');
 const reader = require('../middleware/positions.reader');
 const position = require('../controllers/position.controller');
 const accessCheck = require('../middleware/access.check');
@@ -27,6 +28,7 @@ router.post(
   koaBody(optional),
   fileValidator,
   positionValidator,
+  structureValidator,
   reader.file,
   position.add,
 );
@@ -44,7 +46,7 @@ router.post(
   reader.readPriceImp,
   reader.readPriceStopRing,
   reader.readPriceTools,
-  reader.structure,
+  reader.structureRT,
   reader.renameUploadPrice,
   position.add,
 );
